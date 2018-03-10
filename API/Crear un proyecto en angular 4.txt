@@ -1,0 +1,4 @@
+1. Con el cmd navegar al directorio donde se almacenara el proyecto
+2. Crear un nuevo proyecto con los comandos:ng new nombreProyecto
+3. Para crear un componente se usa ng g c nombreComponente --spec false
+4. 

@@ -1,0 +1,82 @@
+
+DISEÑO
+tecnologia 
+metodologias
+herramientas: para hacer el diseño
+dominio: 
+publico meta se hace para personas promedio  que van hacer con él?
+giro de negocio--> el know-how el saber cómo?
+tiempo y costo del diseño 
+saber los SRS - poner prioridades
+UI/UX user experience definir la experiencia del usuario es mejor empezar por la interfaz
+porque define lo que necesitamos para responder al usuario
+1- definir que va tener la interfaz y ver que se necesita
+
+MODELO
+
+UI/UX
+componentes para rellenar la interfaz
+reutilizar los componentes donde se puede usar una parte que me puede servir para otra parte
+un software para compartir con otro
+DATOS
+administrar en la BD todas las funciones para manejar en la base de datos
+UML 'la carpinteria' para hacer cada parte de la BD
+HACER UN DISEÑO CREAR UN MODELO PARA CONSTRUIR SOFTWARE
+reto del diseñador del sw anticipar y guiar el modelo 
+tiene que tener buenas bases para definir bien el software
+
+importancia construir diseño
+se espera lo minimo que funcione el SW 
+criterio de calidad para hacer un SW mejor
+Divide y conquistaras, mediante segmentos llegar a la solución
+Abstraccion visualizar el problema pensar en como llegar al resultado final
+la solucion no es emulando lo que pasa en la vida real. una cosa es lo que se implementa otra es lo que se realiza
+
+PRINCIPIOS DE DISEÑO que me van a guiar 
+como una app para subirlo a la tienda
+como hacer para preferir la app una sobre otras
+la herramienta tiene que ser confiable las personas tendran confianza en lo que interpretara la aplicacion dando
+las respuestas correctas 
+desarrollo mi algoritmo de la mejor forma
+ej : desinfectantes con el 99,9%
+metodolgias y herramientas para que el SW me de una buena respuesta
+FLEXIBILIDAD
+que haya alternativas...opciones para hacer las cosas dentro de la app
+implica mas tiempo, dinero y código(trabajo)
+Flexiblidad del lado del desarrollador tiene un impacto en el usuario. ejemplo conexión a bases o servidores
+tener opciones para configurar provee la flexibilidad
+Adaptibilidad
+poner nuevos requerimientos con el menor esfuerzo ya que tiende a cambiar
+si suceden cambios buscar otras maneras para adaptar los cambios en el SW
+PORTABILIDAD
+es una necesidad
+que sea la app para ambos sistemas operativos como en los moviles iOs y Android o solo para una
+hay diferentes cualidad el uno al otro ya sea rapidez, eficiencia u otros factores.
+cuando quiero cambiar implica varias cosas para convertir x datos a Y datos
+entre mas portable sea mas exito en el mercado como la portabilidad numerica
+sistema legado ejemplo en los aeropuertos como los codigos
+MANTENIBILIDAD
+pensando que otros puedan entender mi codigo con la adaptación del SW
+que otros entiendan mi SW para que se pueda cambiar
+ALTA COHESION ---> significa que el SW (conjunto de componentes), que todos los elementos integrados tienen que ver entre sí.
+BAJO ACOPLE ----> Componentes independientes de otros. Pueden comunicarse pero no depender de ellos.
+funcionan genericamente esto significa que la probabilidad de fallos disminuye. Es vital para la mantenibilidad.
+Obsolescencia -----> cuando algo cae en desuso, en el software va a cambiar el backend varia menos que el frontend
+proveer tecnologías-----> 
+la reutilizacion para usar algunos componentes para reusar rendimiento
+implica orden cuando hay reusar para obtener productividad por lo que se tiene que organizara pata estandarizar
+para ver si nos conviene o no nos conviene
+
+IN HOUSE
+
+CLARIDAD - COMUNICACION con el cliente
+los casos de usos me ayudan para esforzarme en organizar y construir el proyecto.
+
+SEGURIDAD
+limite de acceso a la informacion de usuarios y sea minimo necesario
+DBA de la Bases de datos.
+ 
+ 
+
+
+

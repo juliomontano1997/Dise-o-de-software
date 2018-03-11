@@ -115,4 +115,5 @@ INSERT INTO sessions (state, playerOneID, playerTwoID, actualPlayerID, boardSize
 SELECT mg_get_player('maquina@othello.com');
 SELECT mg_get_board(1);
 SELECT mg_update_board(1,0,'{0,1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,1,-1,-1,-1,-1,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1}')
+SELECT mg_update_board(1,0,'{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,1,-1,-1,-1,-1,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1}')
 

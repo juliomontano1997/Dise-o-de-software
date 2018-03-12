@@ -25,8 +25,7 @@ CREATE TABLE sessions
 	colorPlayer2     VARCHAR(30) NOT NULL,
 	levelPlayerOne   INT         NOT NULL,
 	levelPlayerTwo   INT         NOT NULL,
-	passTurnOne      INT         NOT NULL,
-	passTurnTwo      INT         NOT NULL,
+	amountPassTurn      INT         NOT NULL,
 	CONSTRAINT PK_sessionID PRIMARY KEY (sessionID),
 	CONSTRAINT FK_playerOneID_players FOREIGN KEY (playerOneID) REFERENCES players(playerID),
 	CONSTRAINT FK_playerTwoID_players FOREIGN KEY (playerTwoID) REFERENCES players(playerID)	
@@ -109,6 +108,7 @@ BEGIN
 		IF o_actualPlayerID = (SELECT playerOneID FROM sessions WHERE sessionID = i_sessionID) THEN UPDATE sessions SET actualPlayerID = (SELECT playerTwoID FROM sessions WHERE sessionID = i_sessionID) WHERE sessionID = i_sessionID;
 		ELSE UPDATE sessions SET actualPlayerID = (SELECT playerOneID FROM sessions WHERE sessionID = i_sessionID) WHERE sessionID = i_sessionID;
 		END IF;
+		UPDATE sessions SET amountPassTurn = 0 WHERE sessionID = i_sessionID;
 		RETURN TRUE;
 	END IF;
 	RETURN FALSE;
@@ -121,7 +121,7 @@ LANGUAGE plpgsql;
 
 INSERT INTO players (playerID, mail, playerName, playerLevel, image) VALUES (0,'maquina@othello.com','Maquina',0,'image1'),(1,'juan12@gmail.com','Juan12',1,'image2');
 
-INSERT INTO sessions (state, playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2, levelPlayerOne, levelPlayerTwo, passTurnOne, passTurnTwo) VALUES 
-	(true,0,1,1,6,'{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,1,-1,-1,-1,-1,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1}','red','blue',1,1,0,0);
+INSERT INTO sessions (state, playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2, levelPlayerOne, levelPlayerTwo, amountPassTurn) VALUES 
+	(true,0,1,1,6,'{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,1,-1,-1,-1,-1,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1}','red','blue',1,1,0);
 
 INSERT INTO sessionStadistics (sessionID, winsPlayer1, winsPlayer2, ties, amountGames, numberActualGame) VALUES (1,0,0,0,3,1);

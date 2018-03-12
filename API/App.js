@@ -54,7 +54,6 @@ app.get('/checkMovement', function(req, res)
         console.log("matriz original");
         printMatrix(originalBoard, matrixSize);
 
-        
         //2. Verify if the actual position 
         if(originalBoard[getIndex(req.query.row, req.query.column, matrixSize)]!==-1)
         {
@@ -67,15 +66,11 @@ app.get('/checkMovement', function(req, res)
         
         var rigth = check(req.query.row, req.query.column*1+1, matrixSize,originalBoard,req.query.idPlayer, 0,1);
         var left = check(req.query.row, req.query.column*1-1, matrixSize,originalBoard,req.query.idPlayer, 0,-1); 
-
-
         var up =  check(req.query.row*1-1, req.query.column, matrixSize,originalBoard,req.query.idPlayer, -1,0);
         var down = check(req.query.row*1+1, req.query.column, matrixSize,originalBoard,req.query.idPlayer, 1,0);
 
- 
         var leftUp = check(req.query.row*1-1, req.query.column*1-1, matrixSize,originalBoard,req.query.idPlayer, -1,-1);    
         var rightUP = check(req.query.row*1-1, req.query.column*1+1, matrixSize,originalBoard,req.query.idPlayer, -1,1);    
-
         var leftDown = check(req.query.row*1+1, req.query.column*1-1, matrixSize,originalBoard,req.query.idPlayer, 1,-1);    
         var rigthDown = check(req.query.row*1+1, req.query.column*1+1, matrixSize,originalBoard,req.query.idPlayer, 1,1); 
 
@@ -235,7 +230,8 @@ function calculateAutomaticMove(idSesion)
         if(data===null)
         {
             return;
-        }             
+        }         
+
         var originalBoard = data[0].o_board;        
         var matrixSize = Math.sqrt(originalBoard.length);
         printMatrix(originalBoard, matrixSize);
@@ -248,29 +244,32 @@ function calculateAutomaticMove(idSesion)
                 marksPositions.push(i);
             }        
         } 
-
+        
+        console.log(marksPositions);
         //2. Verify is each position
         
         var validIndices = [];
         var posiblePlays =[];
         var marks = marksPositions.length;        
         for(i=0; i<marks; i++)
-        {            
+        {   
+            var afectedIndices = []; 
+            console.log(afectedIndices)    ;
             var coordinates = getCoordinates(marksPositions[i], matrixSize);
-            var response = auxiliarCalculate(coordinates[0], coordinates[1], originalBoard, matrixSize, );            
-            var afectedIndices = [marksPositions[i]]; 
+            var row = coordinates[0];
+            var column = coordinates[1];            
 
-            var rigth= auxiliarCalculate(coordinates[0],coordinates[1]+1, matrixSize,originalBoard, 0, 1);
-            var left = auxiliarCalculate(coordinates[0],coordinates[1]-1, matrixSize,originalBoard, 0,-1);         
-            var up =   auxiliarCalculate(coordinates[0]-1,coordinates[1], matrixSize,originalBoard,-1, 0);
-            var down = auxiliarCalculate(coordinates[0]+1,coordinates[1], matrixSize,originalBoard, 1, 0);     
+            var rigth= auxiliarCalculate(row, column+1, matrixSize,originalBoard,0*1,1*1);
+            var left = auxiliarCalculate(row, column-1, matrixSize,originalBoard, 0,-1);         
+            var up =   auxiliarCalculate(row-1,column, matrixSize,originalBoard,-1, 0);
+            var down = auxiliarCalculate(row+1,column, matrixSize,originalBoard, 1, 0);                 
+            var rigthDown = auxiliarCalculate(row+1,column+1, matrixSize,originalBoard,  1, 1);                  
+            var leftDown =  auxiliarCalculate(row+1,column-1, matrixSize,originalBoard,  1,-1);                
+            var rightUP =   auxiliarCalculate(row-1,column+1, matrixSize,originalBoard, -1, 1);  
+            var leftUp =    auxiliarCalculate(row-1,column-1, matrixSize,originalBoard, -1,-1);     
 
-            var rigthDown = auxiliarCalculate(coordinates[0]+1,coordinates[1]+1, matrixSize,originalBoard,  1, 1);                  
-            var leftDown =  auxiliarCalculate(coordinates[0]+1,coordinates[1]-1, matrixSize,originalBoard,  1,-1);                
-            var rightUP =   auxiliarCalculate(coordinates[0]-1,coordinates[1]+1, matrixSize,originalBoard, -1, 1);  
-            var leftUp =    auxiliarCalculate(coordinates[0]-1,coordinates[1]-1, matrixSize,originalBoard, -1,-1);     
-                                
-            afectedIndices = afectedIndices.concat(up).concat(down).concat(left).concat(rigth).concat(leftUp).concat(rightUP).concat(leftDown).concat(rigthDown);                                            
+            afectedIndices = afectedIndices.concat(up).concat(down).concat(left).concat(rigth).concat(leftUp).concat(rightUP).concat(leftDown).concat(rigthDown);
+        
             if(afectedIndices.length>1)
             {
                 posiblePlays.push(afectedIndices);
@@ -278,8 +277,7 @@ function calculateAutomaticMove(idSesion)
             }                        
         }
         //3. Take the best plays
-        console.log(posiblePlays);
-        console.log(validIndices);
+
     })
     .catch(error=> 
     {    	    	 
@@ -288,22 +286,22 @@ function calculateAutomaticMove(idSesion)
 }
 
 function auxiliarCalculate(row, column,matrixSize, board,verticalMov,horisontalMov)
-{                     
+{                         
     var lista = [];                 
     var index = getIndex(row, column, matrixSize);
+
     while(board[index] !== 0 && board[index]!==-1 && row!==-1 && column!==-1 && column<matrixSize && row<matrixSize)
-    {                                lista.push(index);                        
-        row = row*1 + verticalMov*1;            
-        column = column*1 + horisontalMov*1;                
+    {        
+        lista.push(index);                 
+        row = row + verticalMov;            
+        column = column + horisontalMov;                
         index = getIndex(row, column, matrixSize);                
     }
-
-    if(board[index] === -1)
-    {        
-        console.log("Jugada valida");
-        console.log(lista);
-        lista.push(index);
-        return lista;
+    lista.push(index);
+    if(board[index] === -1 && lista.length>1)
+    {                
+        console.log("Jugada valida");                
+        return [index];
     }
     else
     {        

@@ -1,0 +1,27 @@
+/* You can add global styles to this file, and also import other style files */
+
+.title{
+	padding-left: 10%;
+}
+.centered{
+	text-align: center;
+}
+
+.beginImage{
+	width: 60%; 
+}
+
+.fondo{
+	background-color: white;
+}
+
+.mainPage{
+	background-color: #100719;
+	background-repeat: no-repeat;
+}
+.initialPage{
+	width: 100%;
+	margin: 0 auto;
+	background-color: black;
+}
+

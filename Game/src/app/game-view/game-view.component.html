@@ -1,0 +1,49 @@
+
+<!-- 
+<nav class="navbar navbar-light bg-light">
+	<span class="navbar-brand mb-0 h1 title">{{title}}</span>
+	
+  </nav>
+  <button class="btn btn-primary"> Jugar </button>
+-->
+  <div class="container-fluid boardGame">
+    <table class="table table-responsive tableGame">
+      <tr *ngFor="let row of sessionHandler.getBoardSizeArray()"> 
+        <td class="cellBackground" *ngFor="let col of sessionHandler.getBoardSizeArray()" (click)="movePiece(row,col)">
+        <div class="divTd" *ngIf="checkEqualId(row,col,sessionHandler.getPlayerOneId()); else rival">
+          <svg class="circle-piece" >
+            <circle cx="12" cy="7" r="7" [ngStyle]="{fill:sessionHandler.getPlayerOneColor()}"/>
+            Lo sentimos, tu navegador no soporta SVG.  
+          </svg>
+        </div>
+        <ng-template #rival>
+            <div class="divTd" *ngIf="checkEqualId(row,col,sessionHandler.getPlayerTwoId()); else whiteSpace">
+                <svg class="circle-piece" >
+                  <circle id="circle" cx="12" cy="7" r="7" fill="sessionHandler.getPlayerTwoColor()"/>
+                  Lo sentimos, tu navegador no soporta SVG.  
+                </svg>
+              </div>
+        </ng-template>
+        <ng-template #whiteSpace>
+            <div class="divTd">
+              <svg class="circle-piece" >
+                <circle cx="20" cy="9" r="9" fill="lightgreen"/>
+                Lo sentimos, tu navegador no soporta SVG.  
+              </svg>
+            </div>
+        </ng-template>
+        </td> 
+      </tr>
+    </table>
+    <div class="container-fluid text-center"> 
+        <h4 class="yourTurn" *ngIf="sessionHandler.itsMyTurn()==true; else aviso" >
+         Es tu turno de jugar</h4>
+        <ng-template #aviso> 
+        <h4 class="turnAdvice"> 
+          Tu rival está jugando 
+        </h4>
+        </ng-template>
+  </div>
+  </div>
+
+  

@@ -1,4 +1,4 @@
-﻿--DOMIANS
+--DOMIANS
 CREATE DOMAIN t_mail VARCHAR(50) NOT NULL CONSTRAINT CHK_t_mail CHECK (VALUE SIMILAR TO '[A-z]%@[A-z]%.[A-z]%');
 
 CREATE TABLE players
@@ -23,14 +23,23 @@ CREATE TABLE sessions
 	board            INTEGER[]   NOT NULL, 
 	colorPlayer1     VARCHAR(30) NOT NULL,
 	colorPlayer2     VARCHAR(30) NOT NULL,
+	levelPlayerOne   INT         NOT NULL,
+	levelPlayerTwo   INT         NOT NULL,
+	amountPassTurn      INT         NOT NULL,
+	CONSTRAINT PK_sessionID PRIMARY KEY (sessionID),
+	CONSTRAINT FK_playerOneID_players FOREIGN KEY (playerOneID) REFERENCES players(playerID),
+	CONSTRAINT FK_playerTwoID_players FOREIGN KEY (playerTwoID) REFERENCES players(playerID)	
+);
+
+CREATE TABLE sessionStadistics
+(
+	sessionID        INT         NOT NULL,
 	winsPlayer1      INT         NOT NULL,
 	winsPlayer2      INT         NOT NULL,
 	ties             INT         NOT NULL,
 	amountGames      INT         NOT NULL,
 	numberActualGame INT         NOT NULL,
-	CONSTRAINT PK_sessionID PRIMARY KEY (sessionID),
-	CONSTRAINT FK_playerOneID_players FOREIGN KEY (playerOneID) REFERENCES players(playerID),
-	CONSTRAINT FK_playerTwoID_players FOREIGN KEY (playerTwoID) REFERENCES players(playerID)	
+	CONSTRAINT FK_sessionID_sessions FOREIGN KEY (sessionID) REFERENCES sessions
 );
 
 CREATE TABLE messages 
@@ -94,11 +103,15 @@ CREATE OR REPLACE FUNCTION mg_update_board(IN i_sessionID INT, IN o_actualPlayer
 RETURNS BOOLEAN AS
 $body$
 BEGIN 	
-	UPDATE sessions SET board = o_board WHERE sessionID = i_sessionID;
-	IF o_actualPlayerID = (SELECT playerOneID FROM sessions WHERE sessionID = i_sessionID) THEN UPDATE sessions SET actualPlayerID = (SELECT playerTwoID FROM sessions WHERE sessionID = i_sessionID) WHERE sessionID = i_sessionID;
-	ELSE UPDATE sessions SET actualPlayerID = (SELECT playerOneID FROM sessions WHERE sessionID = i_sessionID) WHERE sessionID = i_sessionID;
+	IF o_actualPlayerID = (SELECT actualPlayerID FROM sessions WHERE sessionID = i_sessionID) THEN
+		UPDATE sessions SET board = o_board WHERE sessionID = i_sessionID;
+		IF o_actualPlayerID = (SELECT playerOneID FROM sessions WHERE sessionID = i_sessionID) THEN UPDATE sessions SET actualPlayerID = (SELECT playerTwoID FROM sessions WHERE sessionID = i_sessionID) WHERE sessionID = i_sessionID;
+		ELSE UPDATE sessions SET actualPlayerID = (SELECT playerOneID FROM sessions WHERE sessionID = i_sessionID) WHERE sessionID = i_sessionID;
+		END IF;
+		UPDATE sessions SET amountPassTurn = 0 WHERE sessionID = i_sessionID;
+		RETURN TRUE;
 	END IF;
-	RETURN TRUE;
+	RETURN FALSE;
 	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
 END;	
 $body$
@@ -108,12 +121,7 @@ LANGUAGE plpgsql;
 
 INSERT INTO players (playerID, mail, playerName, playerLevel, image) VALUES (0,'maquina@othello.com','Maquina',0,'image1'),(1,'juan12@gmail.com','Juan12',1,'image2');
 
-INSERT INTO sessions (state, playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2, winsPlayer1, winsPlayer2, ties, amountGames, numberActualGame) VALUES 
-	(true,0,1,1,6,'{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,1,-1,-1,-1,-1,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1}','red','blue',0,0,0,3,1);
+INSERT INTO sessions (state, playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2, levelPlayerOne, levelPlayerTwo, amountPassTurn) VALUES 
+	(true,0,1,1,6,'{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,1,-1,-1,-1,-1,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1}','red','blue',1,1,0);
 
-
-SELECT mg_get_player('maquina@othello.com');
-SELECT mg_get_board(1);
-SELECT mg_update_board(1,0,'{0,1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,1,-1,-1,-1,-1,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1}')
-SELECT mg_update_board(1,0,'{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,1,-1,-1,-1,-1,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1}')
-
+INSERT INTO sessionStadistics (sessionID, winsPlayer1, winsPlayer2, ties, amountGames, numberActualGame) VALUES (1,0,0,0,3,1);

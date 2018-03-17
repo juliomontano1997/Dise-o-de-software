@@ -14,9 +14,9 @@ var app = express();
 var pgp = require('pg-promise')();
 var cn = {host: 'localhost', port: 5432, database: 'otelloDB', user: 'postgres', password: 'postgresql2017'};
 var db = pgp(cn);
-
-
 var http =  require('http');
+
+
 
 
 app.use(function(req, res, next) 
@@ -44,17 +44,20 @@ app.get('/checkMovement', function(req, res)
     db.func('mg_get_board',[req.query.idSesion])    
     .then(data => 
     {        	         
-        if(data=== null)
+        console.log(data);
+        if(data=== null | data[0].o_actualplayerid !== req.query.idPlayer*1)
         {            
+            console.log("Cancelado por que no existe la sesion o porque el id del jugador no es el correcto o no esta en su turno");
             res.end(JSON.stringify(false));
             return;
         }             
         var originalBoard = data[0].o_board;          
         var matrixSize = Math.sqrt(originalBoard.length);        
 
-        //2. Verify if the actual position 
-        if(originalBoard[getIndex(req.query.row, req.query.column, matrixSize)]!==-1)
+        //2. Verify if the actual position is empty 
+        if(originalBoard[getIndex(req.query.row, req.query.column, matrixSize)] !== -1)
         {
+            console.log("Cancelado porque el campo esta ocupado");
             res.end(JSON.stringify(false));  
             return;        
         }          
@@ -73,9 +76,12 @@ app.get('/checkMovement', function(req, res)
         var rigthDown = check(req.query.row*1+1, req.query.column*1+1, matrixSize,originalBoard,req.query.idPlayer, 1,1); 
         afectedIndices = afectedIndices.concat(up).concat(down).concat(left).concat(rigth).concat(leftUp).concat(rightUP).concat(leftDown).concat(rigthDown);                                
        
-        // 4. Update the board in the DB          
+        // 4. Update the board in the DB      
+        printMatrix(originalBoard, matrixSize);
+        console.log(afectedIndices)  ;
         if(afectedIndices.length===1)
         {            
+            console.log("Cancelado por que no existe jugada valida para esta posicion");
             res.end(JSON.stringify(false));  
             return;    
         }          
@@ -85,13 +91,20 @@ app.get('/checkMovement', function(req, res)
             {
                 originalBoard[afectedIndices[i]] = parseInt(req.query.idPlayer);
             }            
-            var band = false;            
-            printMatrix(originalBoard, matrixSize);
-
+            var band = false;    
             db.func('mg_update_board',[req.query.idSesion, req.query.idPlayer, originalBoard])
-            .then(data => 
+            .then(data2 => 
             {                                                 
-                res.end(JSON.stringify(data[0].mg_update_board));                  
+                // Posible posicion para llamar a un metodo que haga la jugada actual.
+                console.log("Retornando al cliente");
+                console.log(data2[0].mg_update_board);
+                console.log(data[0].o_playertwoid);
+                if(data2[0].mg_update_board && data[0].o_playertwoid===0)
+                {
+                    console.log("Haciendo jugada automatica");
+                    calculateAutomaticMove(req.query.idSesion);
+                }             
+                res.end(JSON.stringify(data2[0].mg_update_board));                                
             })
             .catch(error=> 
             {    	    	                         
@@ -137,7 +150,6 @@ app.get('/getSessionStadistics',function(req, res)
     })      
 });
 
-
 app.get('/passTurn',function(req, res)
 {        
     db.func('mg_passTurn',[req.query.idSesion])    
@@ -151,7 +163,6 @@ app.get('/passTurn',function(req, res)
         res.end(JSON.stringify(false));                
     })      
 });
-
 
 /**
  * Allows 
@@ -169,6 +180,12 @@ app.get('/surrender',function(req, res)
         res.end(JSON.stringify(false));                
     })      
 });
+
+
+
+
+
+
 
 /**
  * Allows check the player movement 
@@ -258,8 +275,9 @@ function makeBoard(length, player1, player2)
  * @param {number} machineLevel 
  * @returns {number}  -2 when the machine does't have plaays / (0,1,....n) when have plays 
  */
-function calculateAutomaticMove(idSesion, machineLevel)
+function calculateAutomaticMove(idSesion)
 {
+    console.log("Calculando jugada automatica");
     // 1. Obtain the actual board 
     db.func('mg_get_board',[idSesion])    
     .then(data => 
@@ -270,6 +288,7 @@ function calculateAutomaticMove(idSesion, machineLevel)
         }         
         var originalBoard = data[0].o_board;        
         var matrixSize = Math.sqrt(originalBoard.length);
+        var machineLevel = data[0].o_levelPlayerTwo;
         printMatrix(originalBoard, matrixSize);        
         
         //1.Search the positions and validate if this position .....                 
@@ -301,10 +320,7 @@ function calculateAutomaticMove(idSesion, machineLevel)
                     posiblePlays = posiblePlays.concat(afectedIndices);                
                 }   
             }        
-        }    
-        console.log(posiblePlays);     
-        
-        
+        }         
         //3. Calculate the afected indices of each element in posiblePlay list  and save the afected indices in playsAfectedIndexes
         var playsAfectedIndexes = []; 
         for(i=0; i<posiblePlays.length;i++)
@@ -327,8 +343,8 @@ function calculateAutomaticMove(idSesion, machineLevel)
             playsAfectedIndexes.push(afectedIndices);
         }
         var response = machineSelection(machineLevel, playsAfectedIndexes, posiblePlays);
-        console.log("Jugada"+response);
-        // Aqui se llama al metodo de hacer la jugada 
+        var coordinates = getCoordinates(response, matrixSize);     
+        autoRequest("http://localhost:8081/checkMovement?row="+coordinates[0]+"&column="+coordinates[1]+"&idPlayer="+0+"&idSesion="+idSesion);        
     })
     .catch(error=> 
     {    	    	 
@@ -449,20 +465,22 @@ function printMatrix(lista , tam)
 }
 
 
-function prueba()
+function autoRequest(url)
 {
-    http.get("http://localhost:8081/getSessionStadistics?idSesion=1", (resp)=>{
+    http.get(url, (resp)=>
+    {
         let data = '';
  
         // A chunk of data has been recieved.
-        resp.on('data', (chunk) => {
+        resp.on('data', (chunk) => 
+        {
           data += chunk;
         });
-       
         // The whole response has been received. Print out the result.
         resp.on('end', () => 
         {
-          console.log(JSON.parse(data));
+            console.log("autoRequest");
+            console.log(data);
         });
        
       }).on("error", (err) => {
@@ -472,16 +490,11 @@ function prueba()
 
 
 
-
-
-
 var server = app.listen(8081, function ()
 {                        
 	var host = server.address().address;
 	var port = server.address().port;
-    console.log("Esta corriendo en %s:%s", host, port);
-    var u = calculateAutomaticMove(1,2);    
-    prueba();
+    console.log("Esta corriendo en %s:%s", host, port);   
 });
 
 

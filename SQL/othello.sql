@@ -86,17 +86,29 @@ $body$
 LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION mg_get_board(IN i_sessionID INT, OUT o_playerOneID INT, OUT o_playerTwoID INT,OUT o_actualPlayerID INT, OUT o_boardSize INT, OUT o_board INTEGER[], OUT o_colorPlayer1 VARCHAR(30), OUT o_colorPlayer2 VARCHAR(30))
+CREATE OR REPLACE FUNCTION 
+mg_get_board
+(
+	IN i_sessionID INT, 
+	OUT o_playerOneID INT, 
+	OUT o_playerTwoID INT,
+	OUT o_actualPlayerID INT, 
+	OUT o_boardSize INT, 
+	OUT o_board INTEGER[], 
+	OUT o_colorPlayer1 VARCHAR(30), 
+	OUT o_colorPlayer2 VARCHAR(30), 
+	OUT o_levelPlayerOne INT,
+	OUT o_levelPlayerTwo INT
+)
 RETURNS
 SETOF RECORD AS 
 $body$
 BEGIN 	
 	RETURN query 
-	SELECT playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2 FROM sessions where sessionID = i_sessionID;
+	SELECT playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2,levelPlayerOne, levelPlayerTwo FROM sessions where sessionID = i_sessionID;
 END;	
 $body$
 LANGUAGE plpgsql;
-
 
 CREATE OR REPLACE FUNCTION mg_update_board(IN i_sessionID INT, IN i_actualPlayerID INT, IN i_board INTEGER[])
 RETURNS BOOLEAN AS

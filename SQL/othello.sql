@@ -1,4 +1,4 @@
---DOMIANS
+﻿--DOMIANS
 CREATE DOMAIN t_mail VARCHAR(50) NOT NULL CONSTRAINT CHK_t_mail CHECK (VALUE SIMILAR TO '[A-z]%@[A-z]%.[A-z]%');
 
 CREATE TABLE players
@@ -8,8 +8,7 @@ CREATE TABLE players
 	playerName  VARCHAR(30) NOT NULL,
 	playerLevel INT         NOT NULL,
 	image	    VARCHAR(20) NOT NULL,
-	CONSTRAINT PK_mail_playerID PRIMARY KEY (mail,playerID)
-	
+	CONSTRAINT PK_mail_playerID PRIMARY KEY (mail,playerID)	
 );
 
 CREATE TABLE sessions
@@ -172,6 +171,36 @@ $body$
 LANGUAGE plpgsql;
 
 
+/* 
+* Allows get the session stadistic 
+*
+* Receive: 
+* i_ssesionID int
+*/
+
+CREATE OR REPLACE FUNCTION 
+mg_get_session_stadistic
+(
+	IN i_sessionID  INT,
+	OUT o_sessionID   INT,
+	OUT o_winsPlayer1 INT,
+	OUT o_winsPlayer2 INT,
+	OUT o_ties        INT,
+	OUT o_amountGames INT,
+	OUT o_numberactualgame INT
+)
+RETURNS
+SETOF RECORD AS 
+$body$
+BEGIN 	
+	RETURN query 
+	SELECT sessionid, winsplayer1, winsplayer2, ties, amountgames, numberactualgame FROM sessionStadistics WHERE sessionID =i_sessionID;
+END;	
+$body$
+LANGUAGE plpgsql;
+
+
+
 
 --INSERTS
 
@@ -180,4 +209,4 @@ INSERT INTO players (playerID, mail, playerName, playerLevel, image) VALUES (0,'
 INSERT INTO sessions (state, playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2, levelPlayerOne, levelPlayerTwo, amountPassTurn) VALUES 
 	(true,0,1,1,6,'{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,1,-1,-1,-1,-1,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1}','red','blue',1,1,0);
 
-INSERT INTO sessionStadistics (sessionID, winsPlayer1, winsPlayer2, ties, amountGames, numberActualGame) VALUES (3,0,0,0,3,1);
+INSERT INTO sessionStadistics (sessionID, winsPlayer1, winsPlayer2, ties, amountGames, numberActualGame) VALUES (1,0,0,0,3,1);

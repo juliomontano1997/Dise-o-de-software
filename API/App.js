@@ -12,10 +12,13 @@ var client;
 var express = require('express');
 var app = express();
 var pgp = require('pg-promise')();
-var cn = {host: 'localhost', port: 5432, database: 'othelloDB', user: 'postgres', password: 'postgresql2017'};
+var cn = {host: 'localhost', port: 5432, database: 'otelloDB', user: 'postgres', password: 'postgresql2017'};
 var db = pgp(cn);
-var httpp =  require('http');
-var http = http();
+
+
+var http =  require('http');
+
+
 app.use(function(req, res, next) 
 {
     res.header("Access-Control-Allow-Origin", "*");
@@ -23,9 +26,6 @@ app.use(function(req, res, next)
     res.header("Access-Control-Allow-Methods", "DELETE, GET, POST");
     next();
 });
-
-
-
 
 
 
@@ -105,12 +105,29 @@ app.get('/checkMovement', function(req, res)
     });         
 });
 
+
+
 app.get('/getBoard',function(req, res)
 {        
     db.func('mg_get_board',[req.query.idSesion])    
     .then(data => 
     {        	        
         printMatrix(data[0].o_board, data[0].o_boardsize);
+        res.end(JSON.stringify(data));
+    })
+    .catch(error=> 
+    {    	    	 
+        console.log(error);
+        res.end(JSON.stringify(false));                
+    })      
+});
+
+app.get('/getSessionStadistics',function(req, res)
+{        
+    db.func('mg_get_session_stadistic',[req.query.idSesion])    
+    .then(data => 
+    {        	   
+        console.log(data);
         res.end(JSON.stringify(data));
     })
     .catch(error=> 
@@ -135,6 +152,10 @@ app.get('/passTurn',function(req, res)
     })      
 });
 
+
+/**
+ * Allows 
+ */
 app.get('/surrender',function(req, res)
 {        
     db.func('mg_finishSesion',[req.query.idSesion])    
@@ -430,8 +451,29 @@ function printMatrix(lista , tam)
 
 function prueba()
 {
+    http.get("http://localhost:8081/getSessionStadistics?idSesion=1", (resp)=>{
+        let data = '';
  
+        // A chunk of data has been recieved.
+        resp.on('data', (chunk) => {
+          data += chunk;
+        });
+       
+        // The whole response has been received. Print out the result.
+        resp.on('end', () => 
+        {
+          console.log(JSON.parse(data));
+        });
+       
+      }).on("error", (err) => {
+        console.log("Error: " + err.message);
+      });
 }
+
+
+
+
+
 
 var server = app.listen(8081, function ()
 {                        

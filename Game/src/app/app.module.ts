@@ -8,21 +8,26 @@ import { AppComponent } from './app.component';
 import { HttpModule } from '@angular/http';
 
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { GameModule } from '../app/game-module/game-module.module';
+import { LoginModule } from './login-module/login-module.module';
+import { ProfileModule } from './profile-module/profile.module';
+//import { AppRoutingModule, routingComponents } from './app.routing';
 import { Routes, RouterModule } from '@angular/router';
+import { LoginComponent } from './login-module/login/login.component';
+import { GameModuleComponent } from './game-module/game-module/game-module.component';
+import { ProfileComponent } from './profile-module/profile/profile.component';
+import { MessageService } from './services/Observer/message.service';
 
-import { GameViewComponent } from './game-view/game-view.component';
-import { SessionInformationComponent } from './session-information/session-information.component';
-
-const routes: Routes = [
-  { path: '', component: AppComponent},
-  { path: 'playGame', component: GameViewComponent }
+ export const routes: Routes = [
+  { path: '', component: GameModuleComponent},
+  { path: '**', component:GameModuleComponent},
+  { path: 'gameModule', component: GameModuleComponent},
+  { path: 'profileModule', component:ProfileComponent},
   ];
 
 @NgModule({
   declarations: [
-    AppComponent,
-    GameViewComponent,
-    SessionInformationComponent,
+    AppComponent
   ],
   imports: [
     BrowserModule,
@@ -30,8 +35,10 @@ const routes: Routes = [
     RouterModule.forRoot(routes),
     HttpModule,
     HttpClientModule,
-  ],
-  providers: [GameServicesService],
+    GameModule,
+    LoginModule,
+    ProfileModule],
+  providers: [GameServicesService, MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

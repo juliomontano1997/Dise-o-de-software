@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter, Input, Output } from '@angular/core';
 
-import { GameServicesService } from '../services/game-services.service';
+import { GameServicesService } from '../../services/game-services.service';
 import { HttpClient, HttpClientModule} from '@angular/common/http';
-import { boardSessionHandler } from '../models/boardSessionHandler.model';
+import { boardSessionHandler } from '../../models/boardSessionHandler.model';
+import { MessageService } from '../../services/observer/index';
 
 @Component({
   selector: 'game-play-view',
@@ -10,10 +11,10 @@ import { boardSessionHandler } from '../models/boardSessionHandler.model';
   styleUrls: ['./game-view.component.css']
 })
 export class GameViewComponent implements OnInit {
-  
+  @Output() notification=new EventEmitter<boolean>();
   private sessionHandler:boardSessionHandler;
 
-  constructor(private gameService: GameServicesService) { 
+  constructor(private gameService: GameServicesService,private messageService: MessageService) { 
     this.getBoardChanges();
     this.sessionHandler=new boardSessionHandler(1,0,1,15,
       [0,-1,1,0,-1,-1,-1,0,0,0,-1,-1,-1,-1,-1,
@@ -31,11 +32,16 @@ export class GameViewComponent implements OnInit {
         -1,-1,-1,-1,-1,1,0,0,0,0,-1,-1,-1,-1,-1,
         -1,-1,-1,-1,-1,0,0,0,0,0,-1,-1,-1,-1,-1,
         -1,-1,-1,-1,-1,,0,0,0,0,-1,-1,-1,-1,-1,],'red','black',1);
-
   }
     
   ngOnInit() {
 
+  }
+
+  //notify to sessionInformation component that it's necessary to refresh the data
+  notify(){
+    alert("voy a notificar");
+    this.messageService.sendMessage('Yuo need to reload the session information');
   }
   
   public updateBoard(): void{
@@ -69,8 +75,9 @@ export class GameViewComponent implements OnInit {
   } 
 
   public movePiece(row:number,column:number){
+    this.notify();
     this.sessionHandler.setActualPlayerId(this.sessionHandler.getPlayerTwoId());
-    
+    /*
     if (this.sessionHandler.itsMyTurn()==true){
       this.gameService.makeMove(row,column,1,1)
     .subscribe(
@@ -83,6 +90,7 @@ export class GameViewComponent implements OnInit {
         
       });
     }
+    */
     
   }
 

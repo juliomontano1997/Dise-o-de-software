@@ -1,26 +1,9 @@
 
-<!--
-<div class="row clearfix" >
-<div class="col-lg-8 col-md-8 col-sm-6 col-xs-12" ng-repeat="fleet in fleetAdmin">
-	<div class="container">
-		<game-play-view> </game-play-view>
-	</div>
-	<div class="container">
-		 
-	</div>
-
+<button class="btn -btn-primary" [routerLink]="['../loginModule']">  ir a login   </button>
+<button class="btn -btn-primary" [routerLink]="['gameModule']">  ir a game    </button>
+<button class="btn -btn-primary" [routerLink]="['profileModule']">  ir a profile </button>
+<a routerLink="/profileModule" routerLinkActive="active" > ir a game </a>
+<!-- this space change depending of the active link -->
+<div class="container-fluid">
+	<router-outlet></router-outlet>
 </div>
-</div>
--->
-<div class="row">
-		<div class="col-xs-6">
-
-		</div>
-        <div class="col-xs-6">
-			<game-play-view> </game-play-view>
-        </div>
-        <div class="col-xs-6">
-			<app-session-information> </app-session-information>
-        </div>
-</div>
-

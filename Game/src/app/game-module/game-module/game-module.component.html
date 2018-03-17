@@ -1,0 +1,10 @@
+
+<div class="row">
+
+      <div class="col-xs-6">
+    <game-play-view #gameChild> </game-play-view>
+      </div>
+      <div class="col-xs-6">
+    <app-session-information (onNotification)="gameChild.notify($event)"> </app-session-information>
+      </div>
+</div>

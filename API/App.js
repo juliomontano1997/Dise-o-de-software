@@ -6,7 +6,6 @@
  *  server definitions for the othello emulator API. 
 */
 
-// ****************************  HEADER SECTION  *******************************
 var pg = require('pg');
 var conString = "postgres://postgres:postgresql2017@localhost:5432/devesa_app";
 var client;
@@ -15,7 +14,8 @@ var app = express();
 var pgp = require('pg-promise')();
 var cn = {host: 'localhost', port: 5432, database: 'othelloDB', user: 'postgres', password: 'postgresql2017'};
 var db = pgp(cn);
-
+var httpp =  require('http');
+var http = http();
 app.use(function(req, res, next) 
 {
     res.header("Access-Control-Allow-Origin", "*");
@@ -28,7 +28,6 @@ app.use(function(req, res, next)
 
 
 
-// *********************** INTERFACE CONECTIONS/END POINTS  ***********************
 
 /**
  * Allow make and validate a movement  
@@ -49,10 +48,9 @@ app.get('/checkMovement', function(req, res)
         {            
             res.end(JSON.stringify(false));
             return;
-        }        
+        }             
         var originalBoard = data[0].o_board;          
         var matrixSize = Math.sqrt(originalBoard.length);        
-                    
 
         //2. Verify if the actual position 
         if(originalBoard[getIndex(req.query.row, req.query.column, matrixSize)]!==-1)
@@ -74,25 +72,20 @@ app.get('/checkMovement', function(req, res)
         var leftDown = check(req.query.row*1+1, req.query.column*1-1, matrixSize,originalBoard,req.query.idPlayer, 1,-1);    
         var rigthDown = check(req.query.row*1+1, req.query.column*1+1, matrixSize,originalBoard,req.query.idPlayer, 1,1); 
         afectedIndices = afectedIndices.concat(up).concat(down).concat(left).concat(rigth).concat(leftUp).concat(rightUP).concat(leftDown).concat(rigthDown);                                
-                
-        console.log("indices afectados");
-        console.log(afectedIndices);
+       
         // 4. Update the board in the DB          
         if(afectedIndices.length===1)
-        {
-            console.log("Se salio porque no hay jugada valida");
+        {            
             res.end(JSON.stringify(false));  
             return;    
         }          
         else
-        {
-            console.log(afectedIndices);
+        {            
             for(i=0; i<afectedIndices.length; i++)
             {
                 originalBoard[afectedIndices[i]] = parseInt(req.query.idPlayer);
             }            
-            var band = false;
-            console.log("ultima imprecion antes de guardar");
+            var band = false;            
             printMatrix(originalBoard, matrixSize);
 
             db.func('mg_update_board',[req.query.idSesion, req.query.idPlayer, originalBoard])
@@ -107,49 +100,10 @@ app.get('/checkMovement', function(req, res)
         }                              
     })
     .catch(error=> 
-    {    	    	 
-        console.log(error);
+    {    	    	         
         res.end(JSON.stringify(false));                
     });         
 });
-
-
-/**
- * Allows check the player movement 
- * @param {number} row 
- * @param {number} column 
- * @param {number} matrixSize 
- * @param {number[]} board 
- * @param {number} player 
- * @param {number} verticalMov 
- * @param {number} horisontalMov 
- * 
- */
-function check(row,column, matrixSize, board, player, verticalMov, horisontalMov)
-{       
-    console.log("Datos: x="+row+"y="+column);
-    var index = getIndex(row, column, matrixSize);         
-    var lista = []; 
-    console.log(board[index]);
-    while(board[index] !== (player*1) && board[index]!==-1 && (row*1)!==-1 && (column*1)!==-1 && column*1<matrixSize && row*1<matrixSize)
-    {                
-        lista.push(index);                        
-        row = row*1 + verticalMov*1;            
-        column = column*1 + horisontalMov*1;                
-        index = getIndex(row, column, matrixSize);        
-    }
-    console.log(lista);
-    if(board[index] === player*1)
-    {        
-    console.log("Jugada valida");
-        console.log(lista);
-        return lista;
-    }
-    else
-    {        
-        return [];
-    }
-}
 
 app.get('/getBoard',function(req, res)
 {        
@@ -167,8 +121,65 @@ app.get('/getBoard',function(req, res)
 });
 
 
+app.get('/passTurn',function(req, res)
+{        
+    db.func('mg_passTurn',[req.query.idSesion])    
+    .then(data => 
+    {        	                
+        res.end(JSON.stringify(data));
+    })
+    .catch(error=> 
+    {    	    	 
+        console.log(error);
+        res.end(JSON.stringify(false));                
+    })      
+});
 
-// ******************** LOGIC AND EXTRA FUNCTIONS ********************************
+app.get('/surrender',function(req, res)
+{        
+    db.func('mg_finishSesion',[req.query.idSesion])    
+    .then(data => 
+    {        	              
+        res.end(JSON.stringify(data));
+    })
+    .catch(error=> 
+    {    	    	 
+        console.log(error);
+        res.end(JSON.stringify(false));                
+    })      
+});
+
+/**
+ * Allows check the player movement 
+ * @param {number} row 
+ * @param {number} column 
+ * @param {number} matrixSize 
+ * @param {number[]} board 
+ * @param {number} player 
+ * @param {number} verticalMov 
+ * @param {number} horisontalMov 
+ * 
+ */
+function check(row,column, matrixSize, board, player, verticalMov, horisontalMov)
+{           
+    var index = getIndex(row, column, matrixSize);         
+    var lista = [];     
+    while(board[index] !== (player*1) && board[index]!==-1 && (row*1)!==-1 && (column*1)!==-1 && column*1<matrixSize && row*1<matrixSize)
+    {                
+        lista.push(index);                        
+        row = row*1 + verticalMov*1;            
+        column = column*1 + horisontalMov*1;                
+        index = getIndex(row, column, matrixSize);        
+    }    
+    if(board[index] === player*1)
+    {                    
+        return lista;
+    }
+    else
+    {        
+        return [];
+    }
+}
 
 /**
  * Receive a (y,x) coordinates of a 2d matrix and returns a index of a 1D array
@@ -219,6 +230,13 @@ function makeBoard(length, player1, player2)
     return newBoard;
 }
 
+
+/**
+ * Allows calculate an automatic movement 
+ * @param {number} idSesion 
+ * @param {number} machineLevel 
+ * @returns {number}  -2 when the machine does't have plaays / (0,1,....n) when have plays 
+ */
 function calculateAutomaticMove(idSesion, machineLevel)
 {
     // 1. Obtain the actual board 
@@ -229,52 +247,45 @@ function calculateAutomaticMove(idSesion, machineLevel)
         {
             return;
         }         
-
         var originalBoard = data[0].o_board;        
         var matrixSize = Math.sqrt(originalBoard.length);
-        printMatrix(originalBoard, matrixSize);
+        printMatrix(originalBoard, matrixSize);        
         
-        //1.Search the positions
-        var marksPositions = [];
+        //1.Search the positions and validate if this position .....                 
+        var posiblePlays =[];
+
+        // Search all marks and evaluate if this marks are valid for a new play.
         for(i=0;i<originalBoard.length; i++)
         {
             if(originalBoard[i]===0)
-            {
-                marksPositions.push(i);
+            {                
+                var afectedIndices = [];             
+                var coordinates = getCoordinates(i, matrixSize);
+                var row = coordinates[0];
+                var column = coordinates[1];            
+    
+                var rigth= auxiliarCalculate(row,  column+1, matrixSize,originalBoard,0*1,1*1);
+                var left = auxiliarCalculate(row,  column-1, matrixSize,originalBoard, 0,-1);         
+                var up =   auxiliarCalculate(row-1,column, matrixSize,originalBoard,-1, 0);
+                var down = auxiliarCalculate(row+1,column, matrixSize,originalBoard, 1, 0); 
+    
+                var rigthDown = auxiliarCalculate(row+1,column+1, matrixSize,originalBoard,  1, 1);                  
+                var leftDown =  auxiliarCalculate(row+1,column-1, matrixSize,originalBoard,  1,-1);                
+                var rightUP =   auxiliarCalculate(row-1,column+1, matrixSize,originalBoard, -1, 1);  
+                var leftUp =    auxiliarCalculate(row-1,column-1, matrixSize,originalBoard, -1,-1);     
+    
+                afectedIndices = afectedIndices.concat(up).concat(down).concat(left).concat(rigth).concat(leftUp).concat(rightUP).concat(leftDown).concat(rigthDown);                
+                if(afectedIndices.length>=1)
+                {
+                    posiblePlays = posiblePlays.concat(afectedIndices);                
+                }   
             }        
-        }                 
-
-        //2. Verify is each position ,
-        var validIndices = [];
-        var posiblePlays =[];
-        var marks = marksPositions.length;        
-        for(i=0; i<marks; i++)
-        {   
-            var afectedIndices = []; 
-            console.log(afectedIndices)    ;
-            var coordinates = getCoordinates(marksPositions[i], matrixSize);
-            var row = coordinates[0];
-            var column = coordinates[1];            
-
-            var rigth= auxiliarCalculate(row,  column+1, matrixSize,originalBoard,0*1,1*1);
-            var left = auxiliarCalculate(row,  column-1, matrixSize,originalBoard, 0,-1);         
-            var up =   auxiliarCalculate(row-1,column, matrixSize,originalBoard,-1, 0);
-            var down = auxiliarCalculate(row+1,column, matrixSize,originalBoard, 1, 0); 
-
-            var rigthDown = auxiliarCalculate(row+1,column+1, matrixSize,originalBoard,  1, 1);                  
-            var leftDown =  auxiliarCalculate(row+1,column-1, matrixSize,originalBoard,  1,-1);                
-            var rightUP =   auxiliarCalculate(row-1,column+1, matrixSize,originalBoard, -1, 1);  
-            var leftUp =    auxiliarCalculate(row-1,column-1, matrixSize,originalBoard, -1,-1);     
-
-            afectedIndices = afectedIndices.concat(up).concat(down).concat(left).concat(rigth).concat(leftUp).concat(rightUP).concat(leftDown).concat(rigthDown);
+        }    
+        console.log(posiblePlays);     
         
-            if(afectedIndices.length>1)
-            {
-                posiblePlays = posiblePlays.concat(afectedIndices);                
-            }                        
-        }
-        //3. Calculate the afected indices 
-        var playsAfectedIndexes = [];
+        
+        //3. Calculate the afected indices of each element in posiblePlay list  and save the afected indices in playsAfectedIndexes
+        var playsAfectedIndexes = []; 
         for(i=0; i<posiblePlays.length;i++)
         {
             var afectedIndices = [posiblePlays[i]]; 
@@ -293,49 +304,10 @@ function calculateAutomaticMove(idSesion, machineLevel)
             var rigthDown = check(row*1+1, column*1+1, matrixSize,originalBoard,0*1, 1*1,1*1); 
             afectedIndices = afectedIndices.concat(up).concat(down).concat(left).concat(rigth).concat(leftUp).concat(rightUP).concat(leftDown).concat(rigthDown);
             playsAfectedIndexes.push(afectedIndices);
-        } 
-
-        //4. Calculate the best option acoording to the machine level.         
-
-        if(machineLevel===1)
-        {
-            var auxiliar = playsAfectedIndexes[0].length;
-            var index = -1;
-
-            for(i=0; i<playsAfectedIndexes; i++)
-            {
-                if(playsAfectedIndexes[i].length <= auxiliar)
-                {
-                    auxiliar = playsAfectedIndexes[i].length;
-                    index = posiblePlays[i];
-                }
-            }
-            return index;
         }
-        
-        else if(machineLevel===2)
-        {
-            var length = playsAfectedIndexes.length;
-            return Math.floor((Math.random() * length) + 0);
-        }
-        else
-        {
-            var auxiliar = playsAfectedIndexes[0].length;
-            var index = -1;
-
-            for(i=0; i<playsAfectedIndexes; i++)
-            {
-                if(playsAfectedIndexes[i].length <= auxiliar)
-                {
-                    auxiliar = playsAfectedIndexes[i].length;
-                    index = posiblePlays[i];
-                }
-            }
-            return index;
-        }
-        console.log(playsAfectedIndexes);
-        console.log(posiblePlays);
-
+        var response = machineSelection(machineLevel, playsAfectedIndexes, posiblePlays);
+        console.log("Jugada"+response);
+        // Aqui se llama al metodo de hacer la jugada 
     })
     .catch(error=> 
     {    	    	 
@@ -343,6 +315,16 @@ function calculateAutomaticMove(idSesion, machineLevel)
     });    
 }
 
+/**
+ * Verify if a coordinate is valid play
+ * 
+ *  @param row
+ *  @param column
+ *  @param matrixSize
+ *  @param board
+ *  @param verticalMov
+ *  @param horisontalMov  
+ */
 function auxiliarCalculate(row, column,matrixSize, board,verticalMov,horisontalMov)
 {                         
     var lista = [ ];                 
@@ -358,7 +340,7 @@ function auxiliarCalculate(row, column,matrixSize, board,verticalMov,horisontalM
     lista.push(index);
     if(board[index] === -1 && lista.length>1)
     {                
-        console.log("Jugada valida");                
+        console.log("Jugada valida="+ index);                
         return [index];
     }
     else
@@ -367,11 +349,66 @@ function auxiliarCalculate(row, column,matrixSize, board,verticalMov,horisontalM
     }
 }
 
+/**
+ * Select a respective indice 
+ * 
+ * @param {number} machineLevel 
+ * @param {List[number]} playsAfectedIndexes 
+ * @param {List[number]} playIndices 
+ */
+function machineSelection(machineLevel, playsAfectedIndexes, playIndices)
+{
+    if(playIndices===[])
+    {
+        return -2;
+    }
+    console.log(machineLevel);
+    var length = playsAfectedIndexes.length; 
+    // Selects the worst option 
+    if(machineLevel===1)
+    {
+        var auxiliar = playsAfectedIndexes[0].length;
+        var index = -1;
+        for(i=0; i<length; i++)
+        {
+            if(playsAfectedIndexes[i].length <= auxiliar)
+            {
+                auxiliar = playsAfectedIndexes[i].length;
+                index = playIndices[i];
+            }
+        }
+        return index;
+    }
+    // Select a ramdom option
+    else if(machineLevel===2)
+    {
+        var length = playsAfectedIndexes.length;
+        return playIndices[Math.floor((Math.random() * length) + 0)];
+    }
+    // Select the best option 
+    else
+    {
+        var auxiliar = playsAfectedIndexes[0].length;
+        var index = -1;
+
+        for(i=0; i<length; i++)
+        {
+            if(playsAfectedIndexes[i].length <= auxiliar)
+            {
+                auxiliar = playsAfectedIndexes[i].length;
+                index = playIndices[i];
+            }
+        }
+        return index;
+    }    
+}
+
+
 
 // Extra funtions 
 function printMatrix(lista , tam)
 {
-    console.log("\n********************* Imprimiendo matriz *******************\n");
+    console.log("\n***********************\n");
     for(i=0; i<tam*1; i++)
     {        
         var cat ='';
@@ -390,12 +427,19 @@ function printMatrix(lista , tam)
     }
 }
 
+
+function prueba()
+{
+ 
+}
+
 var server = app.listen(8081, function ()
 {                        
 	var host = server.address().address;
 	var port = server.address().port;
     console.log("Esta corriendo en %s:%s", host, port);
-    calculateAutomaticMove(1);
+    var u = calculateAutomaticMove(1,2);    
+    prueba();
 });
 
 

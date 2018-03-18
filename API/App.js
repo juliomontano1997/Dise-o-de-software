@@ -31,7 +31,6 @@ app.use(function(req, res, next)
 
 /**
  * Allow make and validate a movement  
- * 
  * @param {number} row
  * @param {number} column
  * @param {number} idPlayer
@@ -469,14 +468,11 @@ function autoRequest(url)
 {
     http.get(url, (resp)=>
     {
-        let data = '';
- 
-        // A chunk of data has been recieved.
+        let data = '';        
         resp.on('data', (chunk) => 
         {
           data += chunk;
-        });
-        // The whole response has been received. Print out the result.
+        });        
         resp.on('end', () => 
         {
             console.log("autoRequest");
@@ -487,6 +483,23 @@ function autoRequest(url)
         console.log("Error: " + err.message);
       });
 }
+
+
+
+function verifyFullBoard(board)
+{
+    var length = board.length;
+    for(i=0; i<length; i++)
+    {
+        if(board[i]==-1)
+        {
+            return false;
+        }
+    }
+    return false;
+}
+
+
 
 
 

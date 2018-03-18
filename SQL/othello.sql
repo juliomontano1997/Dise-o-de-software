@@ -41,6 +41,10 @@ CREATE TABLE sessionStadistics
 	CONSTRAINT FK_sessionID_sessions FOREIGN KEY (sessionID) REFERENCES sessions 
 );
 
+
+/*
+-->>> Faltan el id del receptor para mostrarle el chat completo. 
+*/
 CREATE TABLE messages 
 (
 	messageID      SERIAL  NOT NULL,
@@ -72,9 +76,30 @@ CREATE TABLE invitations
 	CONSTRAINT FK_receiverID_players FOREIGN KEY (receiverID) REFERENCES players(playerID)	
 );
 
---PROCEDURES
 
-CREATE OR REPLACE FUNCTION mg_get_player(IN i_mail t_mail, OUT o_playerID INT, OUT o_playerName VARCHAR(30), OUT o_playerLevel INT, OUT o_image VARCHAR(20))
+
+
+
+
+
+
+
+
+
+--PROCEDURES
+/*
+* Returns the player information
+* 
+*/
+CREATE OR REPLACE FUNCTION 
+mg_get_player
+(
+	IN i_mail t_mail, 
+	OUT o_playerID INT, 
+	OUT o_playerName VARCHAR(30), 
+	OUT o_playerLevel INT, 
+	OUT o_image VARCHAR(20)
+)
 RETURNS
 SETOF RECORD AS 
 $body$
@@ -86,6 +111,10 @@ $body$
 LANGUAGE plpgsql;
 
 
+
+/*
+* Returns the basic information of a specific session 
+*/
 CREATE OR REPLACE FUNCTION 
 mg_get_board
 (
@@ -110,7 +139,15 @@ END;
 $body$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION mg_update_board(IN i_sessionID INT, IN i_actualPlayerID INT, IN i_board INTEGER[])
+
+
+/*
+* Allows modify a board of a specific session   
+
+->>>>>    i_actualPlayerID debe ser cambiado a player 
+*/
+CREATE OR REPLACE FUNCTION 
+mg_update_board(IN i_sessionID INT, IN i_actualPlayerID INT, IN i_board INTEGER[])
 RETURNS BOOLEAN AS
 $body$
 BEGIN 	
@@ -128,6 +165,10 @@ END;
 $body$
 LANGUAGE plpgsql;
 
+
+/*
+* Allow pass turn this make an register of the pass turn actions.
+*/
 CREATE OR REPLACE FUNCTION mg_passTurn(IN i_sessionID INT)
 RETURNS BOOLEAN AS
 $body$
@@ -139,16 +180,26 @@ END;
 $body$
 LANGUAGE plpgsql;
 
+
+
+
+/*
+* Allows finish a session 
+-->> en la comparacion tengo ciertas dudas, que pasa si un jugador tiene el id 2?
+-->> board recive la listan nueva? 
+*/
 CREATE OR REPLACE FUNCTION mg_finishGame(IN i_sessionID INT, IN i_winers INT, IN i_board INT[])
 RETURNS BOOLEAN AS
 $body$
 BEGIN 	
-	IF i_winers = 2 THEN 
-		UPDATE sessionStadistics SET ties = ties + 1 WHERE sessionID = i_sessionID;		
-	ELSIF i_winers = (SELECT playerOneID FROM sessions WHERE sessionID = i_sessionID) THEN
-		UPDATE sessionStadistics SET winsPlayer1 = winsPlayer1 + 1 WHERE sessionID = i_sessionID;
+	IF i_winers = 2 
+		THEN 
+			UPDATE sessionStadistics SET ties = ties + 1 WHERE sessionID = i_sessionID;		
+	ELSIF i_winers = (SELECT playerOneID FROM sessions WHERE sessionID = i_sessionID) 
+		THEN
+			UPDATE sessionStadistics SET winsPlayer1 = winsPlayer1 + 1 WHERE sessionID = i_sessionID;
 	ELSE
-		UPDATE sessionStadistics SET winsPlayer2 = winsPlayer2 + 1 WHERE sessionID = i_sessionID;
+			UPDATE sessionStadistics SET winsPlayer2 = winsPlayer2 + 1 WHERE sessionID = i_sessionID;
 	END IF;
 
 	UPDATE sessionStadistics SET numberActualGame = numberActualGame + 1 WHERE sessionID = i_sessionID;
@@ -160,6 +211,12 @@ END;
 $body$
 LANGUAGE plpgsql;
 
+
+
+/*
+* Allows end a specific session. 
+* -->> si no gana creo que no deberia subir ninguno de los dos "cuando empatan"
+*/
 CREATE OR REPLACE FUNCTION mg_finishSession(IN i_sessionID INT)
 RETURNS BOOLEAN AS
 $body$

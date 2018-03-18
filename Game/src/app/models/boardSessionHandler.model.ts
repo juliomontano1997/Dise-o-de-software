@@ -1,4 +1,5 @@
 export class boardSessionHandler {
+    private sessionId: number;
     private playerOneID:number;
     private playerTwoID:number;
     private actualPlayerId:number;
@@ -9,6 +10,7 @@ export class boardSessionHandler {
     private playerPlayingId: number;
     private boardSizeArray: number[];
 
+    
     /**
      * 
      * @param playerOneID 
@@ -20,17 +22,10 @@ export class boardSessionHandler {
      * @param playerTwoColor 
      * @param playerPlayingId it's necessaru to know when disabled the board to the player 
      */
-    constructor(playerOneID:number, playerTwoID:number, actualPlayerId:number, boardSize:number,
-        board: number[], playerOneColor: String, playerTwoColor:String,playerPlayingId: number){
-        this.playerOneID=playerOneID;
-        this.playerTwoID=playerTwoID;
-        this.actualPlayerId=actualPlayerId;
-        this.boardSize= boardSize;
-        this.board= board;
-        this.playerOneColor=playerOneColor;
-        this.playerTwoColor=playerTwoColor;
+    constructor(sessionId:number, playerPlayingId:number){
+        this.sessionId=sessionId;
         this.playerPlayingId=playerPlayingId;
-        this.setBoardSizeArray();
+        this.boardSize=0;
     }
     
     public setBoardSizeArray(){
@@ -39,11 +34,44 @@ export class boardSessionHandler {
         for (i=0; i < this.boardSize;i++) {
             this.boardSizeArray[i]=i;
         }
+        
     }
 
-    public setActualPlayerId(playerId: number):void{
-        this.actualPlayerId=playerId;
+    public UpdateData(dataArray: Array<any>){
+
+        this.actualPlayerId=dataArray[0].o_actualplayerid;
+
+        this.setBoard(dataArray[0].o_board);
+        if (this.boardSize===0){
+            this.boardSize=dataArray[0].o_boardsize;
+            this.playerOneColor=dataArray[0].o_colorplayer1;
+            this.playerTwoColor=dataArray[0].o_colorplayer2;
+            this.playerOneID=dataArray[0].o_playeroneid;
+            this.playerTwoID=dataArray[0].o_playertwoid;
+        }
+        this.setBoardSizeArray();
     }
+
+    public setActualPlayerId():void{
+         if (this.playerPlayingId==this.playerTwoID){
+            this.actualPlayerId= this.playerOneID;
+            }
+        else{
+            this.actualPlayerId=this.playerTwoID;
+            }
+        
+        
+        
+    }
+
+    public setSessionId(sessionId:number):void{
+        this.sessionId=sessionId;
+     }
+
+    public getSessionId():number{
+       return this.sessionId;
+    }
+
 
     public getPlayerOneId(): number{
         return this.playerOneID;

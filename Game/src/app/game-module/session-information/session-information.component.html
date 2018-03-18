@@ -1,0 +1,70 @@
+<div class="container-fluid informationContainer">
+    <div class="text-center">
+     <h2 class="align-center sessionInformation">Informacion de la sesión</h2>
+    </div>
+<form> 
+    <div class="form-group row">
+        <label for="gamesNumbers" class="col-sm-6 col-form-label sessionInformation">
+          Número de partidas: {{sessionInformationHandler.getAmountGamesNumber()}}</label>
+        <div class="col-sm-14">
+          <input type="text" readonly class="form-control-plaintext sessionInformation" id="gamesNumbers" >
+        </div>
+      </div>
+      <div class="form-group row">
+          <label for="currentGame" class="col-sm-6 col-form-label sessionInformation">
+            Partida actual: {{sessionInformationHandler.getCurrentGameNumber()}} </label>
+          <div class="col-sm-14">
+            <input type="text" readonly class="form-control-plaintext sessionInformation" id="currentGame">
+          </div>
+        </div>
+</form>
+
+<table class="table table-dark">
+    <thead>
+      <tr>
+        <th>Partidas</th>
+        <th>{{sessionInformationHandler.getPlayerOneName()}}</th>  <!-- first player name -->
+        <th>{{sessionInformationHandler.getPlayerTwoName()}}</th>  <!-- second player name -->
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Ganadas</td>
+        <td>{{sessionInformationHandler.getWinsPlayerOne()}}</td> <!-- first player victories -->
+        <td>{{sessionInformationHandler.getWinsPlayerTwo()}}</td> <!-- second player victories -->
+      </tr>
+      <tr>
+          <td>Pérdidas</td>
+          <td>{{sessionInformationHandler.getPlayerDefeats(sessionInformationHandler.getWinsPlayerOne())}}</td> <!-- first player defeats -->
+          <td>{{sessionInformationHandler.getPlayerDefeats(sessionInformationHandler.getWinsPlayerTwo())}} </td> <!-- second player defeats -->
+        </tr>
+        <tr>
+            <td>Empatadas</td>
+            <td>{{sessionInformationHandler.getTiesNumber()}}</td> <!-- first player tied -->
+            <td>{{sessionInformationHandler.getTiesNumber()}}</td> <!-- second player tied -->
+          </tr>
+    </tbody>
+  </table>
+
+  <div class="form-group row">
+        
+      <div class="col-sm-14">
+          <button type="button" class="btn btn-secondary btn-lg" (click)="giveUp()">Rendirse</button>
+      </div>
+    </div>
+
+    <div class="form-group row">
+       
+        <div class="col-sm-14">
+            <button type="button" class="btn btn-secondary btn-lg" (click)="passTurn()">Pasar de turno</button>
+        </div>
+      </div>
+
+      <div class="form-group row">
+
+          <div class="col-sm-14">
+              <button type="button" class="btn btn-secondary btn-lg">Salir de partida</button>
+          </div>
+        </div>
+
+</div>

@@ -172,8 +172,30 @@ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION mg_passTurn(IN i_sessionID INT)
 RETURNS BOOLEAN AS
 $body$
+DECLARE 
+
+	currentPlayer INT;
+	playerTurn INT;
+	playerOneId INT;
+	playerTwoId INT;
+	
 BEGIN 	
+
+	/**
+	-------- VALIDAR SI HAY DOS PASOS DE TURNO ES EL FIN DEL JUEGO.
+	*/
+	
 	UPDATE sessions SET amountPassTurn = amountPassTurn + 1 WHERE sessionID = i_sessionID;
+	SELECT s.playerOneId,s.playerTwoId,s.actualPlayerId INTO playerOneId,playerTwoId,currentPlayer FROM sessions AS s WHERE sessionID=i_sessionID;
+
+	IF currentPlayer= playerOneId THEN
+		playerTurn= playerTwoId;
+	ELSE
+		playerTurn= playerOneId;
+	END IF;
+
+	UPDATE sessions SET actualPlayerId =playerTurn WHERE sessionID = i_sessionID;
+	
 	RETURN TRUE;
 	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
 END;	
@@ -268,14 +290,29 @@ END;
 $body$
 LANGUAGE plpgsql;
 
-
-
+CREATE OR REPLACE FUNCTION 
+mg_get_session_playersName
+(
+	IN i_sessionID  INT,
+	OUT o_playerId INT,
+	OUT o_playerName VARCHAR(30),
+	OUT o_playerOneId INT
+)
+RETURNS
+SETOF RECORD AS 
+$body$
+BEGIN 	
+	RETURN query SELECT p.playerId,p.playerName,gameSession.playerOneId FROM (SELECT playerOneId,playerTwoId FROM sessions WHERE sessionID=i_sessionID) AS gameSession
+	INNER JOIN Players AS p ON playerId=gameSession.playerOneId OR playerId= gameSession.playerTwoId;
+END;	
+$body$
+LANGUAGE plpgsql;
 
 --INSERTS
 
 INSERT INTO players (playerID, mail, playerName, playerLevel, image) VALUES (0,'maquina@othello.com','Maquina',0,'image1'),(1,'juan12@gmail.com','Juan12',1,'image2');
 
 INSERT INTO sessions (state, playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2, levelPlayerOne, levelPlayerTwo, amountPassTurn) VALUES 
-	(true,0,1,1,6,'{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,1,-1,-1,-1,-1,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1}','red','blue',1,1,0);
+	(true,1,0,1,6,'{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,1,-1,-1,-1,-1,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1}','red','blue',1,1,0);
 
 INSERT INTO sessionStadistics (sessionID, winsPlayer1, winsPlayer2, ties, amountGames, numberActualGame) VALUES (1,0,0,0,3,1);

@@ -7,12 +7,12 @@
 */
 
 var pg = require('pg');
-var conString = "postgres://postgres:postgresql2017@localhost:5432/devesa_app";
+var conString = "postgres://postgres:12345@localhost:5432/devesa_app";
 var client;
 var express = require('express');
 var app = express();
 var pgp = require('pg-promise')();
-var cn = {host: 'localhost', port: 5432, database: 'otelloDB', user: 'postgres', password: 'postgresql2017'};
+var cn = {host: 'localhost', port: 5432, database: 'otelloDB', user: 'postgres', password: '12345'};
 var db = pgp(cn);
 var http =  require('http');
 
@@ -27,6 +27,19 @@ app.use(function(req, res, next)
     next();
 });
 
+app.get('/sessionPlayersName', function(req, res) 
+{ 
+	db.func('mg_get_session_playersName',[req.query.idSesion])    
+    .then(data => 
+    {        	        
+        res.end(JSON.stringify(data));
+    })
+    .catch(error=> 
+    {    	    	 
+        console.log(error);
+        res.end(JSON.stringify(false));                
+    })   
+});	
 
 
 /**
@@ -45,6 +58,7 @@ app.get('/checkMovement', function(req, res)
     .then(data => 
     {        	         
         console.log(data);
+        console.log(req.query);
         if(data=== null | data[0].o_actualplayerid !== req.query.idPlayer*1)
         {            
             console.log("Cancelado por que no existe la sesion o porque el id del jugador no es el correcto o no esta en su turno");
@@ -99,12 +113,13 @@ app.get('/checkMovement', function(req, res)
                 console.log("Retornando al cliente");
                 console.log(data2[0].mg_update_board);
                 console.log(data[0].o_playertwoid);
+                res.end(JSON.stringify(data2[0].mg_update_board)); 
                 if(data2[0].mg_update_board && data[0].o_playertwoid===0)
                 {
-                    console.log("Haciendo jugada automatica");
-                    calculateAutomaticMove(req.query.idSesion);
+    					console.log("Haciendo jugada aunomatica");
+                    	calculateAutomaticMove(req.query.idSesion);                    
                 }             
-                res.end(JSON.stringify(data2[0].mg_update_board));                                
+                                               
             })
             .catch(error=> 
             {    	    	                         
@@ -127,6 +142,11 @@ app.get('/getBoard',function(req, res)
     {        	        
         printMatrix(data[0].o_board, data[0].o_boardsize);
         res.end(JSON.stringify(data));
+        if(data[0].o_playertwoid===0 && data[0].o_actualplayerid===0)  //calculate automatic machine move
+                {
+    					console.log("Haciendo jugada aunomatica");
+                    	calculateAutomaticMove(req.query.idSesion);                    
+                } 
     })
     .catch(error=> 
     {    	    	 
@@ -156,6 +176,7 @@ app.get('/passTurn',function(req, res)
     .then(data => 
     {        	                
         res.end(JSON.stringify(data));
+
     })
     .catch(error=> 
     {    	    	 
@@ -344,7 +365,13 @@ function calculateAutomaticMove(idSesion)
         }
         var response = machineSelection(machineLevel, playsAfectedIndexes, posiblePlays);
         var coordinates = getCoordinates(response, matrixSize);     
-        autoRequest("http://localhost:8081/checkMovement?row="+coordinates[0]+"&column="+coordinates[1]+"&idPlayer="+0+"&idSesion="+idSesion);        
+        var urlLink="http://localhost:8081/checkMovement?row="+coordinates[0]+"&column="+coordinates[1]+"&idPlayer="+0+"&idSesion="+idSesion;  
+        
+        setTimeout(function () {
+    					console.log("Haciendo jugada aunomatica");
+                    	autoRequest(urlLink);  
+  					}, 2000);
+  
     })
     .catch(error=> 
     {    	    	 

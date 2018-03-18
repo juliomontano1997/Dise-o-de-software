@@ -16,7 +16,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { LoginComponent } from './login-module/login/login.component';
 import { GameModuleComponent } from './game-module/game-module/game-module.component';
 import { ProfileComponent } from './profile-module/profile/profile.component';
-import { MessageService } from './services/Observer/message.service';
 
  export const routes: Routes = [
   { path: '', component: GameModuleComponent},
@@ -38,7 +37,7 @@ import { MessageService } from './services/Observer/message.service';
     GameModule,
     LoginModule,
     ProfileModule],
-  providers: [GameServicesService, MessageService],
+  providers: [GameServicesService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -35,11 +35,11 @@
         </td> 
       </tr>
     </table>
-    <div class="container-fluid text-center"> 
-        <h4 class="yourTurn" *ngIf="sessionHandler.itsMyTurn()==true; else aviso" >
+    <div  class="container-fluid text-center"> 
+        <h4  class="yourTurn" *ngIf="sessionHandler.itsMyTurn()==true; else aviso" >
          Es tu turno de jugar</h4>
-        <ng-template #aviso> 
-        <h4 class="turnAdvice"> 
+        <ng-template  #aviso> 
+        <h4  class="turnAdvice" > 
           Tu rival está jugando 
         </h4>
         </ng-template>

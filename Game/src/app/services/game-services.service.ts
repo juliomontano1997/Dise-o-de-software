@@ -12,18 +12,15 @@ export class GameServicesService {
 
   constructor(private http:Http) { }
 
-  public getUpdatedBoard(sessionId:Number,idJugador: Number)
+  public getUpdatedBoard(sessionId:Number)
   {    
-    return this.http.get(this.apiUrl +`primeraPrueba?name=${sessionId}`)
+    return this.http.get(this.apiUrl +`getBoard?idSesion=${sessionId}`)
     .map(res => 
       res.json()); 
   }
 
   public makeMove(row:Number,column:Number, sessionId:Number,playerId:Number){
-    let headers = new Headers ({"Content-Type": "application/json"});
-    let options = new RequestOptions({headers: headers});
-    return this.http.post(this.apiUrl+`primeraPrueba?`,JSON.stringify({'row':row,'column':column,'sessionId':sessionId,
-        'playerId': playerId}),options)
+    return this.http.get(this.apiUrl +`checkMovement?idSesion=${sessionId}+&idPlayer=${playerId}+&row=${row}+&column=${column}`)
     .map(res => 
       res.json()); 
   }

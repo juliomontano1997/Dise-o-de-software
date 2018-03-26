@@ -89,7 +89,7 @@ CREATE TABLE invitations
 --PROCEDURES
 /*
 * Returns the player information
-* 
+*
 */
 CREATE OR REPLACE FUNCTION 
 mg_get_player

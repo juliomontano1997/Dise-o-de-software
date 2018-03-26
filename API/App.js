@@ -7,17 +7,13 @@
 */
 
 var pg = require('pg');
-var conString = "postgres://postgres:12345@localhost:5432/devesa_app";
 var client;
 var express = require('express');
 var app = express();
 var pgp = require('pg-promise')();
-var cn = {host: 'localhost', port: 5432, database: 'otelloDB', user: 'postgres', password: '12345'};
+var cn = {host: 'localhost', port: 5432, database: 'othelloDB', user: 'postgres', password: 'postgresql2017'};
 var db = pgp(cn);
 var http =  require('http');
-
-
-
 
 app.use(function(req, res, next) 
 {
@@ -27,6 +23,10 @@ app.use(function(req, res, next)
     next();
 });
 
+/**
+ * Allows obtain the player's names.
+ * @param {number} idSesion 
+ */
 app.get('/sessionPlayersName', function(req, res) 
 { 
 	db.func('mg_get_session_playersName',[req.query.idSesion])    
@@ -35,8 +35,7 @@ app.get('/sessionPlayersName', function(req, res)
         res.end(JSON.stringify(data));
     })
     .catch(error=> 
-    {    	    	 
-        console.log(error);
+    {    	    	         
         res.end(JSON.stringify(false));                
     })   
 });	
@@ -52,15 +51,13 @@ app.get('/sessionPlayersName', function(req, res)
  */
 app.get('/checkMovement', function(req, res) 
 {                    
+    console.log("Verificando movimiento");
     // 1. Extract the original board from the DB 
     db.func('mg_get_board',[req.query.idSesion])    
     .then(data => 
-    {        	         
-        console.log(data);
-        console.log(req.query);
+    {        	                     
         if(data=== null | data[0].o_actualplayerid !== req.query.idPlayer*1)
-        {            
-            console.log("Cancelado por que no existe la sesion o porque el id del jugador no es el correcto o no esta en su turno");
+        {                                    
             res.end(JSON.stringify(false));
             return;
         }             
@@ -69,37 +66,38 @@ app.get('/checkMovement', function(req, res)
 
         //2. Verify if the actual position is empty 
         if(originalBoard[getIndex(req.query.row, req.query.column, matrixSize)] !== -1)
-        {
-            console.log("Cancelado porque el campo esta ocupado");
+        {                        
             res.end(JSON.stringify(false));  
             return;        
         }          
 
-        //3. Validate play 
-        var afectedIndices = [getIndex(req.query.row, req.query.column, matrixSize)]; 
         
-        var rigth = check(req.query.row, req.query.column*1+1, matrixSize,originalBoard,req.query.idPlayer, 0,1);
-        var left = check(req.query.row, req.query.column*1-1, matrixSize,originalBoard,req.query.idPlayer, 0,-1); 
-        var up =  check(req.query.row*1-1, req.query.column, matrixSize,originalBoard,req.query.idPlayer, -1,0);
-        var down = check(req.query.row*1+1, req.query.column, matrixSize,originalBoard,req.query.idPlayer, 1,0);
+        //3. Validate play 
+        var afectedIndices = [getIndex(req.query.row, req.query.column, matrixSize)];                 
+        var row = req.query.row*1;
+        var column = req.query.column*1;
+        var idPlayer = req.query.idPlayer*1;
 
-        var leftUp = check(req.query.row*1-1, req.query.column*1-1, matrixSize,originalBoard,req.query.idPlayer, -1,-1);    
-        var rightUP = check(req.query.row*1-1, req.query.column*1+1, matrixSize,originalBoard,req.query.idPlayer, -1,1);    
-        var leftDown = check(req.query.row*1+1, req.query.column*1-1, matrixSize,originalBoard,req.query.idPlayer, 1,-1);    
-        var rigthDown = check(req.query.row*1+1, req.query.column*1+1, matrixSize,originalBoard,req.query.idPlayer, 1,1); 
+        var rigth = check(row, column+1, matrixSize,originalBoard,idPlayer, 0,1);
+        var left = check(row, column-1, matrixSize,originalBoard,idPlayer, 0,-1); 
+        var up =  check(row-1, column, matrixSize,originalBoard,idPlayer, -1,0);
+        var down = check(row+1, column, matrixSize,originalBoard,idPlayer,1, 0);                    
+
+        var leftUp = check(row-1, column-1, matrixSize,originalBoard,idPlayer, -1,-1);    
+        var rightUP = check(row-1, column+1, matrixSize,originalBoard,idPlayer, -1,1);    
+        var leftDown = check(row+1, column-1, matrixSize,originalBoard,idPlayer, 1,-1);    
+        var rigthDown = check(row+1, column+1, matrixSize,originalBoard,idPlayer, 1,1); 
         afectedIndices = afectedIndices.concat(up).concat(down).concat(left).concat(rigth).concat(leftUp).concat(rightUP).concat(leftDown).concat(rigthDown);                                
        
         // 4. Update the board in the DB      
-        printMatrix(originalBoard, matrixSize);
-        console.log(afectedIndices)  ;
+        printMatrix(originalBoard, matrixSize);        
         if(afectedIndices.length===1)
-        {            
-            console.log("Cancelado por que no existe jugada valida para esta posicion");
+        {                            
             res.end(JSON.stringify(false));  
             return;    
         }          
         else
-        {            
+        {                        
             for(i=0; i<afectedIndices.length; i++)
             {
                 originalBoard[afectedIndices[i]] = parseInt(req.query.idPlayer);
@@ -107,18 +105,8 @@ app.get('/checkMovement', function(req, res)
             var band = false;    
             db.func('mg_update_board',[req.query.idSesion, req.query.idPlayer, originalBoard])
             .then(data2 => 
-            {                                                 
-                // Posible posicion para llamar a un metodo que haga la jugada actual.
-                console.log("Retornando al cliente");
-                console.log(data2[0].mg_update_board);
-                console.log(data[0].o_playertwoid);
-                res.end(JSON.stringify(data2[0].mg_update_board)); 
-                if(data2[0].mg_update_board && data[0].o_playertwoid===0)
-                {
-    					console.log("Haciendo jugada aunomatica");
-                    	calculateAutomaticMove(req.query.idSesion);                    
-                }             
-                                               
+            {                                                                               
+                res.end(JSON.stringify(data2[0].mg_update_board));                                                        
             })
             .catch(error=> 
             {    	    	                         
@@ -133,27 +121,61 @@ app.get('/checkMovement', function(req, res)
 });
 
 
-
+/**
+ * Allows obtais the board information
+ * 
+ * @param {number} idSession 
+ * @returns  true, false or other Json whit all the board information.  
+ * 
+ */
 app.get('/getBoard',function(req, res)
 {        
     db.func('mg_get_board',[req.query.idSesion])    
     .then(data => 
-    {        	        
-        printMatrix(data[0].o_board, data[0].o_boardsize);
-        res.end(JSON.stringify(data));
-        if(data[0].o_playertwoid===0 && data[0].o_actualplayerid===0)  //calculate automatic machine move
-                {
-    					console.log("Haciendo jugada aunomatica");
-                    	calculateAutomaticMove(req.query.idSesion);                    
-                } 
+    {        	                        
+        var winners = verifyFullBoard(data[0].o_board, data[0].o_playeroneid);
+        if(winners!=false)
+        {
+            var winner =  winner = -2;
+            var newBoard = makeBoard(data[0].o_boardsize,data[0].o_playeroneid,data[0].o_playertwoid);
+
+            if(winners[0]> winners[1])            
+            {                   
+                winner = data[0].o_playeroneid;
+            }
+            else if (winners[0]<winners[1])
+            {
+                winner = data[0].o_playertwoid;
+            }
+
+            db.func('mg_finishgame', [req.query.idSesion, winner, newBoard])
+            .then(data=>
+            {
+                res.end(JSON.stringify(data[0].mg_finishgame));                                                                
+            })
+            .catch(error => {
+                res.end(JSON.stringify(false));
+            });           
+        }
+        else
+        {
+            res.end(JSON.stringify(data));
+            if(data[0].o_playertwoid===0 && data[0].o_actualplayerid===0)  //calculate automatic machine move
+            {    					            
+                calculateAutomaticMove(req.query.idSesion);                    
+            } 
+        }        
     })
     .catch(error=> 
-    {    	    	 
-        console.log(error);
+    {    	    	         
         res.end(JSON.stringify(false));                
     })      
 });
 
+/**
+ *Allows obtains the session's estadistics
+ *@param {number} idSession 
+ */
 app.get('/getSessionStadistics',function(req, res)
 {        
     db.func('mg_get_session_stadistic',[req.query.idSesion])    
@@ -169,13 +191,16 @@ app.get('/getSessionStadistics',function(req, res)
     })      
 });
 
+
+/**
+ * Allows pass turn 
+ */
 app.get('/passTurn',function(req, res)
 {        
     db.func('mg_passTurn',[req.query.idSesion])    
     .then(data => 
     {        	                
         res.end(JSON.stringify(data));
-
     })
     .catch(error=> 
     {    	    	 
@@ -201,10 +226,71 @@ app.get('/surrender',function(req, res)
     })      
 });
 
+/**
+ * Allows make a new invitation to play. 
+ * 
+ * @param {number} idPlayer1
+ * @param {number} idPlayer2
+ * @param {number} boardLength
+ * @param {number} game
+ * @param {number} gameNumber
+ */
+
+app.get('/newInvitation',function(req, res)
+{        
+    db.func('mg_',[req.query.idSesion])    
+    .then(data => 
+    {        	              
+        res.end(JSON.stringify(data));
+    })
+    .catch(error=> 
+    {    	    	 
+        console.log(error);
+        res.end(JSON.stringify(false));                
+    })      
+});
 
 
+/**
+ * Allows regect an invitation 
+ * 
+ * @param {number} idInvitation 
+ * @param {number} decision
+ */
+app.get('/acept_regectInvitation',function(req, res)
+{        
+    db.func('mg_',[req.query.idSesion])    
+    .then(data => 
+    {        	              
+        res.end(JSON.stringify(data));
+    })
+    .catch(error=> 
+    {    	    	 
+        console.log(error);
+        res.end(JSON.stringify(false));                
+    })      
+});
 
 
+/**
+ * Allows obtatains all the notifications of a player.
+ * 
+ * @param {number} idPlayer 
+ * @returns {json}
+ */
+app.get('/getNotifications',function(req, res)
+{        
+    db.func('mg_finishSesion',[req.query.idSesion])    
+    .then(data => 
+    {        	              
+        res.end(JSON.stringify(data));
+    })
+    .catch(error=> 
+    {    	    	 
+        console.log(error);
+        res.end(JSON.stringify(false));                
+    })      
+});
 
 
 /**
@@ -229,6 +315,10 @@ function check(row,column, matrixSize, board, player, verticalMov, horisontalMov
         column = column*1 + horisontalMov*1;                
         index = getIndex(row, column, matrixSize);        
     }    
+    if(row===-1 | column===-1  | row>=matrixSize | column>=matrixSize)
+    {              
+        return [];
+    }
     if(board[index] === player*1)
     {                    
         return lista;
@@ -288,7 +378,6 @@ function makeBoard(length, player1, player2)
     return newBoard;
 }
 
-
 /**
  * Allows calculate an automatic movement 
  * @param {number} idSesion 
@@ -308,7 +397,7 @@ function calculateAutomaticMove(idSesion)
         }         
         var originalBoard = data[0].o_board;        
         var matrixSize = Math.sqrt(originalBoard.length);
-        var machineLevel = data[0].o_levelPlayerTwo;
+        var machineLevel = data[0].o_levelplayertwo;
         printMatrix(originalBoard, matrixSize);        
         
         //1.Search the positions and validate if this position .....                 
@@ -319,12 +408,12 @@ function calculateAutomaticMove(idSesion)
         {
             if(originalBoard[i]===0)
             {                
-                var afectedIndices = [];             
+                var afectedIndices = [];   // Son los indices con los cuales se puede jugar          
                 var coordinates = getCoordinates(i, matrixSize);
-                var row = coordinates[0];
-                var column = coordinates[1];            
+                var row = coordinates[0]*1;
+                var column = coordinates[1]*1;            
     
-                var rigth= auxiliarCalculate(row,  column+1, matrixSize,originalBoard,0*1,1*1);
+                var rigth= auxiliarCalculate(row,  column+1, matrixSize,originalBoard,0,1);
                 var left = auxiliarCalculate(row,  column-1, matrixSize,originalBoard, 0,-1);         
                 var up =   auxiliarCalculate(row-1,column, matrixSize,originalBoard,-1, 0);
                 var down = auxiliarCalculate(row+1,column, matrixSize,originalBoard, 1, 0); 
@@ -333,14 +422,17 @@ function calculateAutomaticMove(idSesion)
                 var leftDown =  auxiliarCalculate(row+1,column-1, matrixSize,originalBoard,  1,-1);                
                 var rightUP =   auxiliarCalculate(row-1,column+1, matrixSize,originalBoard, -1, 1);  
                 var leftUp =    auxiliarCalculate(row-1,column-1, matrixSize,originalBoard, -1,-1);     
-    
+               
                 afectedIndices = afectedIndices.concat(up).concat(down).concat(left).concat(rigth).concat(leftUp).concat(rightUP).concat(leftDown).concat(rigthDown);                
                 if(afectedIndices.length>=1)
                 {
+                    
                     posiblePlays = posiblePlays.concat(afectedIndices);                
                 }   
             }        
         }         
+
+        console.log("Posibles puntos para jugar: "+posiblePlays);
         //3. Calculate the afected indices of each element in posiblePlay list  and save the afected indices in playsAfectedIndexes
         var playsAfectedIndexes = []; 
         for(i=0; i<posiblePlays.length;i++)
@@ -366,8 +458,9 @@ function calculateAutomaticMove(idSesion)
         var coordinates = getCoordinates(response, matrixSize);     
         var urlLink="http://localhost:8081/checkMovement?row="+coordinates[0]+"&column="+coordinates[1]+"&idPlayer="+0+"&idSesion="+idSesion;  
         
+        console.log(urlLink);
         setTimeout(function () {
-    					console.log("Haciendo jugada aunomatica");
+    					console.log("Haciendo jugada automatica");
                     	autoRequest(urlLink);  
   					}, 2000);
   
@@ -379,7 +472,7 @@ function calculateAutomaticMove(idSesion)
 }
 
 /**
- * Verify if a coordinate is valid play
+ * Verify if a coordinate is valid
  * 
  *  @param row
  *  @param column
@@ -389,27 +482,39 @@ function calculateAutomaticMove(idSesion)
  *  @param horisontalMov  
  */
 function auxiliarCalculate(row, column,matrixSize, board,verticalMov,horisontalMov)
-{                         
-    var lista = [ ];                 
-    var index = getIndex(row, column, matrixSize);
-
-    while(board[index] !== 0 && board[index]!==-1 && row!==-1 && column!==-1 && column<matrixSize && row<matrixSize)
+{            
+    verticalMov = verticalMov*1;
+    horisontalMov = horisontalMov *1;    
+    matrixSize = matrixSize*1;  
+    
+    var lista = [];                 
+    var index = getIndex(row, column, matrixSize);        
+    while(board[index] !== 0 && board[index]!==-1 && row!==-1 && column!==-1  && row<matrixSize && column<matrixSize)
     {        
         lista.push(index);                 
         row = row + verticalMov;            
         column = column + horisontalMov;                
-        index = getIndex(row, column, matrixSize);                
+        index = getIndex(row, column, matrixSize);                      
     }
-    lista.push(index);
-    if(board[index] === -1 && lista.length>1)
-    {                
-        console.log("Jugada valida="+ index);                
-        return [index];
-    }
-    else
-    {        
+
+    console.log("UTLYI row="+row + " Colim="+ column +" in="+index + "ta amm="+matrixSize);  
+    if(row===-1 | column===-1  | row>=matrixSize | column>=matrixSize)
+    {      
+        
         return [];
     }
+    else
+    {
+        lista.push(index);
+        if(board[index] === -1 && lista.length>1)
+        {                                    
+            return [index];
+        }
+        else
+        {        
+            return [];
+        }
+    }   
 }
 
 /**
@@ -424,8 +529,7 @@ function machineSelection(machineLevel, playsAfectedIndexes, playIndices)
     if(playIndices===[])
     {
         return -2;
-    }
-    console.log(machineLevel);
+    }    
     var length = playsAfectedIndexes.length; 
     // Selects the worst option 
     if(machineLevel===1)
@@ -466,12 +570,9 @@ function machineSelection(machineLevel, playsAfectedIndexes, playIndices)
     }    
 }
 
-
-
 // Extra funtions 
 function printMatrix(lista , tam)
-{
-    console.log("\n***********************\n");
+{    
     for(i=0; i<tam*1; i++)
     {        
         var cat ='';
@@ -490,7 +591,6 @@ function printMatrix(lista , tam)
     }
 }
 
-
 function autoRequest(url)
 {
     http.get(url, (resp)=>
@@ -501,8 +601,8 @@ function autoRequest(url)
           data += chunk;
         });        
         resp.on('end', () => 
-        {
-            console.log("autoRequest");
+        {            
+            // Aqui se verifica si la respuesta fue buena o no. 
             console.log(data);
         });
        
@@ -511,10 +611,16 @@ function autoRequest(url)
       });
 }
 
-
-
-function verifyFullBoard(board)
+/**
+ * Allows verify if the board is filled. It needs the player 1 to veryfi the winner.
+ * 
+ * @param {number} board
+ * @param {number} player1
+ */
+function verifyFullBoard(board, player1)
 {
+    var marksPlayer1 =0;
+    var marksPlayer2 =0;
     var length = board.length;
     for(i=0; i<length; i++)
     {
@@ -522,8 +628,16 @@ function verifyFullBoard(board)
         {
             return false;
         }
-    }
-    return false;
+        else if(board[i]==player1)
+        {
+            marksPlayer1++;
+        }        
+        else
+        {
+            marksPlayer2++;
+        }
+    }  
+    return [marksPlayer1, marksPlayer2];
 }
 
 

@@ -51,21 +51,10 @@ app.get('/getPlayerId',function(req, res)
  * @param idSesion
  * @param color1
  * @param color2 
+ * @param idPlayer1
+ * @param idPlayer2
+ * @param boardLength
  */
-app.get('/startSession',function(req, res)
-{        
-    // codigo para agregar session    
-    db.func('mg_get_startSession', [req.query.idSesion, newBoard, req.query.color1, req.query.color2])    
-    .then(data => 
-    {        	              
-        res.end(JSON.stringify(data));
-    })
-    .catch(error=> 
-    {    	    	 
-        console.log(error);
-        res.end(JSON.stringify(false));                
-    })      
-});
 
 /**
  * Allows obtais the board information
@@ -295,16 +284,34 @@ app.get('/getNotifications',function(req, res)
 });
 
 /**
- * Allows regect an invitation 
+ * Allows regect or acept an invitation 
  * 
  * @param {number} idInvitation 
  * @param {number} decision
- */
+ * @param {number} boardLength
+ * @param {number} idPlayer1
+ * @param {number} idPlayer2 
+ * 
+ * */
 app.get('/decideInvitation',function(req, res)
 {        
-    db.func('mg_handling_invitations',[req.query.idSesion, req.query.decision])    
+    db.func('mg_handling_invitations',[req.query.idInvitation, req.query.decision])    
     .then(data => 
-    {        	              
+    {   
+        if(data.mg_handling_invitations=== true)
+        {
+            var newBoard = makeBoard(req.query.boardLength, req.query.idPlayer1, req.query.idPlayer2);
+            db.func('mg_get_startSession', [req.query.idSesion, newBoard, req.query.color1, req.query.color2])    
+            .then(data => 
+            {        	              
+                res.end(JSON.stringify(data));
+            })
+            .catch(error=> 
+            {    	    	 
+                console.log(error);
+                res.end(JSON.stringify(false));                
+            });        
+        }     	              
         res.end(JSON.stringify(data));
     })
     .catch(error=> 
@@ -378,7 +385,7 @@ function check(row,column, matrixSize, board, player, verticalMov, horisontalMov
  */
 function getIndex(row, column,lengt)
 {    
-    return (lengt*row+column*1) ; // se hizo asi por un problema extraño
+    return (lengt*row+column*1) ; 
 }
 
 /**

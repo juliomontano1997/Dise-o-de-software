@@ -2,8 +2,7 @@
  * Date: 05-03-2018
  * Last update: 09-03-2018
  * @author: Julio Adán Montano Hernandez 
- * @summary: this is the
- *  server definitions for the othello emulator API. 
+ * @summary: this is the server definitions for the othello emulator. 
 */
 
 var pg = require('pg');
@@ -23,22 +22,101 @@ app.use(function(req, res, next)
     next();
 });
 
-/**
- * Allows obtain the player's names.
- * @param {number} idSesion 
+
+// END POINTS
+
+/** 
+ * Allows registrate a user and return the id
+ * @param {String} mail
+ * @param {String} name 
+ * @param {String} imageURL
+ * @returns {number}
  */
-app.get('/sessionPlayersName', function(req, res) 
-{ 
-	db.func('mg_get_session_playersName',[req.query.idSesion])    
+app.get('/getPlayerId',function(req, res)
+{        
+    db.func('mg_get_player', [req.query.mail, req.query.name, req.query.imageURL])    
     .then(data => 
-    {        	        
+    {        	              
         res.end(JSON.stringify(data));
+    })
+    .catch(error=> 
+    {    	    	 
+        console.log(error);
+        res.end(JSON.stringify(false));                
+    })      
+});
+
+/**
+ * Allows create a new session 
+ * @param idSesion
+ * @param color1
+ * @param color2 
+ */
+app.get('/startSession',function(req, res)
+{        
+    // codigo para agregar session    
+    db.func('mg_get_startSession', [req.query.idSesion, newBoard, req.query.color1, req.query.color2])    
+    .then(data => 
+    {        	              
+        res.end(JSON.stringify(data));
+    })
+    .catch(error=> 
+    {    	    	 
+        console.log(error);
+        res.end(JSON.stringify(false));                
+    })      
+});
+
+/**
+ * Allows obtais the board information
+ * 
+ * @param {number} idSession 
+ * @returns  true, false or other Json whit all the board information.  
+ * 
+ */
+app.get('/getBoard',function(req, res)
+{        
+    db.func('mg_get_board',[req.query.idSesion])    
+    .then(data => 
+    {        	                        
+        var winners = verifyFullBoard(data[0].o_board, data[0].o_playeroneid);
+        if(winners!=false)
+        {
+            var winner =  winner = -2;
+            var newBoard = makeBoard(data[0].o_boardsize,data[0].o_playeroneid,data[0].o_playertwoid);
+
+            if(winners[0]> winners[1])            
+            {                   
+                winner = data[0].o_playeroneid;
+            }
+            else if (winners[0]<winners[1])
+            {
+                winner = data[0].o_playertwoid;
+            }
+
+            db.func('mg_finishgame', [req.query.idSesion, winner, newBoard])
+            .then(data=>
+            {
+                res.end(JSON.stringify(data[0].mg_finishgame));                                                                
+            })
+            .catch(error => {
+                res.end(JSON.stringify(false));
+            });           
+        }
+        else
+        {
+            res.end(JSON.stringify(data));
+            if(data[0].o_playertwoid===0 && data[0].o_actualplayerid===0)  //calculate automatic machine move
+            {    					            
+                calculateAutomaticMove(req.query.idSesion);                    
+            } 
+        }        
     })
     .catch(error=> 
     {    	    	         
         res.end(JSON.stringify(false));                
-    })   
-});	
+    })      
+});
 
 /**
  * Allow make and validate a movement  
@@ -120,52 +198,39 @@ app.get('/checkMovement', function(req, res)
 });
 
 /**
- * Allows obtais the board information
- * 
- * @param {number} idSession 
- * @returns  true, false or other Json whit all the board information.  
- * 
+ * Allows pass turn 
+ * @param {number} idSession
  */
-app.get('/getBoard',function(req, res)
+app.get('/passTurn',function(req, res)
 {        
-    db.func('mg_get_board',[req.query.idSesion])    
+    db.func('mg_passTurn',[req.query.idSesion])    
     .then(data => 
-    {        	                        
-        var winners = verifyFullBoard(data[0].o_board, data[0].o_playeroneid);
-        if(winners!=false)
-        {
-            var winner =  winner = -2;
-            var newBoard = makeBoard(data[0].o_boardsize,data[0].o_playeroneid,data[0].o_playertwoid);
-
-            if(winners[0]> winners[1])            
-            {                   
-                winner = data[0].o_playeroneid;
-            }
-            else if (winners[0]<winners[1])
-            {
-                winner = data[0].o_playertwoid;
-            }
-
-            db.func('mg_finishgame', [req.query.idSesion, winner, newBoard])
-            .then(data=>
-            {
-                res.end(JSON.stringify(data[0].mg_finishgame));                                                                
-            })
-            .catch(error => {
-                res.end(JSON.stringify(false));
-            });           
-        }
-        else
-        {
-            res.end(JSON.stringify(data));
-            if(data[0].o_playertwoid===0 && data[0].o_actualplayerid===0)  //calculate automatic machine move
-            {    					            
-                calculateAutomaticMove(req.query.idSesion);                    
-            } 
-        }        
+    {        	                
+        res.end(JSON.stringify(data));
     })
     .catch(error=> 
-    {    	    	         
+    {    	    	 
+        console.log(error);
+        res.end(JSON.stringify(false));                
+    })      
+});
+
+/**
+ * Allows surrender and start a new game. 
+ */
+app.get('/surrender',function(req, res)
+{        
+
+    var winner;
+    var newBoard;
+    db.func('mg_finishGame',[req.query.idSesion, winners, newBoard])    
+    .then(data => 
+    {        	              
+        res.end(JSON.stringify(data));
+    })
+    .catch(error=> 
+    {    	    	 
+        console.log(error);
         res.end(JSON.stringify(false));                
     })      
 });
@@ -189,85 +254,25 @@ app.get('/getSessionStadistics',function(req, res)
     })      
 });
 
-/**
- * Allows pass turn 
- */
-app.get('/passTurn',function(req, res)
-{        
-    db.func('mg_passTurn',[req.query.idSesion])    
-    .then(data => 
-    {        	                
-        res.end(JSON.stringify(data));
-    })
-    .catch(error=> 
-    {    	    	 
-        console.log(error);
-        res.end(JSON.stringify(false));                
-    })      
-});
 
-/**
- * Allows 
- */
-app.get('/surrender',function(req, res)
-{        
-    db.func('mg_finishSesion',[req.query.idSesion])    
-    .then(data => 
-    {        	              
-        res.end(JSON.stringify(data));
-    })
-    .catch(error=> 
-    {    	    	 
-        console.log(error);
-        res.end(JSON.stringify(false));                
-    })      
-});
-
-/**
- * Allows make a new invitation to play. 
- * 
- * @param {number} idPlayer1
- * @param {number} idPlayer2
- * @param {number} boardLength
- * @param {number} game
- * @param {number} gameNumber
- */
-
-app.get('/newInvitation',function(req, res)
-{        
-    db.func('mg_',[req.query.idSesion])    
-    .then(data => 
-    {        	              
-        res.end(JSON.stringify(data));
-    })
-    .catch(error=> 
-    {    	    	 
-        console.log(error);
-        res.end(JSON.stringify(false));                
-    })      
-});
 
 
 /**
- * Allows regect an invitation 
- * 
- * @param {number} idInvitation 
- * @param {number} decision
+ * Allows obtain the player's names.
+ * @param {number} idSesion 
  */
-app.get('/decideInvitation',function(req, res)
-{        
-    db.func('mg_',[req.query.idSesion])    
+app.get('/sessionPlayersName', function(req, res) 
+{ 
+	db.func('mg_get_session_playersName',[req.query.idSesion])    
     .then(data => 
-    {        	              
+    {        	        
         res.end(JSON.stringify(data));
     })
     .catch(error=> 
-    {    	    	 
-        console.log(error);
+    {    	    	         
         res.end(JSON.stringify(false));                
-    })      
-});
-
+    })   
+});	
 
 /**
  * Allows obtatains all the notifications of a player.
@@ -277,7 +282,7 @@ app.get('/decideInvitation',function(req, res)
  */
 app.get('/getNotifications',function(req, res)
 {        
-    db.func('mg_finishSesion',[req.query.idSesion])    
+    db.func('mg_get_notifications', [req.query.idPlayer])    
     .then(data => 
     {        	              
         res.end(JSON.stringify(data));
@@ -288,6 +293,29 @@ app.get('/getNotifications',function(req, res)
         res.end(JSON.stringify(false));                
     })      
 });
+
+/**
+ * Allows regect an invitation 
+ * 
+ * @param {number} idInvitation 
+ * @param {number} decision
+ */
+app.get('/decideInvitation',function(req, res)
+{        
+    db.func('mg_handling_invitations',[req.query.idSesion, req.query.decision])    
+    .then(data => 
+    {        	              
+        res.end(JSON.stringify(data));
+    })
+    .catch(error=> 
+    {    	    	 
+        console.log(error);
+        res.end(JSON.stringify(false));                
+    })      
+});
+
+
+
 
 
 

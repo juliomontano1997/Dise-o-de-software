@@ -40,7 +40,6 @@ app.get('/sessionPlayersName', function(req, res)
     })   
 });	
 
-
 /**
  * Allow make and validate a movement  
  * @param {number} row
@@ -120,7 +119,6 @@ app.get('/checkMovement', function(req, res)
     });         
 });
 
-
 /**
  * Allows obtais the board information
  * 
@@ -191,7 +189,6 @@ app.get('/getSessionStadistics',function(req, res)
     })      
 });
 
-
 /**
  * Allows pass turn 
  */
@@ -257,7 +254,7 @@ app.get('/newInvitation',function(req, res)
  * @param {number} idInvitation 
  * @param {number} decision
  */
-app.get('/acept_regectInvitation',function(req, res)
+app.get('/decideInvitation',function(req, res)
 {        
     db.func('mg_',[req.query.idSesion])    
     .then(data => 
@@ -291,6 +288,19 @@ app.get('/getNotifications',function(req, res)
         res.end(JSON.stringify(false));                
     })      
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /**
@@ -639,8 +649,6 @@ function verifyFullBoard(board, player1)
     }  
     return [marksPlayer1, marksPlayer2];
 }
-
-
 
 
 

@@ -11,6 +11,7 @@ import { boardSessionHandler } from '../../models/boardSessionHandler.model';
   styleUrls: ['./game-view.component.css']
 })
 export class GameViewComponent implements OnInit {
+  
   private sessionHandler:boardSessionHandler;
 
   constructor(private gameService: GameServicesService) { 

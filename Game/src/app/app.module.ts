@@ -8,36 +8,28 @@ import { AppComponent } from './app.component';
 import { HttpModule } from '@angular/http';
 
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { GameModule } from '../app/game-module/game-module.module';
-import { LoginModule } from './login-module/login-module.module';
-import { ProfileModule } from './profile-module/profile.module';
-//import { AppRoutingModule, routingComponents } from './app.routing';
-import { Routes, RouterModule } from '@angular/router';
-import { LoginComponent } from './login-module/login/login.component';
-import { GameModuleComponent } from './game-module/game-module/game-module.component';
-import { ProfileComponent } from './profile-module/profile/profile.component';
 
- export const routes: Routes = [
-  { path: '', component: GameModuleComponent},
-  { path: '**', component:GameModuleComponent},
-  { path: 'gameModule', component: GameModuleComponent},
-  { path: 'profileModule', component:ProfileComponent},
-  ];
+import { Routes, RouterModule } from '@angular/router';
+
+
+const routes: Routes = [
+  { path: '',loadChildren: './login-module/login-module.module#LoginModule'},
+  { path: 'gameModule', loadChildren: './game-module/game-module.module#GameModule'},
+  { path: 'profileModule',loadChildren:'./profile-module/profile.module#ProfileModule' },
+];
+const routerModule = RouterModule.forRoot(routes);
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     BrowserModule,
     FormsModule,
-    RouterModule.forRoot(routes),
+    routerModule,
     HttpModule,
-    HttpClientModule,
-    GameModule,
-    LoginModule,
-    ProfileModule],
-  providers: [GameServicesService],
+    HttpClientModule,],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

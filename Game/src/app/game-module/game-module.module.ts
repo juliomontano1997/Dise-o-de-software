@@ -10,14 +10,16 @@ import { GameModuleComponent } from '../game-module/game-module/game-module.comp
 import { GameViewComponent } from './game-view/game-view.component';
 import { SessionInformationComponent } from './session-information/session-information.component';
 import { SessionStadisticsService } from '../services/session-stadistics.service';
+import { Routes, RouterModule } from '@angular/router';
+
+const routes: Routes = [
+  { path: '', component: GameModuleComponent},
+];
 
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
-    FormsModule,
-    HttpModule,
-    HttpClientModule,
+    RouterModule.forChild(routes),
   ],
   declarations: [
   GameModuleComponent,

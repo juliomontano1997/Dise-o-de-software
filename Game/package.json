@@ -5,6 +5,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "code": "ng serve --ssl 1 --ssl-key \"C:\\certs\\server.key\" --ssl-cert \"C:\\certs\\server.crt\"",
     "build": "ng build --prod",
     "test": "ng test",
     "lint": "ng lint",
@@ -21,7 +22,9 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
+    "angular4-social-login": "^1.1.1",
     "core-js": "^2.4.1",
+    "ngx-pagination": "^3.1.0",
     "rxjs": "^5.5.6",
     "zone.js": "^0.8.19"
   },

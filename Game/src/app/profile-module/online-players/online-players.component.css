@@ -1,0 +1,47 @@
+.letter{
+    color: white;
+}
+
+.alignData{
+    padding-left:120px;
+}
+
+.tableOnline{
+    border: none;
+}
+
+.name{
+    padding-left: 120px;
+}
+
+
+.imageSize{
+    width: 28%;
+    height:28%;
+}
+
+@media only screen and (max-width: 600px) {
+    
+    
+    .name{
+        font-size: 12px;
+        margin-top: 70%;
+        padding-left: 0px;
+    }
+    .alignData{
+        padding-left:0px;
+        font-size: 12px;
+    }
+
+    
+    .imageSize{
+        width: 50%;
+        height:50%;
+    }
+
+    .title{
+        font-size: 14px;
+    }
+
+
+}

@@ -17,7 +17,8 @@
 
 .mainPage{
 	background-color: #100719;
-	background-repeat: no-repeat;
+	width:100%;
+	height:100%;
 }
 .initialPage{
 	width: 100%;

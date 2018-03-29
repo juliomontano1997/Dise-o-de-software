@@ -11,6 +11,7 @@ import { GameViewComponent } from './game-view/game-view.component';
 import { SessionInformationComponent } from './session-information/session-information.component';
 import { SessionStadisticsService } from '../services/session-stadistics.service';
 import { Routes, RouterModule } from '@angular/router';
+import { MessageNavBarComponent } from './message-nav-bar/message-nav-bar.component';
 
 const routes: Routes = [
   { path: '', component: GameModuleComponent},
@@ -19,12 +20,14 @@ const routes: Routes = [
 @NgModule({
   imports: [
     CommonModule,
+    FormsModule,
     RouterModule.forChild(routes),
   ],
   declarations: [
   GameModuleComponent,
   GameViewComponent,
-  SessionInformationComponent
+  SessionInformationComponent,
+  MessageNavBarComponent
   ],
   providers: [GameServicesService, SessionStadisticsService]
 })

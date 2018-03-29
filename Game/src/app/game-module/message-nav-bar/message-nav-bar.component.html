@@ -1,0 +1,56 @@
+
+<ul class="nav bg-dark justify-content-end">
+  <li class="nav-item">
+        <a class="nav-link hand letter" data-toggle="modal" data-target="#messages">
+        <i class="material-icons bg-white">chat</i>
+        <span class="label-count letter"> {{messagesNumber}}</span>
+        </a>
+      </li>
+  <li class="nav-item">
+    <button class="btn btn-primary exit"  (click)="closeSession()">Salir</button>
+  </li>
+</ul>  
+
+
+<div class="modal fade bd-example-modal-lg" id="messages" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Bandeja de entrada</h4>  
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+          
+        </div>
+        <div class="modal-body">
+          <div  class="container-fluid" *ngFor="let message of messages">
+              <h1>id:  {{message.transmitterId}}</h1>
+              <div class="row">
+                  <div   [ngClass]="{'col-md-4': message.transmitterId===playerId,
+                      'col-md-4 ml-auto' :message.transmitterId!=playerId}">
+                     <textarea class="form-control" [ngStyle]="{'background-color':setBackgroundColor(message.transmitterId)}"
+                      readonly  id="staticMessage" [(ngModel)]="message.messageContent" >
+                        </textarea>
+                  </div>
+                  
+              </div>
+  
+          </div>
+
+
+        </div>
+        <div class="modal-footer">
+            <div class="container-fluid">
+                <div style="display:inline-block;">
+                    <input type="text" class="form-control" id="messageContent" 
+                    placeholder="Envía un mensaje si así lo deseas" [(ngModel)]="messageBody">
+                </div>
+                <div style="display:inline-block;">
+                    <button type="button" class="btn btn-primary" 
+                    data-dismiss="modal">Enviar mensaje</button>
+                </div>
+              </div>
+            
+          
+        </div>
+  </div>
+</div>
+</div>

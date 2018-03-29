@@ -1,0 +1,31 @@
+.letter{
+    color: white;  
+}
+
+.message{
+    color: black;
+}
+
+.hand{
+    cursor: pointer;
+}
+
+.exit{
+    color: white;
+    margin-top: 8%;
+}
+
+.divBorder{
+    border: solid 10px gray;
+    
+}
+
+@media only screen and (max-width: 600px) {
+    
+    
+    .exit{
+        margin-top: 8%;
+    }
+
+
+}

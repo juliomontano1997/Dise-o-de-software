@@ -16,8 +16,7 @@ CREATE TABLE players
 
 CREATE TABLE sessions
 (
-	sessionID        SERIAL      NOT NULL,
-	state	         BOOLEAN     NOT NULL, 
+	sessionID        SERIAL      NOT NULL, 
 	playerOneID      INT         NOT NULL,
 	playerTwoID      INT         NOT NULL,
 	actualPlayerID   INT         NOT NULL,
@@ -409,7 +408,7 @@ BEGIN
 	RETURN query 
 	SELECT s.sessionID, s.boardSize, t.amountGames, t.numberActualGame 
 	FROM sessions s, sessionStadistics t 
-	WHERE s.sessionID = t.sessionID AND playerOneID = i_playerID OR playerTwoID = i_playerID AND state = TRUE;  
+	WHERE s.sessionID = t.sessionID AND playerOneID = i_playerID OR playerTwoID = i_playerID;  
 	
 	
 END;	
@@ -505,8 +504,8 @@ $body$
 BEGIN 	
 	SELECT sessionID INTO sessionExists FROM sessions WHERE playerOneID = i_playerOD AND playerTwoID = 0;
 	IF NOT sessionExists THEN
-		INSERT INTO sessions (state, playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2, levelPlayerOne, levelPlayerTwo, amountPassTurn) VALUES 
-		(TRUE, i_playerID, 0, i_playerID, i_boardSize,'{}','red','blue',(SELECT playerLevel FROM players WHERE playerID = ID1),i_machineLevel,0);
+		INSERT INTO sessions (playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2, levelPlayerOne, levelPlayerTwo, amountPassTurn) VALUES 
+		(i_playerID, 0, i_playerID, i_boardSize,'{}','red','blue',(SELECT playerLevel FROM players WHERE playerID = ID1),i_machineLevel,0);
 
 		INSERT INTO sessionStadistics (winsPlayer1, winsPlayer2, ties, amountGames, numberActualGame) VALUES (0,0,0, i_amountGames, 1);
 		
@@ -547,8 +546,8 @@ BEGIN
 	ELSE
 		INSERT INTO notifications (playerID, notificationContent) VALUES (ID1, (SELECT playerName FROM players WHERE playerID = ID2)|| ' aceptó tu invitación' );
 
-		INSERT INTO sessions (state, playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2, levelPlayerOne, levelPlayerTwo, amountPassTurn) VALUES 
-		(TRUE, ID1, ID2, ID1, BS,'{}','red','blue',(SELECT playerLevel FROM players WHERE playerID = ID1),(SELECT playerLevel FROM players WHERE playerID = ID2),0);
+		INSERT INTO sessions (playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2, levelPlayerOne, levelPlayerTwo, amountPassTurn) VALUES 
+		(ID1, ID2, ID1, BS,'{}','red','blue',(SELECT playerLevel FROM players WHERE playerID = ID1),(SELECT playerLevel FROM players WHERE playerID = ID2),0);
 
 		INSERT INTO sessionStadistics (winsPlayer1, winsPlayer2, ties, amountGames, numberActualGame) VALUES (0,0,0, AG, 1);
 		

@@ -13,9 +13,11 @@ import { boardSessionHandler } from '../../models/boardSessionHandler.model';
 export class GameViewComponent implements OnInit {
   
   private sessionHandler:boardSessionHandler;
+  private sessionId
 
   constructor(private gameService: GameServicesService) { 
-    this.sessionHandler= new boardSessionHandler(1,1);
+    let sessionInformation= JSON.parse(localStorage.getItem("sessionData"));
+    this.sessionHandler= new boardSessionHandler(sessionInformation.sessionId,sessionInformation.playerId);
     this.updateBoard();
     this.getBoardChanges();
   }
@@ -29,7 +31,8 @@ export class GameViewComponent implements OnInit {
     this.gameService.getUpdatedBoard(this.sessionHandler.getSessionId())
     .subscribe(
       (res) =>{
-
+        console.log("respuesta actualización");
+        console.log(res);
         this.sessionHandler.UpdateData(res);
       },
       (err) => {
@@ -40,7 +43,13 @@ export class GameViewComponent implements OnInit {
 
   public getBoardChanges():void{
     let id = setInterval(() => {
-      this.updateBoard(); 
+      if (this.sessionHandler.itsMyTurn()===true){
+        this.updateBoard(); 
+      }
+      
+      else{
+        clearInterval(id);
+      }
       
     }, 500);
   }
@@ -55,10 +64,10 @@ export class GameViewComponent implements OnInit {
       this.gameService.makeMove(row,column,this.sessionHandler.getSessionId(),this.sessionHandler.getPlayerPlayingId())
     .subscribe(
       (res) =>{
-        if (res===true){
-        this.sessionHandler.getBoard()[(row*this.sessionHandler.getBoardSize())+column]=this.sessionHandler.getPlayerPlayingId();
+        if (res!=false){
+        //this.sessionHandler.getBoard()[(row*this.sessionHandler.getBoardSize())+column]=this.sessionHandler.getPlayerPlayingId();
+        this.getBoardChanges();
         this.sessionHandler.setActualPlayerId();
-        //this.getBoardChanges();
         }
 
 

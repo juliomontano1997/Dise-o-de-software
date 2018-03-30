@@ -40,16 +40,17 @@ export class boardSessionHandler {
     public UpdateData(dataArray: Array<any>){
 
         this.actualPlayerId=dataArray[0].o_actualplayerid;
-
+        this.playerOneColor=dataArray[0].o_colorplayer1;
+        this.playerTwoColor=dataArray[0].o_colorplayer2;
         this.setBoard(dataArray[0].o_board);
         if (this.boardSize===0){
             this.boardSize=dataArray[0].o_boardsize;
-            this.playerOneColor=dataArray[0].o_colorplayer1;
-            this.playerTwoColor=dataArray[0].o_colorplayer2;
+            this.setBoardSizeArray();
             this.playerOneID=dataArray[0].o_playeroneid;
             this.playerTwoID=dataArray[0].o_playertwoid;
+            
         }
-        this.setBoardSizeArray();
+   
     }
 
     public setActualPlayerId():void{

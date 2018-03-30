@@ -11,7 +11,7 @@ export class UserService {
 
   constructor(private http:Http) { }
 
-  public getPlayerInformation(playerId:Number){
+  public getPlayerInformation(playerId:any){
 
     return this.http.get(this.apiUrl +`surrender?playerId=${playerId}`)
     .map(res => 

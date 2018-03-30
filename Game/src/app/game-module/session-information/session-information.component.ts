@@ -13,11 +13,14 @@ import { sessionInformationHandler } from '../../models/sessionInformationHandle
 export class SessionInformationComponent implements OnInit {
 
   private sessionInformationHandler:sessionInformationHandler;
+
   constructor(private sessionService:SessionStadisticsService,) {
-      this.sessionInformationHandler=new sessionInformationHandler(1);
-      this.getPlayersName();
-      this.updateSessionInformation();
-   }
+    let sessionInformation= JSON.parse(localStorage.getItem("sessionData"));
+    this.sessionInformationHandler=new sessionInformationHandler(sessionInformation.sessionId);
+    this.getPlayersName();
+    this.updateSessionInformation();
+   
+  }
 
   ngOnInit() {
   }
@@ -37,8 +40,13 @@ export class SessionInformationComponent implements OnInit {
 
   public updateSessionInformation():void{
     let id = setInterval(() => {
-      this.getSessionInformation();
-    }, 1000);
+      if (this.sessionInformationHandler.getAllowUpdating()===true){
+        this.getSessionInformation();
+      }
+      else{
+        clearInterval(id);
+      }
+    }, 3000);
   }
 
   public getPlayersName(): void{

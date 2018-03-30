@@ -14,8 +14,8 @@ export class LoginServiceService {
   public userRegistration(playerEmail:String,playerName:String,playerImage:String){
     let headers = new Headers ({"Content-Type": "application/json"});
     let options = new RequestOptions({headers: headers});
-    return this.http.post(this.apiUrl+`primeraPrueba?`,JSON.stringify({'playerEmail':playerEmail,
-    'playerName':playerName,'playerImage':playerImage}),options)
+    return this.http.post(this.apiUrl+`getPlayerId?`,JSON.stringify({'mail':playerEmail,
+    'name':playerName,'imageUrl':playerImage}),options)
     .map(res => 
       res.json()); 
   }

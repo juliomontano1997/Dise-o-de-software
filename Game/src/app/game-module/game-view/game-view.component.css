@@ -29,6 +29,11 @@
 
 }
 
+
+.tableGame{
+	align-self: center;
+}
+
 .yourTurn {
     color: white;
     background-color: green;

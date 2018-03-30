@@ -13,7 +13,6 @@ export class UserInformationComponent implements OnInit {
   
   constructor(private userService: UserService) { 
     this.getPlayerInformation();
-    
   }
 
   ngOnInit() {
@@ -21,11 +20,10 @@ export class UserInformationComponent implements OnInit {
 
   public getPlayerInformation(){
 
-    //get player data through a web service
-    // this.userService.getPlayerInformation().subscribe
     let playerData= JSON.parse(localStorage.getItem("user_data")); //parse string json to json object
-    this.playerHandler=new player(1,playerData.name,playerData.email,2,
-      "https://graph.facebook.com/"+playerData.id+"/picture?type=normal");
+    let playerIdLevel=JSON.parse(localStorage.getItem("playerInformation"));
+    this.playerHandler=new player(playerIdLevel.o_playerId,playerData.name,playerData.email,
+      playerIdLevel.o_playerLevel, "https://graph.facebook.com/"+playerData.id+"/picture?type=normal");
     console.log("player object");
     console.log(this.playerHandler);
   }

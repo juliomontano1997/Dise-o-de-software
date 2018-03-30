@@ -16,6 +16,7 @@ export class MessageNavBarComponent implements OnInit {
   private messagesNumber:Number=0;
 
   constructor() { 
+    this.facebookManager=new facebookSessionHandler('726004681121152');
     this.messages= new Array<any>();
     //testing
     this.playerId=1;

@@ -19,7 +19,7 @@ export class LoginComponent implements OnInit,AfterViewInit {
  
     private aplicationId:any;
     private userId:any;
-    private imageUrl:String;
+    private imageUrl:string;
     
      constructor(private http:HttpClient,private loginService:LoginServiceService) {
 
@@ -106,25 +106,22 @@ public notifyUser(){
 }
 
   //verify if the user exist.
-public userSignIn(response:any, imageDir:String){
+public userSignIn(response:any, imageDir:string){
     console.log(response);
     localStorage.setItem("user_data",JSON.stringify(response));
-    window.location.href='profileModule';
 
-   /*
     this.loginService.userRegistration(response.email,response.name,imageDir)
     .subscribe(
         (res) =>{
             console.log("login response");
             console.log(response);
-             localStorage.setItem("user_data",JSON.stringify(response));
-
+            localStorage.setItem("playerInformation",JSON.stringify(res));
+            
              window.location.href='profileModule';
         },
         (err) => {
           console.log(err.json()); 
         });
-    */
 
 }
 

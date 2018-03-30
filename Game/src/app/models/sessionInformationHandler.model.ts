@@ -8,10 +8,11 @@ export class sessionInformationHandler {
     private winsPlayerTwo: number;
     private currentGameNumber: number;
     private amountGamesNumber: number;
-    
+    private allowUpdating:boolean;
 
     constructor(sessionId:number){
         this.sessionId=sessionId;
+        this.allowUpdating=true;
     }
 
     public UpdateData(dataArray: Array<any>){
@@ -22,6 +23,14 @@ export class sessionInformationHandler {
         this.setTiesNumber(dataArray[0].o_ties);
     }
     
+    public setAllowUpdating(allow:boolean){
+        this.allowUpdating=allow;
+    }
+
+    public getAllowUpdating():boolean{
+        return this.allowUpdating;
+    }
+
     public setPlayerOneId(playerOneID:number):void{
         this.playerOneID=playerOneID;
     }

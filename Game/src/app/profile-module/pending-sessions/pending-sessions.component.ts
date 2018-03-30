@@ -30,7 +30,10 @@ export class PendingSessionsComponent implements OnInit {
 
   
   public restartSession(sessionId:Number){
+    let playerIdLevel=JSON.parse(localStorage.getItem("playerInformation"));
     alert("Id de la sesión: "+ sessionId);
+    localStorage.setItem("sessionData",JSON.stringify({"sessionId":sessionId,"playerId":playerIdLevel.o_playerId}));
+    window.location.href='gameModule';
   }
 
   ngOnInit() {

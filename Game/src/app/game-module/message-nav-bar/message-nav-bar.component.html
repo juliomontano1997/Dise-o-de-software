@@ -24,8 +24,8 @@
           <div  class="container-fluid" *ngFor="let message of messages">
               <h1>id:  {{message.transmitterId}}</h1>
               <div class="row">
-                  <div   [ngClass]="{'col-md-4': message.transmitterId===playerId,
-                      'col-md-4 ml-auto' :message.transmitterId!=playerId}">
+                  <div   [ngClass]="{'col-md-6': message.transmitterId===playerId,
+                      'col-md-6 ml-auto' :message.transmitterId!=playerId}">
                      <textarea class="form-control" [ngStyle]="{'background-color':setBackgroundColor(message.transmitterId)}"
                       readonly  id="staticMessage" [(ngModel)]="message.messageContent" >
                         </textarea>
@@ -38,17 +38,19 @@
 
         </div>
         <div class="modal-footer">
-            <div class="container-fluid">
-                <div style="display:inline-block;">
-                    <input type="text" class="form-control" id="messageContent" 
-                    placeholder="Envía un mensaje si así lo deseas" [(ngModel)]="messageBody">
+                
+            <div class="container-fluid"> 
+                <div class="form-group">
+                        <textarea class="form-control" placeholder="Envía un mensaje si así lo deseas" [(ngModel)]="messageBody"  >
+                          </textarea>
+
                 </div>
-                <div style="display:inline-block;">
-                    <button type="button" class="btn btn-primary" 
-                    data-dismiss="modal">Enviar mensaje</button>
+
+                <div class="form-group">
+                        <button type="button" class="btn btn-primary" 
+                          data-dismiss="modal">Enviar mensaje</button>
                 </div>
-              </div>
-            
+            </div>
           
         </div>
   </div>

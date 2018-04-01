@@ -1,4 +1,4 @@
-﻿--DOMIANS
+--DOMIANS
 CREATE DOMAIN t_mail VARCHAR(50) NOT NULL CONSTRAINT CHK_t_mail CHECK (VALUE SIMILAR TO '[A-z]%@[A-z]%.[A-z]%');
 
 --TABLES
@@ -93,8 +93,9 @@ CREATE TABLE invitations
 * Return:
 * playerID int
 */
-CREATE OR REPLACE FUNCTION mg_get_player(IN i_mail t_mail, IN i_playerName VARCHAR(50), IN i_image VARCHAR(50))
-RETURNS INT AS
+CREATE OR REPLACE FUNCTION mg_get_player(IN i_mail t_mail, IN i_playerName VARCHAR(50), IN i_image VARCHAR(50), OUT o_playerId INT, OUT o_playerLevel INT)
+RETURNS 
+SETOF RECORD AS
 $body$
 BEGIN 	
 	IF ((SELECT COUNT(playerID) FROM players WHERE mail = i_mail) > 0) THEN
@@ -105,7 +106,8 @@ BEGIN
 		INSERT INTO players (mail, playerName, playerLevel, image) VALUES (i_mail, i_playerName, 1, i_image);
 	END IF;
 	UPDATE players SET state = TRUE WHERE mail = i_mail;
-	RETURN (SELECT playerID FROM players WHERE mail = i_mail);
+	RETURN query
+	(SELECT playerID, playerLevel FROM players WHERE mail = i_mail);
 		
 END;	
 $body$
@@ -121,12 +123,13 @@ LANGUAGE plpgsql;
 * playerName varchar
 * image varchar
 */
-CREATE OR REPLACE FUNCTION mg_get_activePlayers(OUT o_playerID INT, OUT o_playerName VARCHAR(50), OUT o_image VARCHAR(50))
+CREATE OR REPLACE FUNCTION mg_get_activePlayers(IN i_playerID INT,OUT o_playerID INT, OUT o_playerName VARCHAR(50), OUT o_playerImage VARCHAR(50),OUT o_playerLevel INT)
 RETURNS 
 SETOF RECORD AS
 $body$
 BEGIN 	
-	RETURN (SELECT playerID, playerName, image FROM players WHERE state = TRUE);	
+	RETURN query
+	(SELECT playerID, playerName, image, playerLevel FROM players WHERE state = TRUE AND playerID != i_playerID);	
 END;	
 $body$
 LANGUAGE plpgsql;
@@ -400,16 +403,22 @@ LANGUAGE plpgsql;
 * amountGames int
 * numberActualGames int
 */
-CREATE OR REPLACE FUNCTION mg_get_activeSessions(IN i_playerID INT, OUT o_sessionID INT, OUT o_boardSize INT, OUT o_amountGames INT, OUT o_numberActualGame INT)
+CREATE OR REPLACE FUNCTION mg_get_activeSessions(IN i_playerID INT, OUT o_sessionID INT, OUT o_boardSize INT, OUT o_amountGames INT, OUT o_numberActualGame INT, OUT o_enemyName VARCHAR(50))
 RETURNS
 SETOF RECORD AS
 $body$
+DECLARE
+
+ enemyID INT;
+
 BEGIN 	
+	IF (SELECT COUNT(*) FROM sessions WHERE)
+	enemyID = (SELECT FROM sessions WHERE playerOneId)
 	RETURN query 
-	SELECT s.sessionID, s.boardSize, t.amountGames, t.numberActualGame 
-	FROM sessions s, sessionStadistics t 
-	WHERE s.sessionID = t.sessionID AND playerOneID = i_playerID OR playerTwoID = i_playerID;  
-	
+	SELECT s.sessionID, s.boardSize, t.amountGames, t.numberActualGame ,p.playerName FROM
+	((SELECT * FROM sessions s, sessionStadistics t 
+	WHERE s.sessionID = t.sessionID AND playerOneID = i_playerID OR playerTwoID = i_playerID) AS sessionData
+	INNER JOIN players AS p ON ((p.playerId=p.playerOneId AND p.playerId!=i_playerID) OR (p.playerId=p.playerTwoId AND p.playerId !=i_playerID) )); 
 	
 END;	
 $body$
@@ -431,9 +440,31 @@ SETOF RECORD AS
 $body$
 BEGIN 	
 	RETURN query 
-	SELECT (n.notificationID, v.invitationID) "ID" , (n.notificationContent, 
-	((SELECT playerName FROM players WHERE playerID = v.transmitterID) || 'te ha invitado a jugar.\n Caracteristicas del juego:\n Tamaño del tablero: '|| v.boardSize || '\nCantidad partidas: ' || v.amountGames)) "content" 
-	FROM notifications n, invitations v WHERE n.playerID = i_playerID or v.receiverID = i_playerID ORDER BY n.creationDate, v.creationDate DESC;
+	SELECT notificationID "ID", notificationContent FROM notifications WHERE playerID = i_playerID ORDER BY creationDate DESC;
+
+END;	
+$body$
+LANGUAGE plpgsql;
+
+/* 
+* Allows get all the invitations of a player
+*
+* Receive: 
+* i_playerID  int
+*
+* Return:
+* ID int
+* content text
+*/
+CREATE OR REPLACE FUNCTION mg_get_invitations(IN i_playerID INT, OUT o_ID INT, OUT o_Content TEXT)
+RETURNS
+SETOF RECORD AS
+$body$
+BEGIN 	
+	RETURN query 
+	SELECT invitationID "ID", ((SELECT playerName FROM players WHERE playerID = transmitterID) || ' te ha invitado a jugar. Caracteristicas del juego: Tamaño del tablero: '|| boardSize || ' Cantidad partidas: ' || amountGames) "content" 
+	FROM invitations WHERE receiverID = i_playerID ORDER BY creationDate DESC;
+
 END;	
 $body$
 LANGUAGE plpgsql;
@@ -452,6 +483,8 @@ RETURNS BOOLEAN AS
 $body$
 BEGIN 	
 	DELETE FROM notifications WHERE notificationID = i_notificationID; 
+	RETURN TRUE;
+	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
 	
 END;	
 $body$
@@ -468,15 +501,20 @@ LANGUAGE plpgsql;
 */
 CREATE OR REPLACE FUNCTION mg_create_invitation(IN i_transmitterID INT, IN i_receiverID INT, IN i_boardSize INT, IN i_amountGames INT)
 RETURNS BOOLEAN AS
-DECLARE
-	sessionExists = FALSE;
 $body$
+DECLARE
+	sessionExists INTEGER;
+	
 BEGIN 	
-	SELECT sessionID INTO sessionExists FROM sessions WHERE playerOneID = i_transmitterID AND playerTwoID = i_receiverID;
-	IF NOT sessionExists THEN
+	SELECT count(*) INTO sessionExists FROM sessions WHERE playerOneID = i_transmitterID AND playerTwoID = i_receiverID;
+
+	IF (sessionExists = 0) THEN
 		INSERT INTO invitations (transmitterID, receiverID, boardSize, amountGames) VALUES (i_transmitterID, i_receiverID, i_boardSize, i_amountGames);
 		RETURN TRUE;
+	ELSE
+		RETURN FALSE;
 	END IF;
+	
 	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
 	
 	
@@ -496,13 +534,13 @@ LANGUAGE plpgsql;
 * Return:
 * boolean
 */
-CREATE OR REPLACE FUNCTION mg_invite_machine(IN i_playerID, IN i_boardSize INT, IN i_amountGames INT, IN machineLevel INT)
+CREATE OR REPLACE FUNCTION mg_invite_machine(IN i_playerID INT, IN i_boardSize INT, IN i_amountGames INT, IN machineLevel INT)
 RETURNS BOOLEAN AS
-DECLARE
-	sessionExists = FALSE;
 $body$
+DECLARE
+	sessionExists BOOLEAN = FALSE;
 BEGIN 	
-	SELECT sessionID INTO sessionExists FROM sessions WHERE playerOneID = i_playerOD AND playerTwoID = 0;
+	SELECT sessionID INTO sessionExists FROM sessions WHERE playerOneID = i_playerID AND playerTwoID = 0;
 	IF NOT sessionExists THEN
 		INSERT INTO sessions (playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2, levelPlayerOne, levelPlayerTwo, amountPassTurn) VALUES 
 		(i_playerID, 0, i_playerID, i_boardSize,'{}','red','blue',(SELECT playerLevel FROM players WHERE playerID = ID1),i_machineLevel,0);
@@ -535,8 +573,9 @@ DECLARE
 	ID2 INT;
 	BS  INT;
 	AG  INT;
+	newSessionID INT;
 BEGIN 	 
-	SELECT trasnmitterID, receiverID, boardSize, amountGames INTO ID1, ID2, BS, AG FROM invitations WHERE invitationID = i_invitationID;
+	SELECT transmitterID, receiverID, boardSize, amountGames INTO ID1, ID2, BS, AG FROM invitations WHERE invitationID = i_invitationID;
 	IF (i_decision = FALSE) THEN
 		INSERT INTO notifications (playerID, notificationContent) VALUES (ID1, (SELECT playerName FROM players WHERE playerID = ID2)|| ' rechazó tu invitación');
 
@@ -549,16 +588,17 @@ BEGIN
 		INSERT INTO sessions (playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2, levelPlayerOne, levelPlayerTwo, amountPassTurn) VALUES 
 		(ID1, ID2, ID1, BS,'{}','red','blue',(SELECT playerLevel FROM players WHERE playerID = ID1),(SELECT playerLevel FROM players WHERE playerID = ID2),0);
 
-		INSERT INTO sessionStadistics (winsPlayer1, winsPlayer2, ties, amountGames, numberActualGame) VALUES (0,0,0, AG, 1);
+		newSessionID = (SELECT currval('sessions_sessionid_seq'));
+		INSERT INTO sessionStadistics (sessionId,winsPlayer1, winsPlayer2, ties, amountGames, numberActualGame) VALUES (newSessionID, 0, 0, 0, AG, 1);
 		
 		DELETE FROM invitations WHERE invitationID = i_invitationID;
 
 		RETURN TRUE;
 	END IF;
-	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
+	
 END;	
 $body$
-LANGUAGE plpgsql
+LANGUAGE plpgsql;
 
 /* 
 * Allows player to give up in a game
@@ -570,7 +610,7 @@ LANGUAGE plpgsql
 * Return:
 * boolean
 */
-CREATE OR REPLACE FUNCTION mg_give_up(IN i_playerID, IN sessionID INT)
+CREATE OR REPLACE FUNCTION mg_give_up(IN i_playerID INT, IN sessionID INT)
 RETURNS BOOLEAN AS
 $body$
 BEGIN 	

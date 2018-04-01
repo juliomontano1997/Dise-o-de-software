@@ -407,18 +407,13 @@ CREATE OR REPLACE FUNCTION mg_get_activeSessions(IN i_playerID INT, OUT o_sessio
 RETURNS
 SETOF RECORD AS
 $body$
-DECLARE
-
- enemyID INT;
-
 BEGIN 	
-	IF (SELECT COUNT(*) FROM sessions WHERE)
-	enemyID = (SELECT FROM sessions WHERE playerOneId)
+
 	RETURN query 
-	SELECT s.sessionID, s.boardSize, t.amountGames, t.numberActualGame ,p.playerName FROM
-	((SELECT * FROM sessions s, sessionStadistics t 
+	SELECT sessionData.sessionID, sessionData.boardSize, sessionData.amountGames, sessionData.numberActualGame , p.playerName FROM
+	(SELECT s.*, t.amountGames,t.numberActualGame FROM sessions s, sessionStadistics t 
 	WHERE s.sessionID = t.sessionID AND playerOneID = i_playerID OR playerTwoID = i_playerID) AS sessionData
-	INNER JOIN players AS p ON ((p.playerId=p.playerOneId AND p.playerId!=i_playerID) OR (p.playerId=p.playerTwoId AND p.playerId !=i_playerID) )); 
+	INNER JOIN players AS p ON ((p.playerID = sessionData.playerOneId AND p.playerID != i_playerID) OR (p.playerID = sessionData.playerTwoId AND p.playerID != i_playerID)); 
 	
 END;	
 $body$

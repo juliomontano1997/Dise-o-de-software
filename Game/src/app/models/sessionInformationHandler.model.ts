@@ -9,11 +9,30 @@ export class sessionInformationHandler {
     private currentGameNumber: number;
     private amountGamesNumber: number;
     private allowUpdating:boolean;
+    private playerPlayingId: Number;
+    private sessionEnd: Boolean;
 
     constructor(sessionId:number){
         this.sessionId=sessionId;
         this.allowUpdating=true;
     }
+
+    public setSessionEnd(sessionEnd:Boolean){
+        this.sessionEnd=sessionEnd;
+    }
+
+    public getSessionEnd():Boolean{
+        return this.sessionEnd;
+    }   
+
+    public setPlayerPlayingId(playerId:Number){
+        this.playerPlayingId=playerId;
+    }
+
+    public getPlayerPlayingId():Number{
+        return this.playerPlayingId;
+    }
+
 
     public UpdateData(dataArray: Array<any>){
         this.setAmountGamesNumber(dataArray[0].o_amountgames);

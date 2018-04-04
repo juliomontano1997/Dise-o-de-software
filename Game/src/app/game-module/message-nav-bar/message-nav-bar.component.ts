@@ -48,6 +48,14 @@ export class MessageNavBarComponent implements OnInit {
     
   }
 
+  /**
+  public getBoardChanges():void{
+    let id = setInterval(() => {
+      
+      
+    }, 5000);
+  }
+*/
   ngOnInit() {
   }
 

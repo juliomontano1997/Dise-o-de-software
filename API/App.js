@@ -10,7 +10,7 @@ var client;
 var express = require('express');
 var app = express();
 var pgp = require('pg-promise')();
-var cn = {host: 'localhost', port: 5432, database: 'othelloDB', user: 'postgres', password: 'postgresql2017'};
+var cn = {host: 'localhost', port: 5432, database: 'otelloDB', user: 'postgres', password: '12345'};
 var db = pgp(cn);
 var http =  require('http');
 
@@ -34,7 +34,7 @@ app.use(function(req, res, next)
  */
 app.get('/getPlayerId',function(req, res)
 {        
-    db.func('mg_get_player', [req.query.mail, req.query.name, req.query.imageURL])    
+    db.func('mg_get_player', [req.body.mail, req.body.name, req.body.imageURL])    
     .then(data => 
     {        	              
         res.end(JSON.stringify(data));

@@ -11,7 +11,6 @@ export class onlinePlayersHandler {
         
     }
 
-
     public setPlayers(data:Array<any>){
         this.players=data;
     }
@@ -26,6 +25,35 @@ export class onlinePlayersHandler {
 
     public getGuestPlayerId(){
         return this.guestPlayerId;
+    }
+
+    public updatePlayersArray(playersData:Array<any>){
+        let size:Number = playersData.length;
+        this.players=new Array<any>();
+        let i=0;
+        for (i=0; i < size;i++) {
+            this.players.push(new player(playersData[i].o_playerId,
+                playersData[i].o_playerName,
+                "",
+                playersData[i].o_playerLevel,
+                playersData[i].o_playerImage));
+        }
+    }
+
+    public getMachineLevel (level:String):Number{
+        if (level==="Fácil"){
+            return 1;
+        }   
+        else if ("Intermedio"){
+            return 2;
+        }
+        else{
+            return 3;
+        }
+    }
+
+    public isMachineId():boolean{
+        return this.guestPlayerId===0;
     }
 
     public checkSessionData(boardSize:Number,gamesNumber):boolean{

@@ -109,7 +109,9 @@ public notifyUser(){
 public userSignIn(response:any, imageDir:string){
     console.log(response);
     localStorage.setItem("user_data",JSON.stringify(response));
+    window.location.href='profileModule';
 
+/**    
     this.loginService.userRegistration(response.email,response.name,imageDir)
     .subscribe(
         (res) =>{
@@ -122,7 +124,7 @@ public userSignIn(response:any, imageDir:string){
         (err) => {
           console.log(err.json()); 
         });
-
+*/
 }
 
 

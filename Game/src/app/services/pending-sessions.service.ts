@@ -12,11 +12,8 @@ export class PendingSessionsService {
 
   constructor(private http:Http) { }
 
-  public userRegistration(playerEmail:String,playerName:String,playerImage:String){
-    let headers = new Headers ({"Content-Type": "application/json"});
-    let options = new RequestOptions({headers: headers});
-    return this.http.post(this.apiUrl+`primeraPrueba?`,JSON.stringify({'playerEmail':playerEmail,
-    'playerName':playerName,'playerImage':playerImage}),options)
+  public getPendingSessions(playerId:Number){
+    return this.http.get(this.apiUrl +`getPendingSessions?playerId=${playerId}`)
     .map(res => 
       res.json()); 
   }

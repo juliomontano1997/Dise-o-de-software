@@ -8,10 +8,9 @@ CREATE TABLE players
 	mail        t_mail      NOT NULL,
 	playerName  VARCHAR(50) NOT NULL,
 	playerLevel INT         NOT NULL,
-	image	    VARCHAR(50) NOT NULL,
+	image	    TEXT NOT NULL,
 	state       BOOLEAN     NOT NULL  DEFAULT FALSE,
 	CONSTRAINT PK_mail_playerID PRIMARY KEY (mail,playerID)
-
 );
 
 CREATE TABLE sessions
@@ -96,7 +95,7 @@ CREATE TABLE invitations
 CREATE OR REPLACE FUNCTION mg_get_player(
 IN i_mail t_mail,
 IN i_playerName VARCHAR(50),
-IN i_image VARCHAR(50),
+IN i_image TEXT,
 OUT o_playerId INT,
 OUT o_playerLevel INT)
 RETURNS
@@ -132,7 +131,7 @@ CREATE OR REPLACE FUNCTION mg_get_activePlayers(
 IN i_playerID INT,
 OUT o_playerID INT,
 OUT o_playerName VARCHAR(50),
-OUT o_playerImage VARCHAR(50),
+OUT o_playerImage TEXT,
 OUT o_playerLevel INT)
 RETURNS
 SETOF RECORD AS
@@ -677,6 +676,7 @@ LANGUAGE plpgsql;
 * Return:
 * boolean
 */
+
 CREATE OR REPLACE FUNCTION mg_give_up(
 IN i_playerID INT,
 IN sessionID INT)

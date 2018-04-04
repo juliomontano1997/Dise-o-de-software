@@ -35,9 +35,9 @@ app.use(function(req, res, next)
  * @returns JSON
  * Checked
  */
-app.post('/getPlayerId',function(req, res)
+app.get('/getPlayerId',function(req, res)
 {        
-    db.func('mg_get_player', [req.body.mail, req.body.name, req.body.imageURL])    
+    db.func('mg_get_player', [req.query.mail, req.query.name, req.query.imageURL])    
     .then(data => 
     {        	              
         res.end(JSON.stringify(data));

@@ -6,7 +6,6 @@
 */
 
 var pg = require('pg');
-var client;
 var express = require('express');
 var app = express();
 var pgp = require('pg-promise')();
@@ -23,18 +22,94 @@ app.use(function(req, res, next)
 });
 
 
-// END POINTS
 
+
+
+
+//************************  End points **************************
 /** 
  * Allows registrate a user and return the id
  * @param {String} mail
  * @param {String} name 
  * @param {String} imageURL
- * @returns {number}
+ * @returns JSON
+ * Checked
  */
-app.get('/getPlayerId',function(req, res)
+app.post('/getPlayerId',function(req, res)
 {        
-    db.func('mg_get_player', [req.query.mail, req.query.name, req.query.imageURL])    
+    db.func('mg_get_player', [req.body.mail, req.body.name, req.body.imageURL])    
+    .then(data => 
+    {        	              
+        res.end(JSON.stringify(data));
+    })
+    .catch(error=> 
+    {    	    	         
+        res.end(JSON.stringify(false));                
+    })      
+});
+
+/**
+ * Allows obtains the list of the active players 
+ * @param {number} idPlayer
+ * @returns Json
+ * Checked
+ */
+app.get('/getActivePlayers',function(req, res)
+{        
+    console.log(req.query.idPlayer);
+    db.func('mg_get_activePlayers', [req.query.idPlayer])    
+    .then(data => 
+    {        	              
+        console.log(data);
+        res.end(JSON.stringify(data));
+    })
+    .catch(error=> 
+    {    	    	 
+        console.log(error);
+        res.end(JSON.stringify(false));                
+    })      
+});
+
+
+
+
+
+
+
+
+/**
+ * Allows start a new session, the method initialice the board
+ * @param {number} idSession
+ * @returns Json
+ */
+app.get('/startSession',function(req, res)
+{        
+    db.func ('mg_get_board', [req.query.idSession])
+    .then(data =>
+    {
+        var newBoard = makeBoard(data[0].o_boardsize,data[0].o_playeroneid,data[0].o_playertwoid);
+        db.func('mg_get_startSession', [req.query.idSession, newBoard])    
+        .then(data => 
+        {        	              
+            res.end(JSON.stringify(data));
+        })
+        .catch(error=> 
+        {    	    	 
+            console.log(error);
+            res.end(JSON.stringify(false));                
+        });
+    })
+    .catch(error=>
+    {
+        console.log(error);
+        res.end(JSON.stringify(false));   
+    });   
+});
+
+
+app.get('/updateColor',function(req, res)
+{        
+    db.func('mg_get_updateColor', [req.query.idSession, req.query.idPlayer,req.query.color])    
     .then(data => 
     {        	              
         res.end(JSON.stringify(data));
@@ -46,26 +121,18 @@ app.get('/getPlayerId',function(req, res)
     })      
 });
 
-/**
- * Allows create a new session 
- * @param idSesion
- * @param color1
- * @param color2 
- * @param idPlayer1
- * @param idPlayer2
- * @param boardLength
- */
 
 /**
  * Allows obtais the board information
- * 
  * @param {number} idSession 
- * @returns  true, false or other Json whit all the board information.  
+ * @returns  true, false or other Json with all the board information.  
  * 
  */
+// Falta verificar si es la ultima partida 
+
 app.get('/getBoard',function(req, res)
 {        
-    db.func('mg_get_board',[req.query.idSesion])    
+    db.func('mg_get_board',[req.query.idSession])    
     .then(data => 
     {        	                        
         var winners = verifyFullBoard(data[0].o_board, data[0].o_playeroneid);
@@ -83,21 +150,21 @@ app.get('/getBoard',function(req, res)
                 winner = data[0].o_playertwoid;
             }
 
-            db.func('mg_finishgame', [req.query.idSesion, winner, newBoard])
+            db.func('mg_finishgame', [req.query.idSession, winner, newBoard])
             .then(data=>
             {
                 res.end(JSON.stringify(data[0].mg_finishgame));                                                                
             })
             .catch(error => {
                 res.end(JSON.stringify(false));
-            });           
+            });                              
         }
         else
         {
             res.end(JSON.stringify(data));
             if(data[0].o_playertwoid===0 && data[0].o_actualplayerid===0)  //calculate automatic machine move
             {    					            
-                calculateAutomaticMove(req.query.idSesion);                    
+                calculateAutomaticMove(req.query.idSession);                    
             } 
         }        
     })
@@ -112,14 +179,12 @@ app.get('/getBoard',function(req, res)
  * @param {number} row
  * @param {number} column
  * @param {number} idPlayer
- * @param {number} idSesion
- * @return true/false
+ * @param {number} idSession
+ * @returns Json
  */
 app.get('/checkMovement', function(req, res) 
 {                    
-    console.log("Verificando movimiento");
-    // 1. Extract the original board from the DB 
-    db.func('mg_get_board',[req.query.idSesion])    
+    db.func('mg_get_board',[req.query.idSession])    
     .then(data => 
     {        	                     
         if(data=== null | data[0].o_actualplayerid !== req.query.idPlayer*1)
@@ -129,15 +194,12 @@ app.get('/checkMovement', function(req, res)
         }             
         var originalBoard = data[0].o_board;          
         var matrixSize = Math.sqrt(originalBoard.length);        
-
         //2. Verify if the actual position is empty 
         if(originalBoard[getIndex(req.query.row, req.query.column, matrixSize)] !== -1)
         {                        
             res.end(JSON.stringify(false));  
             return;        
-        }          
-
-        
+        }                  
         //3. Validate play 
         var afectedIndices = [getIndex(req.query.row, req.query.column, matrixSize)];                 
         var row = req.query.row*1;
@@ -169,7 +231,7 @@ app.get('/checkMovement', function(req, res)
                 originalBoard[afectedIndices[i]] = parseInt(req.query.idPlayer);
             }            
             var band = false;    
-            db.func('mg_update_board',[req.query.idSesion, req.query.idPlayer, originalBoard])
+            db.func('mg_update_board',[req.query.idSession, req.query.idPlayer, originalBoard])
             .then(data2 => 
             {                                                                               
                 res.end(JSON.stringify(data2[0].mg_update_board));                                                        
@@ -189,10 +251,11 @@ app.get('/checkMovement', function(req, res)
 /**
  * Allows pass turn 
  * @param {number} idSession
+ * @returns Json
  */
 app.get('/passTurn',function(req, res)
 {        
-    db.func('mg_passTurn',[req.query.idSesion])    
+    db.func('mg_passTurn',[req.query.idSession])    
     .then(data => 
     {        	                
         res.end(JSON.stringify(data));
@@ -205,32 +268,58 @@ app.get('/passTurn',function(req, res)
 });
 
 /**
- * Allows surrender and start a new game. 
+ * Allows surrender and start a new game or set 
+ * @param {number} idSession
+ * @param {number} idPlayer
+ * @param {number} currentGame
+ * @param {number} amountGames
+ * @returns Json
+ * 
+ * Note: 
+ *      if resp is 1 the session is terminated
+ *      if resp is true, the game is end but 
  */
 app.get('/surrender',function(req, res)
-{        
-
-    var winner;
+{           
     var newBoard;
-    db.func('mg_finishGame',[req.query.idSesion, winners, newBoard])    
+    db.func('mg_give_up',[req.query.idPlayer,req.query.idSession])  
     .then(data => 
-    {        	              
-        res.end(JSON.stringify(data));
+    {        	        
+        if(req.query.currentGame === req.query.amountGames)
+        {            
+            db.func('mg_finishSession',[req.query.idSession])    
+            .then(data => 
+            {                        	                   
+                res.end(JSON.stringify(1));
+            })
+            .catch(error=> 
+            {    	    	                 
+                res.end(JSON.stringify(false));                
+            })               
+        }  
+        else
+        {
+            var urlLink="http://localhost:8081/startSession?idSession="+req.query.idSession;              
+            autoRequest(urlLink);  
+            res.end(JSON.stringify(true));
+        }
+        res.end(JSON.stringify());                  
     })
     .catch(error=> 
     {    	    	 
         console.log(error);
         res.end(JSON.stringify(false));                
-    })      
+    });            
 });
 
 /**
  *Allows obtains the session's estadistics
  *@param {number} idSession 
+ *@returns Json
  */
 app.get('/getSessionStadistics',function(req, res)
 {        
-    db.func('mg_get_session_stadistic',[req.query.idSesion])    
+    db.func('mg_get_session_stadistic',[req.query.idSession])    
     .then(data => 
     {        	   
         console.log(data);
@@ -243,16 +332,13 @@ app.get('/getSessionStadistics',function(req, res)
     })      
 });
 
-
-
-
 /**
  * Allows obtain the player's names.
- * @param {number} idSesion 
+ * @param {number} idSession 
  */
 app.get('/sessionPlayersName', function(req, res) 
 { 
-	db.func('mg_get_session_playersName',[req.query.idSesion])    
+	db.func('mg_get_session_playersName',[req.query.idSession])    
     .then(data => 
     {        	        
         res.end(JSON.stringify(data));
@@ -264,14 +350,111 @@ app.get('/sessionPlayersName', function(req, res)
 });	
 
 /**
- * Allows obtatains all the notifications of a player.
- * 
+ * Allows obtatains the list of active sessions 
+ * @param {number} idPlayer
+ * @requires Json
+ */
+app.get('/getActiveSessions', function(req, res) 
+{ 
+	db.func('mg_get_activeSessions',[req.query.idPlayer])    
+    .then(data => 
+    {        	        
+        res.end(JSON.stringify(data));
+    })
+    .catch(error=> 
+    {    	    	         
+        res.end(JSON.stringify(false));                
+    })   
+});	
+
+
+/**
+ * Allows obtains all the notifications of a player.
  * @param {number} idPlayer 
- * @returns {json}
+ * @returns Json
  */
 app.get('/getNotifications',function(req, res)
 {        
     db.func('mg_get_notifications', [req.query.idPlayer])    
+    .then(data => 
+    {        	              
+        res.end(JSON.stringify(data));
+    })
+    .catch(error=> 
+    {    	    	 
+        console.log(error);
+        res.end(JSON.stringify(false));                
+    })      
+});
+
+/**
+ * Allows obtains the list of  received invitations
+ * @param {number} idPlayer
+ * @returns Json
+ */
+app.get('/getInvitations',function(req, res)
+{        
+    db.func('mg_get_invitations', [req.query.idPlayer])    
+    .then(data => 
+    {        	              
+        res.end(JSON.stringify(data));
+    })
+    .catch(error=> 
+    {    	    	 
+        console.log(error);
+        res.end(JSON.stringify(false));                
+    })      
+});
+
+/**
+ * Allows delete one element of the list of notifications 
+ * @param {number} idNotification
+ */
+app.get('/deleteNotifications',function(req, res)
+{        
+    db.func('mg_erase_notifications', [req.query.idNotification])    
+    .then(data => 
+    {        	              
+        res.end(JSON.stringify(data));
+    })
+    .catch(error=> 
+    {    	    	 
+        console.log(error);
+        res.end(JSON.stringify(false));                
+    })      
+});
+
+/**
+ * Allows create a new invitation 
+ * @param {number} idPlayer
+ * @param {number} idRival
+ * @param {number} boardSize
+ * @param {number} amountGames
+ */
+app.get('/newInvitation',function(req, res)
+{        
+    db.func('mg_create_invitation', [req.query.idPlayer, req.query.idRival,req.query.boardSize, req.query.amountGames])    
+    .then(data => 
+    {        	              
+        res.end(JSON.stringify(data));
+    })
+    .catch(error=> 
+    {    	    	 
+        console.log(error);
+        res.end(JSON.stringify(false));                
+    })      
+});
+
+/**
+ * Allows create a session against the computer IA
+ * @param {number} idPlayer 
+ * @param {number} boardSize
+ * @param {number} amountGames
+ * @param {number} machineLevel
+ */
+app.get('/inviteMachine',function(req, res)
+{        
+    db.func('mg_invite_machine', [req.query.idPlayer, req.query.boardSize,req.query.amountGames, req.query.machineLevel])    
     .then(data => 
     {        	              
         res.end(JSON.stringify(data));
@@ -297,21 +480,7 @@ app.get('/decideInvitation',function(req, res)
 {        
     db.func('mg_handling_invitations',[req.query.idInvitation, req.query.decision])    
     .then(data => 
-    {   
-        if(data.mg_handling_invitations=== true)
-        {
-            var newBoard = makeBoard(req.query.boardLength, req.query.idPlayer1, req.query.idPlayer2);
-            db.func('mg_get_startSession', [req.query.idSesion, newBoard, req.query.color1, req.query.color2])    
-            .then(data => 
-            {        	              
-                res.end(JSON.stringify(data));
-            })
-            .catch(error=> 
-            {    	    	 
-                console.log(error);
-                res.end(JSON.stringify(false));                
-            });        
-        }     	              
+    {              	              
         res.end(JSON.stringify(data));
     })
     .catch(error=> 
@@ -400,11 +569,13 @@ function getCoordinates(index, lengt)
 }
 
 /**
- * Allows make a boar whit a specific length 
+ * Allows make a board with a specific length 
  * 
  * @param {number} length the length of the matrix 
+ * @param {number} player1
+ * @param {number} player2
  * @returns {Array} a list that contains the board 
- * Note: this method can't be used whit odd numbers  
+ * Note: this method can't be used with odd numbers  
  */
 function makeBoard(length, player1, player2)
 {
@@ -425,15 +596,14 @@ function makeBoard(length, player1, player2)
 
 /**
  * Allows calculate an automatic movement 
- * @param {number} idSesion 
+ * @param {number} idSession 
  * @param {number} machineLevel 
  * @returns {number}  -2 when the machine does't have plaays / (0,1,....n) when have plays 
  */
-function calculateAutomaticMove(idSesion)
+function calculateAutomaticMove(idSession)
 {
-    console.log("Calculando jugada automatica");
     // 1. Obtain the actual board 
-    db.func('mg_get_board',[idSesion])    
+    db.func('mg_get_board',[idSession])    
     .then(data => 
     {        	       
         if(data===null)
@@ -501,7 +671,7 @@ function calculateAutomaticMove(idSesion)
         }
         var response = machineSelection(machineLevel, playsAfectedIndexes, posiblePlays);
         var coordinates = getCoordinates(response, matrixSize);     
-        var urlLink="http://localhost:8081/checkMovement?row="+coordinates[0]+"&column="+coordinates[1]+"&idPlayer="+0+"&idSesion="+idSesion;  
+        var urlLink="http://localhost:8081/checkMovement?row="+coordinates[0]+"&column="+coordinates[1]+"&idPlayer="+0+"&idSession="+idSession;  
         
         console.log(urlLink);
         setTimeout(function () {

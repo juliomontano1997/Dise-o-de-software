@@ -1,4 +1,4 @@
---DOMIANS
+﻿--DOMIANS
 CREATE DOMAIN t_mail VARCHAR(50) NOT NULL CONSTRAINT CHK_t_mail CHECK (VALUE SIMILAR TO '[A-z]%@[A-z]%.[A-z]%');
 
 --TABLES
@@ -10,7 +10,7 @@ CREATE TABLE players
 	playerLevel INT         NOT NULL,
 	image	    VARCHAR(50) NOT NULL,
 	state       BOOLEAN     NOT NULL  DEFAULT FALSE,
-	CONSTRAINT PK_mail_playerID PRIMARY KEY (mail,playerID)
+	CONSTRAINT PK_mail_plfayerID PRIMARY KEY (mail,playerID)
 	
 );
 
@@ -128,12 +128,13 @@ RETURNS
 SETOF RECORD AS
 $body$
 BEGIN 	
-	RETURN query
-	(SELECT playerID, playerName, image, playerLevel FROM players WHERE state = TRUE AND playerID != i_playerID);	
+	RETURN query (SELECT playerID, playerName, image, playerLevel FROM players WHERE state = TRUE AND playerID != i_playerID);	
 END;	
 $body$
 LANGUAGE plpgsql;
 
+
+select mg_get_activePlayers(1)
 /* 
 * Allows start the board of a session
 *
@@ -281,7 +282,7 @@ $body$
 LANGUAGE plpgsql;
 
 /* 
-* Allows finish a game
+* Allows finish a game when all is normal.
 *
 * Receive: 
 * i_sessionID  int
@@ -544,6 +545,7 @@ BEGIN
 		
 		RETURN TRUE;
 	END IF;
+	RETURN TRUE;
 	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
 	
 	
@@ -551,8 +553,8 @@ END;
 $body$
 LANGUAGE plpgsql;
 
-/* 
-* Allows the handling of a player's invitations
+/*
+Allows the handling of a player s invitations
 *
 * Receive: 
 * i_playerID  int
@@ -560,6 +562,8 @@ LANGUAGE plpgsql;
 * Return:
 * boolean
 */
+
+
 CREATE OR REPLACE FUNCTION mg_handling_invitations(IN i_invitationID INT, IN i_decision BOOLEAN)
 RETURNS BOOLEAN AS
 $body$

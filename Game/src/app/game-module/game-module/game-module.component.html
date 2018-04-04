@@ -1,8 +1,8 @@
 <app-message-nav-bar></app-message-nav-bar>
 <div class="row">
-
-      <div class="col-xs-6">
-    <game-play-view #gameChild> </game-play-view>
+    <div class="col-xs-6">
+    <game-play-view #gameChild>       
+    </game-play-view>
       </div>
       <div class="col-xs-6 information">
     <app-session-information (onNotification)="gameChild.notify($event)"> </app-session-information>

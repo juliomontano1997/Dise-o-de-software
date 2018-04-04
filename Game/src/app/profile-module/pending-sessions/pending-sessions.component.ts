@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { pendingSessions } from '../../models/pendingSessions.model';
+import { PendingSessionsService } from '../../services/pending-sessions.service';
 
 @Component({
   selector: 'app-pending-sessions',
@@ -11,28 +12,50 @@ export class PendingSessionsComponent implements OnInit {
   private pendingSessions:Array<pendingSessions>;
   private amountItems=4; //amount of items per page
   private pageNumberTwo=1; //current page
+  private playerId;
 
-  constructor() { 
-
-    this.pendingSessions= new Array<pendingSessions>();
-    this.pendingSessions.push(new pendingSessions(0,"Enemigo de prueba1",6,10));
-    this.pendingSessions.push(new pendingSessions(1,"Enemigo de prueba2",5,8));
-    this.pendingSessions.push(new pendingSessions(2,"Enemigo de prueba3",4,5));
-    this.pendingSessions.push(new pendingSessions(3,"Enemigo de prueba4",3,6));
-    this.pendingSessions.push(new pendingSessions(4,"Enemigo de prueba5",2,4));
-    this.pendingSessions.push(new pendingSessions(5,"Enemigo de prueba6",1,10));
-    this.pendingSessions.push(new pendingSessions(6,"Enemigo de prueba7",7,8));
-    this.pendingSessions.push(new pendingSessions(7,"Enemigo de prueba8",8,6));
-    this.pendingSessions.push(new pendingSessions(8,"Enemigo de prueba9",9,5));
-    this.pendingSessions.push(new pendingSessions(9,"Enemigo de prueba10",5,4));
+  constructor(private pendingSessionService:PendingSessionsService) { 
+    let playerIdLevel=JSON.parse(localStorage.getItem("playerInformation"));
+    this.playerId=playerIdLevel.o_playerId;
+    this.getSessions();
 
   }
 
-  
+
+  public setPendingSessions(dataArray:Array<any>){
+    let size= dataArray.length;
+    let i=0;
+    this.pendingSessions=new Array<pendingSessions>();
+
+    for(i=0; i< size;i++){
+      this.pendingSessions.push(new pendingSessions(dataArray[i].o_sessionID,
+        dataArray[i].o_enemyName,dataArray[i].o_amountGames,dataArray[i].o_boardSize,
+        dataArray[i].o_numberActualGame));
+
+    }
+  }
+
+  public getPendingSessions(playerId:Number){
+    this.pendingSessionService.getPendingSessions(playerId)
+      .subscribe(
+        (res) =>{
+            this.setPendingSessions(res);
+        },
+        (err) => {
+          console.log(err.json()); 
+        });
+  }
+
+  public getSessions(){
+    let id = setInterval(() => {
+      this.getPendingSessions(this.playerId);
+  }, 10000);
+
+  }
+
   public restartSession(sessionId:Number){
-    let playerIdLevel=JSON.parse(localStorage.getItem("playerInformation"));
     alert("Id de la sesión: "+ sessionId);
-    localStorage.setItem("sessionData",JSON.stringify({"sessionId":sessionId,"playerId":playerIdLevel.o_playerId}));
+    localStorage.setItem("sessionData",JSON.stringify({"sessionId":sessionId,"playerId":this.playerId}));
     window.location.href='gameModule';
   }
 

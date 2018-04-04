@@ -14,6 +14,9 @@ import { OnlinePlayersComponent } from './online-players/online-players.componen
 import { PendingSessionsComponent } from './pending-sessions/pending-sessions.component';
 import { UserService } from '../services/user.service';
 import {NgxPaginationModule} from 'ngx-pagination';
+import { NavService } from '../services/nav.service';
+import { OnlinePlayersService } from '../services/online-players.service';
+import { PendingSessionsService } from '../services/pending-sessions.service';
 
 
 const routes: Routes = [
@@ -30,6 +33,6 @@ const routes: Routes = [
 
   ],
   declarations: [ProfileComponent, UserInformationComponent, ProfileNavBarComponent, OnlinePlayersComponent, PendingSessionsComponent],
-  providers: [UserService]
+  providers: [UserService,NavService,OnlinePlayersService,PendingSessionsService]
 })
 export class ProfileModule { }

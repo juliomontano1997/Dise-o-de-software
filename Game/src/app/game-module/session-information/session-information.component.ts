@@ -16,7 +16,14 @@ export class SessionInformationComponent implements OnInit {
 
   constructor(private sessionService:SessionStadisticsService,) {
     let sessionInformation= JSON.parse(localStorage.getItem("sessionData"));
-    this.sessionInformationHandler=new sessionInformationHandler(sessionInformation.sessionId);
+    //this.sessionInformationHandler=new sessionInformationHandler(sessionInformation.sessionId);
+    //this.sessionInformationHandler.setPlayerPlayingId(sessionInformation.playerId);
+       // let sessionInformation= JSON.parse(localStorage.getItem("sessionData"));
+    //this.sessionHandler= new boardSessionHandler(sessionInformation.sessionId,sessionInformation.playerId);
+    this.sessionInformationHandler=new sessionInformationHandler(1);
+    this.sessionInformationHandler.setSessionEnd(false);
+    let data= JSON.parse(localStorage.getItem("somethingChange"));
+    this.sessionInformationHandler.setAllowUpdating(data.state);
     this.getPlayersName();
     this.updateSessionInformation();
    
@@ -26,6 +33,14 @@ export class SessionInformationComponent implements OnInit {
   }
 
   
+  public sessionEnd(state:Boolean){
+    //session end
+      if (state===true){
+        localStorage.setItem("notUpdate",JSON.stringify({"state":true}));      
+      }
+      localStorage.setItem("somethingChange",JSON.stringify({"state":false}));
+  }
+
   public getSessionInformation():void{
     this.sessionService.getStadistics(this.sessionInformationHandler.getSessionId())
     .subscribe(
@@ -38,13 +53,19 @@ export class SessionInformationComponent implements OnInit {
       });
   }
 
-  public updateSessionInformation():void{
+  public updateSessionInformation():void {
     let id = setInterval(() => {
+
+      this.sessionInformationHandler.setAllowUpdating(JSON.parse(localStorage.getItem("somethingChange")).state);
       if (this.sessionInformationHandler.getAllowUpdating()===true){
         this.getSessionInformation();
       }
+
       else{
-        clearInterval(id);
+        if (this.sessionInformationHandler.getSessionEnd()===true){
+              clearInterval(id);
+        }
+       
       }
     }, 3000);
   }
@@ -64,11 +85,25 @@ export class SessionInformationComponent implements OnInit {
     }
 
     public giveUp(){
-        this.sessionService.giveUp(this.sessionInformationHandler.getSessionId())
+        this.sessionService.giveUp(this.sessionInformationHandler.getSessionId()
+      ,this.sessionInformationHandler.getPlayerPlayingId(), this.sessionInformationHandler.getAmountGamesNumber(), 
+      this.sessionInformationHandler.getCurrentGameNumber())
         .subscribe(
           (res) =>{
     
-            console.log(res);
+            //if the session is not ended
+            if (res.mg_finishSession===true){
+              //stop updating
+              this.sessionEnd(false);
+              this.updateSessionInformation();
+              
+            }
+            else{
+              this.sessionInformationHandler.setSessionEnd(true);
+              this.sessionEnd(true);
+              //determinar quien ganó el juego.
+            }
+            
           },
           (err) => {
             console.log(err.json()); 

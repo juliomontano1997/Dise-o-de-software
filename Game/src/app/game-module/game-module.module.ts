@@ -29,6 +29,6 @@ const routes: Routes = [
   SessionInformationComponent,
   MessageNavBarComponent
   ],
-  providers: [GameServicesService, SessionStadisticsService]
+  providers: [GameServicesService, SessionStadisticsService,]
 })
 export class GameModule { }

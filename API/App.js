@@ -9,7 +9,7 @@ var pg = require('pg');
 var express = require('express');
 var app = express();
 var pgp = require('pg-promise')();
-var cn = {host: 'localhost', port: 5432, database: 'othelloDB', user: 'postgres', password: 'postgresql2017'};
+var cn = {host: 'localhost', port: 5432, database: 'otelloDB', user: 'postgres', password: '12345'};
 var db = pgp(cn);
 var http =  require('http');
 
@@ -56,8 +56,12 @@ app.get('/getPlayerId',function(req, res)
  */
 app.get('/getActivePlayers',function(req, res)
 {        
+<<<<<<< HEAD
+    db.func('mg_get_player', [req.body.mail, req.body.name, req.body.imageURL])    
+=======
     console.log(req.query.idPlayer);
     db.func('mg_get_activePlayers', [req.query.idPlayer])    
+>>>>>>> e2d0aa20b9083a80ddf6d48945bf3aa1c8ac9d9e
     .then(data => 
     {        	              
         console.log(data);

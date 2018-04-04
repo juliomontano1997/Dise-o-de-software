@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { onlinePlayersHandler } from '../../models/onlinePlayersHandler.model';
+import { OnlinePlayersService } from '../../services/online-players.service';
 import { player } from '../../models/player.model';
 @Component({
   selector: 'app-online-players',
@@ -15,29 +16,16 @@ export class OnlinePlayersComponent implements OnInit {
   private pageNumber=1; //current page
   private machineId=0;
   private selectedLevel="Fácil";
+  private playerId:Number;
 
-  constructor() { 
+  constructor( private onlinePlayersService: OnlinePlayersService) { 
 
     this.playersHandler=new onlinePlayersHandler();
-    let p:Array<player>;
-    p=new Array<player>();
-    let playerData= JSON.parse(localStorage.getItem("user_data")); //parse string json to json object
-    p.push(new player(0,"Máquina","nothing",0,"/assets/images/machine.jpg"));
-    p.push(new player(1,"Joshua Carranza Pérez","email",1,"https://graph.facebook.com/"+playerData.id+"/picture?type=normal"));
-    p.push(new player(2,"Joshua Carranza Pérez","email",2,"https://graph.facebook.com/"+playerData.id+"/picture?type=normal"));
-    p.push(new player(3,"Joshua Carranza Pérez","email",3,"https://graph.facebook.com/"+playerData.id+"/picture?type=normal"));
-    p.push(new player(4,"Joshua Carranza Pérez","email",4,"https://graph.facebook.com/"+playerData.id+"/picture?type=normal"));
-    p.push(new player(5,"Joshua Carranza Pérez","email",5,"https://graph.facebook.com/"+playerData.id+"/picture?type=normal"));
-    p.push(new player(6,"Joshua Carranza Pérez","email",6,"https://graph.facebook.com/"+playerData.id+"/picture?type=normal"));
-    p.push(new player(7,"Joshua Carranza Pérez","email",7,"https://graph.facebook.com/"+playerData.id+"/picture?type=normal"));
-    p.push(new player(8,"Joshua Carranza Pérez","email",8,"https://graph.facebook.com/"+playerData.id+"/picture?type=normal"));
-    p.push(new player(9,"Joshua Carranza Pérez","email",9,"https://graph.facebook.com/"+playerData.id+"/picture?type=normal"));
-    p.push(new player(10,"Joshua Carranza Pérez","email",10,"https://graph.facebook.com/"+playerData.id+"/picture?type=normal"));
-    p.push(new player(11,"Joshua Carranza Pérez","email",11,"https://graph.facebook.com/"+playerData.id+"/picture?type=normal"));
-    p.push(new player(12,"Joshua Carranza Pérez","email",12,"https://graph.facebook.com/"+playerData.id+"/picture?type=normal"));
-    this.playersHandler.setPlayers(p);
-    console.log("players");
-    console.log(this.playersHandler.getPlayers());
+
+    let playerIdLevel=JSON.parse(localStorage.getItem("playerInformation"));
+    this.playerId=playerIdLevel.o_playerId;
+    this.getPlayersOnline();
+
   }
 
   public invitePlayer(playerId:Number){
@@ -46,11 +34,64 @@ export class OnlinePlayersComponent implements OnInit {
   }
 
   public finishInvitation(){
-      alert("terminar la invitación: bsize= "+ this.boardSize+ " games: " +this.amountGames
-      +" select model: "+ this.selectedLevel); 
-      console.log("resultado de validar");
-      console.log(this.playersHandler.checkSessionData(this.boardSize,this.amountGames));
 
+    if (this.playersHandler.checkSessionData(this.boardSize,this.amountGames)){
+      if (this.playersHandler.isMachineId()===true) {
+
+        // get real machine level representation 
+
+        let machineLevel: Number = this.playersHandler.getMachineLevel(this.selectedLevel);
+
+        this.onlinePlayersService.inviteMachine(this.playerId,
+        this.boardSize,this.amountGames,machineLevel)
+        .subscribe(
+          (res) =>{
+              console.log("successful machine invitation");
+              console.log(res);
+          },
+          (err) => {
+            console.log(err.json()); 
+          });
+      }
+      //invite player
+      else{
+        this.onlinePlayersService.invitePlayer(this.playerId,this.playersHandler.getGuestPlayerId(),
+        this.boardSize,this.amountGames)
+        .subscribe(
+            (res) =>{
+            console.log("successful player invitation");
+            console.log(res);
+            this.playersHandler.updatePlayersArray(res);
+          },
+          (err) => {
+          console.log(err.json()); 
+          });
+      }
+    }
+
+    else{
+      //show error in board size or amount games
+    }
+
+  }
+
+  public getPlayers(){
+    this.onlinePlayersService.getPlayers(this.playerId)
+    .subscribe(
+        (res) =>{
+            console.log("playersOnline");
+            console.log(res);
+            this.playersHandler.updatePlayersArray(res);
+        },
+        (err) => {
+          console.log(err.json()); 
+        });
+  }
+
+  public getPlayersOnline():void{
+    let id = setInterval(() => {
+        this.getPlayers();
+    }, 10000);
   }
 
   ngOnInit() {

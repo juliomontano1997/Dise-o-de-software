@@ -23,8 +23,9 @@ export class SessionStadisticsService {
       res.json()); 
   }
 
-  public giveUp(sessionId:Number){
-    return this.http.get(this.apiUrl +`surrender?idSesion=${sessionId}`)
+  public giveUp(sessionId:Number,playerId:Number,currentGameNumber:Number, amountGame:Number){
+    return this.http.get(this.apiUrl +`surrender?idSession=${sessionId}&idPlayer=${playerId}&amountGame=${amountGame}
+      &currentGame=${currentGameNumber}`)
     .map(res => 
       res.json()); 
   }

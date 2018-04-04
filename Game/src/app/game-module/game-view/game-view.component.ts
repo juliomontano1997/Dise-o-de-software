@@ -16,14 +16,21 @@ export class GameViewComponent implements OnInit {
   private sessionId
 
   constructor(private gameService: GameServicesService) { 
-    let sessionInformation= JSON.parse(localStorage.getItem("sessionData"));
-    this.sessionHandler= new boardSessionHandler(sessionInformation.sessionId,sessionInformation.playerId);
+   // let sessionInformation= JSON.parse(localStorage.getItem("sessionData"));
+  //  this.sessionHandler= new boardSessionHandler(sessionInformation.sessionId,sessionInformation.playerId);
+    localStorage.setItem("notUpdate",JSON.stringify({"state":false})); 
+    this.sessionHandler= new boardSessionHandler(1,1);
     this.updateBoard();
     this.getBoardChanges();
   }
     
   ngOnInit() {
 
+  }
+
+
+  public changeNotify (){
+      localStorage.setItem("somethingChange",JSON.stringify({"state":true}));
   }
 
   public updateBoard(): void{
@@ -43,7 +50,8 @@ export class GameViewComponent implements OnInit {
 
   public getBoardChanges():void{
     let id = setInterval(() => {
-      if (this.sessionHandler.itsMyTurn()===true){
+      if (this.sessionHandler.itsMyTurn()===true &&
+        (JSON.parse(localStorage.getItem("notUpdate")).state===false){
         this.updateBoard(); 
       }
       
@@ -66,9 +74,12 @@ export class GameViewComponent implements OnInit {
       (res) =>{
         if (res!=false){
         //this.sessionHandler.getBoard()[(row*this.sessionHandler.getBoardSize())+column]=this.sessionHandler.getPlayerPlayingId();
-        this.getBoardChanges();
         this.sessionHandler.setActualPlayerId();
+        this.getBoardChanges();
+        
         }
+
+
 
 
       },

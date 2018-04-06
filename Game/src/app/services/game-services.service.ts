@@ -13,13 +13,13 @@ export class GameServicesService {
 
   public getUpdatedBoard(sessionId:Number)
   {    
-    return this.http.get(this.apiUrl +`getBoard?idSesion=${sessionId}`)
+    return this.http.get(this.apiUrl +`getBoard?idSession=${sessionId}`)
     .map(res => 
       res.json()); 
   }
 
   public makeMove(row:Number,column:Number, sessionId:Number,playerId:Number){
-    return this.http.get(this.apiUrl +`checkMovement?idSesion=${sessionId}+&idPlayer=${playerId}+&row=${row}+&column=${column}`)
+    return this.http.get(this.apiUrl +`checkMovement?idSession=${sessionId}+&idPlayer=${playerId}+&row=${row}+&column=${column}`)
     .map(res => 
       res.json()); 
   }

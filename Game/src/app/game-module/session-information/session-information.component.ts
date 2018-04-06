@@ -20,10 +20,10 @@ export class SessionInformationComponent implements OnInit {
     //this.sessionInformationHandler.setPlayerPlayingId(sessionInformation.playerId);
        // let sessionInformation= JSON.parse(localStorage.getItem("sessionData"));
     //this.sessionHandler= new boardSessionHandler(sessionInformation.sessionId,sessionInformation.playerId);
-    this.sessionInformationHandler=new sessionInformationHandler(1);
+    this.sessionInformationHandler=new sessionInformationHandler(4);
     this.sessionInformationHandler.setSessionEnd(false);
-    let data= JSON.parse(localStorage.getItem("somethingChange"));
-    this.sessionInformationHandler.setAllowUpdating(data.state);
+    //let data= JSON.parse(localStorage.getItem("somethingChange"));
+    this.sessionInformationHandler.setAllowUpdating(true);
     this.getPlayersName();
     this.updateSessionInformation();
    
@@ -56,7 +56,7 @@ export class SessionInformationComponent implements OnInit {
   public updateSessionInformation():void {
     let id = setInterval(() => {
 
-      this.sessionInformationHandler.setAllowUpdating(JSON.parse(localStorage.getItem("somethingChange")).state);
+      //this.sessionInformationHandler.setAllowUpdating(JSON.parse(localStorage.getItem("somethingChange")).state);
       if (this.sessionInformationHandler.getAllowUpdating()===true){
         this.getSessionInformation();
       }

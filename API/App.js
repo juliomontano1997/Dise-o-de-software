@@ -9,7 +9,7 @@ var pg = require('pg');
 var express = require('express');
 var app = express();
 var pgp = require('pg-promise')();
-var cn = {host: 'localhost', port: 5432, database: 'otelloDB', user: 'postgres', password: '12345'};
+var cn = {host: 'localhost', port: 5432, database: 'othelloDB', user: 'postgres', password: 'postgresql2017'};
 var db = pgp(cn);
 var http =  require('http');
 
@@ -20,11 +20,6 @@ app.use(function(req, res, next)
     res.header("Access-Control-Allow-Methods", "DELETE, GET, POST");
     next();
 });
-
-
-
-
-
 
 //************************  End points **************************
 /** 
@@ -56,12 +51,8 @@ app.get('/getPlayerId',function(req, res)
  */
 app.get('/getActivePlayers',function(req, res)
 {        
-<<<<<<< HEAD
-    db.func('mg_get_player', [req.body.mail, req.body.name, req.body.imageURL])    
-=======
     console.log(req.query.idPlayer);
     db.func('mg_get_activePlayers', [req.query.idPlayer])    
->>>>>>> e2d0aa20b9083a80ddf6d48945bf3aa1c8ac9d9e
     .then(data => 
     {        	              
         console.log(data);
@@ -73,12 +64,6 @@ app.get('/getActivePlayers',function(req, res)
         res.end(JSON.stringify(false));                
     })      
 });
-
-
-
-
-
-
 
 
 /**
@@ -94,7 +79,8 @@ app.get('/startSession',function(req, res)
         var newBoard = makeBoard(data[0].o_boardsize,data[0].o_playeroneid,data[0].o_playertwoid);
         db.func('mg_get_startSession', [req.query.idSession, newBoard])    
         .then(data => 
-        {        	              
+        {        	        
+                  
             res.end(JSON.stringify(data));
         })
         .catch(error=> 
@@ -130,15 +116,16 @@ app.get('/updateColor',function(req, res)
  * Allows obtais the board information
  * @param {number} idSession 
  * @returns  true, false or other Json with all the board information.  
- * 
  */
 // Falta verificar si es la ultima partida 
 
 app.get('/getBoard',function(req, res)
 {        
+    console.log("Get board");
     db.func('mg_get_board',[req.query.idSession])    
     .then(data => 
-    {        	                        
+    {        
+        // cambiar los nombre de estas variables	                        
         var winners = verifyFullBoard(data[0].o_board, data[0].o_playeroneid);
         if(winners!=false)
         {
@@ -156,7 +143,7 @@ app.get('/getBoard',function(req, res)
 
             db.func('mg_finishgame', [req.query.idSession, winner, newBoard])
             .then(data=>
-            {
+            {                
                 res.end(JSON.stringify(data[0].mg_finishgame));                                                                
             })
             .catch(error => {
@@ -165,6 +152,8 @@ app.get('/getBoard',function(req, res)
         }
         else
         {
+            console.log("Estos son los datos que se retornan");
+            console.log(data);
             res.end(JSON.stringify(data));
             if(data[0].o_playertwoid===0 && data[0].o_actualplayerid===0)  //calculate automatic machine move
             {    					            

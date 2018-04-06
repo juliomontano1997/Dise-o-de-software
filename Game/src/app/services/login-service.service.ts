@@ -11,12 +11,14 @@ export class LoginServiceService {
 
   constructor(private http:Http) { }
 
-  public userRegistration(playerEmail:String,playerName:String,playerImage:String){
-    let headers = new Headers ({"Content-Type": "application/json"});
-    let options = new RequestOptions({headers: headers});
-    return this.http.post(this.apiUrl+`getPlayerId?`,JSON.stringify({'mail':playerEmail,
-    'name':playerName,'imageUrl':playerImage}),options)
-    .map(res => 
-      res.json()); 
+  public userRegistration(playerEmail:String,playerName:String,playerImage:String)
+  {   
+    playerEmail = 'juliomontano008@gmail.com';
+    return this.http.get(this.apiUrl +'getPlayerId?mail='+playerEmail+'&name='+playerName+'&imageURL='+playerImage)
+    .map
+    (
+      res => 
+        res.json()
+    ); 
   }
 }

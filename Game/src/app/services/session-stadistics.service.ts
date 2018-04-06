@@ -12,13 +12,13 @@ export class SessionStadisticsService {
 
   public getSessionNames(sessionId:Number)
   {    
-    return this.http.get(this.apiUrl +`sessionPlayersName?idSesion=${sessionId}`)
+    return this.http.get(this.apiUrl +`sessionPlayersName?idSession=${sessionId}`)
     .map(res => 
       res.json()); 
   }
 
   public passTurn (sessionId:Number){
-    return this.http.get(this.apiUrl +`passTurn?idSesion=${sessionId}`)
+    return this.http.get(this.apiUrl +`passTurn?idSession=${sessionId}`)
     .map(res => 
       res.json()); 
   }
@@ -31,7 +31,7 @@ export class SessionStadisticsService {
   }
 
   public getStadistics(sessionId:Number){
-    return this.http.get(this.apiUrl +`getSessionStadistics?idSesion=${sessionId}`)
+    return this.http.get(this.apiUrl +`getSessionStadistics?idSession=${sessionId}`)
     .map(res => 
       res.json()); 
   }

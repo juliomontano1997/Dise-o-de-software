@@ -177,29 +177,32 @@ LANGUAGE plpgsql;
 * Return:
 * boolean
 */
-CREATE OR REPLACE FUNCTION mg_get_updateColor(IN i_sessionID INT,
+CREATE OR REPLACE FUNCTION mg_get_updateColor(
+IN i_sessionID INT,
 IN i_playerID INT,
 IN i_color VARCHAR(20))
 RETURNS BOOLEAN AS
 $body$
 BEGIN
 
-IF ((SELECT playerOneID FROM sessions WHERE sessionID = i_sessionID) = i_playerID) THEN
-IF((SELECT colorPlayer2 FROM sessions WHERE sessionID = i_sessionID) != color) THEN
-UPDATE sessions SET colorPlayer1 = i_color WHERE sessionID = i_sessionID;
-RETURN TRUE;
-ELSE
-RETURN FALSE;
-END IF;
-ELSE
-IF((SELECT colorPlayer1 FROM sessions WHERE sessionID = i_sessionID) != color) THEN
-UPDATE sessions SET colorPlayer2 = i_color WHERE sessionID = i_sessionID;
-RETURN TRUE;
-ELSE
-RETURN FALSE;
-END IF;
-END IF;
-EXCEPTION WHEN OTHERS THEN RETURN FALSE;
+	IF ((SELECT playerOneID FROM sessions WHERE sessionID = i_sessionID) = i_playerID) 
+	THEN
+		IF((SELECT colorPlayer2 FROM sessions WHERE sessionID = i_sessionID) != i_color) 
+		THEN
+			UPDATE sessions SET colorPlayer1 = i_color WHERE sessionID = i_sessionID;
+			RETURN TRUE;
+		ELSE
+			RETURN FALSE;
+		END IF;
+	ELSE
+		IF((SELECT colorPlayer1 FROM sessions WHERE sessionID = i_sessionID) != i_color) THEN
+			UPDATE sessions SET colorPlayer2 = i_color WHERE sessionID = i_sessionID;
+			RETURN TRUE;
+		ELSE
+			RETURN FALSE;	
+		END IF;
+	END IF;
+	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
 END;
 $body$
 LANGUAGE plpgsql;

@@ -21,7 +21,7 @@ app.use(function(req, res, next)
     next();
 });
 
-//************************  End points **************************
+
 /** 
  * Allows registrate a user and return the id
  * @param {String} mail
@@ -42,6 +42,8 @@ app.get('/getPlayerId',function(req, res)
         res.end(JSON.stringify(false));                
     })      
 });
+
+
 
 /**
  * Allows obtains the list of the active players 
@@ -70,24 +72,25 @@ app.get('/getActivePlayers',function(req, res)
  * Allows start a new session, the method initialice the board
  * @param {number} idSession
  * @returns Json
+ * Checked
  */
 app.get('/startSession',function(req, res)
 {        
     db.func ('mg_get_board', [req.query.idSession])
     .then(data =>
-    {
-        var newBoard = makeBoard(data[0].o_boardsize,data[0].o_playeroneid,data[0].o_playertwoid);
-        db.func('mg_get_startSession', [req.query.idSession, newBoard])    
-        .then(data => 
-        {        	        
-                  
-            res.end(JSON.stringify(data));
-        })
-        .catch(error=> 
-        {    	    	 
-            console.log(error);
-            res.end(JSON.stringify(false));                
-        });
+    {        
+        var newBoard;
+        try {
+            newBoard = makeBoard(data[0].o_boardsize,data[0].o_playeroneid,data[0].o_playertwoid);
+            db.func('mg_get_startSession', [req.query.idSession, newBoard])    
+            .then(data => {res.end(JSON.stringify(data));})
+            .catch(error=> {console.log(error);res.end(JSON.stringify(false));                
+            });
+        }  
+        catch(err)
+        {
+            res.end(JSON.stringify(false));            
+        }                     
     })
     .catch(error=>
     {
@@ -97,6 +100,14 @@ app.get('/startSession',function(req, res)
 });
 
 
+/**
+ * Allows update the color of a player.
+ * 
+ * @param idSession 
+ * @param idPlayer
+ * @param color
+ * Checked
+ */
 app.get('/updateColor',function(req, res)
 {        
     db.func('mg_get_updateColor', [req.query.idSession, req.query.idPlayer,req.query.color])    
@@ -117,45 +128,66 @@ app.get('/updateColor',function(req, res)
  * @param {number} idSession 
  * @returns  true, false or other Json with all the board information.  
  */
-// Falta verificar si es la ultima partida 
-
 app.get('/getBoard',function(req, res)
-{        
-    console.log("Get board");
+{            
     db.func('mg_get_board',[req.query.idSession])    
     .then(data => 
-    {        
-        // cambiar los nombre de estas variables	                        
-        var winners = verifyFullBoard(data[0].o_board, data[0].o_playeroneid);
-        if(winners!=false)
+    {                	                        
+        var scores = verifyFullBoard(data[0].o_board, data[0].o_playeroneid);
+        if(scores!=false) // Solo se activa cuando se llena el tablero.
         {
-            var winner =  winner = -2;
+            var winner = -2;
             var newBoard = makeBoard(data[0].o_boardsize,data[0].o_playeroneid,data[0].o_playertwoid);
-
-            if(winners[0]> winners[1])            
+            if(scores[0]> scores[1])            
             {                   
                 winner = data[0].o_playeroneid;
             }
-            else if (winners[0]<winners[1])
+            else if (scores[0]<scores[1])
             {
                 winner = data[0].o_playertwoid;
             }
-
             db.func('mg_finishgame', [req.query.idSession, winner, newBoard])
             .then(data=>
-            {                
-                res.end(JSON.stringify(data[0].mg_finishgame));                                                                
+            {                                
+
+                db.func('mg_get_session_stadistic',[req.query.idSession])  
+                .then(data => 
+                {        	        
+                    if(data[0].o_amountgames ===data[0].o_numberactualgame)
+                    {            
+                        db.func('mg_finishSession',[req.query.idSession])    
+                        .then(data => 
+                        {                        	                   
+                            res.end(JSON.stringify(1));
+                        })
+                        .catch(error=> 
+                        {    	    	                 
+                            res.end(JSON.stringify(false));                
+                        })               
+                    }  
+                    else
+                    {
+                        var urlLink="http://localhost:8081/startSession?idSession="+req.query.idSession;              
+                        autoRequest(urlLink);  
+                        res.end(JSON.stringify(true));
+                    }
+                    res.end(JSON.stringify());                  
+                })
+                .catch(error=> 
+                {    	    	 
+                    console.log(error);
+                    res.end(JSON.stringify(false));                
+                });                            
+                res.end(JSON.stringify(data[0].mg_finishgame));                                                                                                
             })
             .catch(error => {
                 res.end(JSON.stringify(false));
             });                              
         }
         else
-        {
-            console.log("Estos son los datos que se retornan");
-            console.log(data);
+        {           
             res.end(JSON.stringify(data));
-            if(data[0].o_playertwoid===0 && data[0].o_actualplayerid===0)  //calculate automatic machine move
+            if(data[0].o_playertwoid===0 && data[0].o_actualplayerid===0) 
             {    					            
                 calculateAutomaticMove(req.query.idSession);                    
             } 
@@ -247,7 +279,7 @@ app.get('/checkMovement', function(req, res)
  * @returns Json
  */
 app.get('/passTurn',function(req, res)
-{        
+{            
     db.func('mg_passTurn',[req.query.idSession])    
     .then(data => 
     {        	                
@@ -270,7 +302,7 @@ app.get('/passTurn',function(req, res)
  * 
  * Note: 
  *      if resp is 1 the session is terminated
- *      if resp is true, the game is end but 
+ *      if resp is true, the game is end but the session continue.
  */
 app.get('/surrender',function(req, res)
 {           
@@ -579,10 +611,10 @@ function makeBoard(length, player1, player2)
         newBoard.push(-1);
     }
     var x =  (length/2)-1;     
-    newBoard[(x*length)+x] = 1;
-    newBoard[(x*length)+x+1] = 2;
-    newBoard[((x+1)*length)+x] = 2;
-    newBoard[((x+1)*length)+x+1] = 1;
+    newBoard[(x*length)+x] = player1;
+    newBoard[(x*length)+x+1] = player2;
+    newBoard[((x+1)*length)+x] = player2;
+    newBoard[((x+1)*length)+x+1] = player1;
     printMatrix(newBoard, length);
     return newBoard;
 }

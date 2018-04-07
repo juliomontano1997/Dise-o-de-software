@@ -19,7 +19,7 @@ export class GameViewComponent implements OnInit {
    // let sessionInformation= JSON.parse(localStorage.getItem("sessionData"));
   //  this.sessionHandler= new boardSessionHandler(sessionInformation.sessionId,sessionInformation.playerId);
     localStorage.setItem("notUpdate",JSON.stringify({"state":false})); 
-    this.sessionHandler= new boardSessionHandler(1,1);
+    this.sessionHandler= new boardSessionHandler(4,1);
     this.updateBoard();
     this.getBoardChanges();
   }
@@ -50,8 +50,10 @@ export class GameViewComponent implements OnInit {
 
   public getBoardChanges():void{
     let id = setInterval(() => {
+
       if (this.sessionHandler.itsMyTurn()===true &&
         (JSON.parse(localStorage.getItem("notUpdate")).state===false)){
+
         this.updateBoard(); 
       }
       

@@ -11,11 +11,14 @@ export class LoginServiceService {
 
   constructor(private http:Http) { }
 
+
   public userRegistration(playerEmail:String,playerName:String,playerImage:String){
 
     return this.http.get(this.apiUrl+`getPlayerId?mail=${playerEmail}+&name=${playerName}+&imageURL=${playerImage}`)
     .map(res => 
       res.json()); 
-  }
   
+}
+
+
 }

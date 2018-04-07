@@ -14,17 +14,17 @@ declare var swal:any;
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit,AfterViewInit {
 
- 
+
+export class LoginComponent implements OnInit,AfterViewInit 
+{
     private aplicationId:any;
     private userId:any;
     private imageUrl:string;
     
-     constructor(private http:HttpClient,private loginService:LoginServiceService) {
-
-       this.aplicationId='726004681121152';
-       
+    constructor(private http:HttpClient,private loginService:LoginServiceService) 
+    {
+       this.aplicationId='726004681121152';       
     }
   
    
@@ -35,10 +35,10 @@ export class LoginComponent implements OnInit,AfterViewInit {
 
 
 
-    public getFacebookInformation() {
+    public getFacebookInformation() 
+    {
       let environment=this;
       FB.api('/me','GET', {fields: 'email,first_name,last_name,name,id,picture.width(150).height(150)'},function (response) {
-
           environment.imageUrl="https://graph.facebook.com/"+response.id+"/picture?type=normal";
           console.log("respuesta");
           console.log(response.email);
@@ -108,10 +108,11 @@ public notifyUser(){
 }
 
   //verify if the user exist.
-public userSignIn(response:any, imageDir:string){
+public userSignIn(response:any, imageDir:string)
+{
     console.log(response);
     localStorage.setItem("user_data",JSON.stringify(response));
-   
+
     this.loginService.userRegistration(response.email,response.name,imageDir)
     .subscribe(
         (res) =>{
@@ -119,6 +120,7 @@ public userSignIn(response:any, imageDir:string){
             console.log(res);
             localStorage.setItem("playerInformation",JSON.stringify(res[0]));
             window.location.href='profileModule';
+
         },
         (err) => {
           console.log(err.json()); 

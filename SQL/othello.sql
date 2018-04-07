@@ -685,7 +685,7 @@ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION mg_give_up(
 IN i_playerID INT,
-IN sessionID INT)
+IN i_sessionID INT)
 RETURNS BOOLEAN AS
 $body$
 BEGIN

@@ -13,7 +13,6 @@ CREATE TABLE players
 	CONSTRAINT PK_mail_playerID PRIMARY KEY (mail,playerID)
 );
 
-
 CREATE TABLE sessions
 (
 	sessionID        SERIAL      NOT NULL,
@@ -427,7 +426,7 @@ SETOF RECORD AS
 $body$
 BEGIN
 RETURN query
-SELECT p.playerID, p.playerName, gameSession.playerOneID FROM (SELECT playerOneID, playerTwoID FROM sessions WHERE sessionID = i_sessionID) AS gameSession
+SELECT p.playerID, p.playerName, gameSession.playerOneID FROM (SELECT playerOneID, playerTwoID FROM sessions WHERE sessionID =1) AS gameSession
 INNER JOIN Players AS p
   ON playerID = gameSession.playerOneID OR playerID = gameSession.playerTwoID;
 END;
@@ -566,9 +565,9 @@ BEGIN
 SELECT count(*) INTO sessionExists FROM sessions WHERE playerOneID = i_transmitterID AND playerTwoID = i_receiverID;
 
 IF (sessionExists = 0) THEN
-INSERT INTO invitations (transmitterID, receiverID, boardSize, amountGames) VALUES
-(i_transmitterID, i_receiverID, i_boardSize, i_amountGames);
-RETURN TRUE;
+	INSERT INTO invitations (transmitterID, receiverID, boardSize, amountGames) VALUES
+	(i_transmitterID, i_receiverID, i_boardSize, i_amountGames);
+	RETURN TRUE;
 ELSE
 RETURN FALSE;
 END IF;
@@ -685,22 +684,30 @@ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION mg_give_up(
 IN i_playerID INT,
-IN sessionID INT)
+IN i_sessionID INT)
 RETURNS BOOLEAN AS
 $body$
 BEGIN
 	IF i_playerID = (SELECT playerOneID FROM sessions WHERE sessionID = i_sessionID) THEN
-		UPDATE sessionStadistics SET winsPlayer1 = winsPlayer1 + 1 WHERE sessionID = i_sessionID;
-	ELSE
 		UPDATE sessionStadistics SET winsPlayer2 = winsPlayer2 + 1 WHERE sessionID = i_sessionID;
+	ELSE
+		UPDATE sessionStadistics SET winsPlayer1 = winsPlayer1 + 1 WHERE sessionID = i_sessionID;
 	END IF;
-	UPDATE sessionStadistics SET numberActualGame = numberActualGame + 1 WHERE sessionID = i_sessionID;
+	IF (SELECT amountGames > numberActualGame FROM sessionstadistics WHERE sessionID= i_sessionID) = TRUE THEN
+		UPDATE sessionStadistics SET numberActualGame = numberActualGame + 1 WHERE sessionID = i_sessionID;
+	END IF;
+	
 	UPDATE sessions SET amountPassTurn = 0 WHERE sessionID = i_sessionID;
 	UPDATE sessions SET board = '{}' WHERE sessionID = i_sessionID;
 RETURN TRUE;
 EXCEPTION WHEN OTHERS THEN RETURN FALSE;
 
-
 END;
 $body$
 LANGUAGE plpgsql;
+
+
+/**********************************
+Machine image
+**********************************/
+--../../assets/images/machine.jpg

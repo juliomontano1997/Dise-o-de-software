@@ -1,3 +1,19 @@
 .information{
-    margin-left: 55%;
+    margin-left: 54%;
+}
+
+.game{
+    margin-left: 2%;
+    margin-right:50%;
+}
+
+@media only screen and (max-width: 600px) {
+    
+    .information{
+        margin-left: 5%;
+    }
+    .game{
+        margin-left: 2%;
+    }
+
 }

@@ -23,7 +23,7 @@ export class ProfileNavBarComponent implements OnInit {
     this.notificationsNumber=0;
     let playerIdLevel=JSON.parse(localStorage.getItem("playerInformation"));
     this.playerId=playerIdLevel.o_playerId;
-    this.getNotifications();
+    //this.getNotifications();
   }
 
   ngOnInit() {

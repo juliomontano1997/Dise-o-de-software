@@ -129,13 +129,4 @@ export class sessionInformationHandler {
         return this.amountGamesNumber;
     }
 
-    public getPlayerDefeats(opponentWins:number):number{
-        if (opponentWins===0){
-            return 0;
-        }
-        
-        return this.currentGameNumber-(opponentWins+this.tiesNumber);
-    }
-
-
 }

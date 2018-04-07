@@ -33,7 +33,7 @@ export class OnlinePlayersService {
 
   public inviteMachine(playerId:Number,boardSize:Number,amountGames:Number,machineLevel:Number){
 
-    return this.http.get(this.apiUrl+`inviteMachine?=idPlayer=${playerId}
+    return this.http.get(this.apiUrl+`inviteMachine?idPlayer=${playerId}
     +&boardSize=${boardSize}+&amountGames=${amountGames}+&machineLevel=${machineLevel}`)
     .map(res => 
       res.json()); 

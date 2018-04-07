@@ -9,7 +9,7 @@ var pg = require('pg');
 var express = require('express');
 var app = express();
 var pgp = require('pg-promise')();
-var cn = {host: 'localhost', port: 5432, database: 'othelloDB', user: 'postgres', password: 'postgresql2017'};
+var cn = {host: 'localhost', port: 5432, database: 'otelloDB', user: 'postgres', password: '12345'};
 var db = pgp(cn);
 var http =  require('http');
 
@@ -31,12 +31,8 @@ app.use(function(req, res, next)
  * Checked
  */
 app.get('/getPlayerId',function(req, res)
-<<<<<<< HEAD
 {    
-    console.log(req.query);
-=======
-{        
->>>>>>> 9b2d2f2a8158be81604d76689185484ca2ddd478
+
     db.func('mg_get_player', [req.query.mail, req.query.name, req.query.imageURL])    
     .then(data => 
     {        	              
@@ -81,12 +77,15 @@ app.get('/getActivePlayers',function(req, res)
  */
 app.get('/startSession',function(req, res)
 {        
+
+    console.log("voy hacer el tablero");
     db.func ('mg_get_board', [req.query.idSession])
     .then(data =>
     {        
         var newBoard;
         try {
             newBoard = makeBoard(data[0].o_boardsize,data[0].o_playeroneid,data[0].o_playertwoid);
+            
             db.func('mg_get_startSession', [req.query.idSession, newBoard])    
             .then(data => {res.end(JSON.stringify(data));})
             .catch(error=> {console.log(error);res.end(JSON.stringify(false));                
@@ -349,6 +348,8 @@ app.get('/surrender',function(req, res)
  */
 app.get('/getSessionStadistics',function(req, res)
 {        
+    console.log("session stadistics");
+    console.log(req.query.idSession);
     db.func('mg_get_session_stadistic',[req.query.idSession])    
     .then(data => 
     {        	   
@@ -388,7 +389,8 @@ app.get('/getActiveSessions', function(req, res)
 { 
 	db.func('mg_get_activeSessions',[req.query.idPlayer])    
     .then(data => 
-    {        	        
+    {        	  
+        console.log(data);      
         res.end(JSON.stringify(data));
     })
     .catch(error=> 
@@ -463,10 +465,12 @@ app.get('/deleteNotifications',function(req, res)
  */
 app.get('/newInvitation',function(req, res)
 {        
+    console.log("new invitation");
+    console.log("by someone");
     db.func('mg_create_invitation', [req.query.idPlayer, req.query.idRival,req.query.boardSize, req.query.amountGames])    
     .then(data => 
     {        	              
-        res.end(JSON.stringify(data));
+        res.end(JSON.stringify({"data":data[0].mg_create_invitation}));
     })
     .catch(error=> 
     {    	    	 
@@ -487,7 +491,7 @@ app.get('/inviteMachine',function(req, res)
     db.func('mg_invite_machine', [req.query.idPlayer, req.query.boardSize,req.query.amountGames, req.query.machineLevel])    
     .then(data => 
     {        	              
-        res.end(JSON.stringify(data));
+        res.end(JSON.stringify({"data":data[0].mg_invite_machine}));
     })
     .catch(error=> 
     {    	    	 
@@ -495,6 +499,7 @@ app.get('/inviteMachine',function(req, res)
         res.end(JSON.stringify(false));                
     })      
 });
+
 
 /**
  * Allows regect or acept an invitation 

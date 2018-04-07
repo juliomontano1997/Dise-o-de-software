@@ -14,7 +14,7 @@ export class PendingSessionsService {
 
   public getPendingSessions(playerId:Number)
   {
-    return this.http.get(this.apiUrl +`getPendingSessions?idPlayer=${playerId}`)
+    return this.http.get(this.apiUrl +`getActiveSessions?idPlayer=${playerId}`)
     .map(res => 
       res.json()); 
   }

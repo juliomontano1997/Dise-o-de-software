@@ -16,10 +16,12 @@ export class GameViewComponent implements OnInit {
   private sessionId
 
   constructor(private gameService: GameServicesService) { 
-   // let sessionInformation= JSON.parse(localStorage.getItem("sessionData"));
-  //  this.sessionHandler= new boardSessionHandler(sessionInformation.sessionId,sessionInformation.playerId);
-    localStorage.setItem("notUpdate",JSON.stringify({"state":false})); 
-    this.sessionHandler= new boardSessionHandler(4,1);
+    let sessionInformation= JSON.parse(localStorage.getItem("sessionData"));
+
+    this.sessionHandler= new boardSessionHandler(sessionInformation.sessionId,
+      sessionInformation.playerId);
+    
+    this.sessionHandler= new boardSessionHandler(sessionInformation.sessionId,sessionInformation.playerId);
     this.updateBoard();
     this.getBoardChanges();
   }
@@ -50,9 +52,15 @@ export class GameViewComponent implements OnInit {
 
   public getBoardChanges():void{
     let id = setInterval(() => {
-
-      if (this.sessionHandler.itsMyTurn()===true &&
+      console.log("looking for answer");
+      /**
+       * if (this.sessionHandler.itsMyTurn()===false &&
         (JSON.parse(localStorage.getItem("notUpdate")).state===false)){
+
+        this.updateBoard(); 
+        }
+       */
+      if (JSON.parse(localStorage.getItem("notUpdate")).state===false){
 
         this.updateBoard(); 
       }
@@ -75,7 +83,7 @@ export class GameViewComponent implements OnInit {
     .subscribe(
       (res) =>{
         if (res!=false){
-        //this.sessionHandler.getBoard()[(row*this.sessionHandler.getBoardSize())+column]=this.sessionHandler.getPlayerPlayingId();
+        this.sessionHandler.getBoard()[(row*this.sessionHandler.getBoardSize())+column]=this.sessionHandler.getPlayerPlayingId();
         this.sessionHandler.setActualPlayerId();
         this.getBoardChanges();
         

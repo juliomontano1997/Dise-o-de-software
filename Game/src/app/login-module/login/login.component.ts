@@ -37,8 +37,9 @@ export class LoginComponent implements OnInit,AfterViewInit
 
     public getFacebookInformation() 
     {
+
       let environment=this;
-      FB.api('/me','GET', {fields: 'email,first_name,last_name,name,id,picture.width(150).height(150)'},function (response) {
+      FB.api('/me','GET', {"fields":"id,name,email,first_name,last_name,picture.width(150).height(150)"},function (response) {
           environment.imageUrl="https://graph.facebook.com/"+response.id+"/picture?type=normal";
           console.log("respuesta");
           console.log(response.email);

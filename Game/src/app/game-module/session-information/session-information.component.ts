@@ -16,17 +16,17 @@ export class SessionInformationComponent implements OnInit {
 
   constructor(private sessionService:SessionStadisticsService,) {
     let sessionInformation= JSON.parse(localStorage.getItem("sessionData"));
-    //this.sessionInformationHandler=new sessionInformationHandler(sessionInformation.sessionId);
-    //this.sessionInformationHandler.setPlayerPlayingId(sessionInformation.playerId);
-       // let sessionInformation= JSON.parse(localStorage.getItem("sessionData"));
-    //this.sessionHandler= new boardSessionHandler(sessionInformation.sessionId,sessionInformation.playerId);
-    this.sessionInformationHandler=new sessionInformationHandler(4);
+    this.sessionInformationHandler=new sessionInformationHandler(sessionInformation.sessionId);
+    this.sessionInformationHandler.setPlayerPlayingId(sessionInformation.playerId);
     this.sessionInformationHandler.setSessionEnd(false);
 
     let data= JSON.parse(localStorage.getItem("somethingChange"));
+    console.log("data local");
+    alert("sessionInformation: "+ data.state);
+    console.log(data);
     this.sessionInformationHandler.setAllowUpdating(data.state);
-
     this.getPlayersName();
+    this.getSessionInformation();
     this.updateSessionInformation();
    
   }
@@ -44,11 +44,13 @@ export class SessionInformationComponent implements OnInit {
   }
 
   public getSessionInformation():void{
+    alert("we go to session Id: "+ this.sessionInformationHandler.getSessionId());
     this.sessionService.getStadistics(this.sessionInformationHandler.getSessionId())
     .subscribe(
       (res) =>{
         console.log(res);
         this.sessionInformationHandler.UpdateData(res);
+
       },
       (err) => {
         console.log(err.json()); 
@@ -58,9 +60,10 @@ export class SessionInformationComponent implements OnInit {
   public updateSessionInformation():void {
     let id = setInterval(() => {
 
-      //this.sessionInformationHandler.setAllowUpdating(JSON.parse(localStorage.getItem("somethingChange")).state);
+      this.sessionInformationHandler.setAllowUpdating(JSON.parse(localStorage.getItem("somethingChange")).state);
       if (this.sessionInformationHandler.getAllowUpdating()===true){
         this.getSessionInformation();
+        this.sessionEnd(false);
       }
 
       else{
@@ -123,5 +126,7 @@ export class SessionInformationComponent implements OnInit {
             console.log(err.json()); 
           });
     }
+
+    
 
 }

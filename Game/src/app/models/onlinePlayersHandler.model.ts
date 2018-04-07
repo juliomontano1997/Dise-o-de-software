@@ -32,11 +32,11 @@ export class onlinePlayersHandler {
         this.players=new Array<any>();
         let i=0;
         for (i=0; i < size;i++) {
-            this.players.push(new player(playersData[i].o_playerId,
-                playersData[i].o_playerName,
+            this.players.push(new player(playersData[i].o_playerid,
+                playersData[i].o_playername,
                 "",
-                playersData[i].o_playerLevel,
-                playersData[i].o_playerImage));
+                playersData[i].o_playerlevel,
+                playersData[i].o_playerimage));
         }
     }
 

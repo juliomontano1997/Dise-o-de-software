@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { onlinePlayersHandler } from '../../models/onlinePlayersHandler.model';
+import { userNotificationsHandler } from '../../models/userNotificationsHandler.model';
 import { OnlinePlayersService } from '../../services/online-players.service';
 import { player } from '../../models/player.model';
 @Component({
@@ -17,12 +18,13 @@ export class OnlinePlayersComponent implements OnInit {
   private machineId=0;
   private selectedLevel="Fácil";
   private playerId:Number;
+  private userNotices:userNotificationsHandler;
 
   constructor( private onlinePlayersService: OnlinePlayersService) { 
-
+    this.userNotices= new userNotificationsHandler();
     this.playersHandler=new onlinePlayersHandler();
     let playerIdLevel=JSON.parse(localStorage.getItem("playerInformation"));
-    this.playerId=playerIdLevel.o_playerId;
+    this.playerId=playerIdLevel.o_playerid;
     this.getPlayersOnline();
 
   }
@@ -30,10 +32,13 @@ export class OnlinePlayersComponent implements OnInit {
   public invitePlayer(playerId:Number){
     this.playersHandler.setGuestPlayerId(playerId);
     alert("invitar jugador con Id: " + playerId);
+  
   }
 
-  public finishInvitation(){
+  
 
+  public finishInvitation(){
+    
     if (this.playersHandler.checkSessionData(this.boardSize,this.amountGames)){
       if (this.playersHandler.isMachineId()===true) {
 
@@ -47,6 +52,13 @@ export class OnlinePlayersComponent implements OnInit {
           (res) =>{
               console.log("successful machine invitation");
               console.log(res);
+              if (res.data===true){
+                this.userNotices.notify(0,
+                "La invitación ha sido enviada con éxito, ahora tienes una sesión contra la máquina"
+                ,"Notificación del sistema");
+                this.amountGames=0;
+                this.boardSize=0;
+              }
           },
           (err) => {
             console.log(err.json()); 
@@ -61,7 +73,12 @@ export class OnlinePlayersComponent implements OnInit {
             (res) =>{
             console.log("successful player invitation");
             console.log(res);
-            this.playersHandler.updatePlayersArray(res);
+            //success player invitation
+            if (res.data===true){
+              this.userNotices.notify(0,"La invitación ha sido enviada","Notificación del sistema");
+              this.amountGames=0;
+              this.boardSize=0;
+            }
           },
           (err) => {
           console.log(err.json()); 
@@ -70,6 +87,8 @@ export class OnlinePlayersComponent implements OnInit {
     }
 
     else{
+      this.userNotices.notify(1,"Error, debe especificar el número de partidas y el tamaño de tablero"  
+      +" tal que sean mayor a 0 ","Notificación del sistema");
       //show error in board size or amount games
     }
 

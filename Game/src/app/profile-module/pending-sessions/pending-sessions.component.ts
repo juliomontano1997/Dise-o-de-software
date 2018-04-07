@@ -16,7 +16,7 @@ export class PendingSessionsComponent implements OnInit {
 
   constructor(private pendingSessionService:PendingSessionsService) { 
     let playerIdLevel=JSON.parse(localStorage.getItem("playerInformation"));
-    this.playerId=playerIdLevel.o_playerId;
+    this.playerId=playerIdLevel.o_playerid;
     this.getSessions();
 
   }
@@ -28,9 +28,9 @@ export class PendingSessionsComponent implements OnInit {
     this.pendingSessions=new Array<pendingSessions>();
 
     for(i=0; i< size;i++){
-      this.pendingSessions.push(new pendingSessions(dataArray[i].o_sessionID,
-        dataArray[i].o_enemyName,dataArray[i].o_amountGames,dataArray[i].o_boardSize,
-        dataArray[i].o_numberActualGame,dataArray[i].o_board));
+      this.pendingSessions.push(new pendingSessions(dataArray[i].o_sessionid,
+        dataArray[i].o_enemyname,dataArray[i].o_amountgames,dataArray[i].o_boardsize,
+        dataArray[i].o_numberactualgame,dataArray[i].o_board));
 
     }
   }
@@ -39,6 +39,8 @@ export class PendingSessionsComponent implements OnInit {
     this.pendingSessionService.getPendingSessions(playerId)
       .subscribe(
         (res) =>{
+            console.log("respuesta recibida");
+            console.log(res);
             this.setPendingSessions(res);
         },
         (err) => {
@@ -50,7 +52,9 @@ export class PendingSessionsComponent implements OnInit {
     this.pendingSessionService.startSession(sessionId)
     .subscribe(
       (res) =>{
+ 
         localStorage.setItem("sessionData",JSON.stringify({"sessionId":sessionId,"playerId":this.playerId}));
+
         window.location.href='gameModule';
       },
       (err) => {
@@ -67,8 +71,12 @@ export class PendingSessionsComponent implements OnInit {
 
   public restartSession(sessionId:Number,board:Array<any>){
     alert("Id de la sesión: "+ sessionId);
-    if (board.length>0 ){
-      localStorage.setItem("sessionData",JSON.stringify({"sessionId":sessionId,"playerId":this.playerId}));
+    console.log("board size: "+ board.length);
+    localStorage.setItem("somethingChange",JSON.stringify({"state":false}));
+    localStorage.setItem("notUpdate",JSON.stringify({"state":false}));
+    localStorage.setItem("sessionData",JSON.stringify({"sessionId":sessionId,"playerId":this.playerId}));
+    if (board.length> 0 ){
+      
       window.location.href='gameModule';
     }
     else{

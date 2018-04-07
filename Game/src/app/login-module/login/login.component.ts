@@ -40,6 +40,8 @@ export class LoginComponent implements OnInit,AfterViewInit {
       FB.api('/me','GET', {fields: 'email,first_name,last_name,name,id,picture.width(150).height(150)'},function (response) {
 
           environment.imageUrl="https://graph.facebook.com/"+response.id+"/picture?type=normal";
+          console.log("respuesta");
+          console.log(response.email);
           environment.userSignIn(response,environment.imageUrl);
           
       });
@@ -109,22 +111,18 @@ public notifyUser(){
 public userSignIn(response:any, imageDir:string){
     console.log(response);
     localStorage.setItem("user_data",JSON.stringify(response));
-    window.location.href='profileModule';
-
-/**    
+   
     this.loginService.userRegistration(response.email,response.name,imageDir)
     .subscribe(
         (res) =>{
             console.log("login response");
-            console.log(response);
-            localStorage.setItem("playerInformation",JSON.stringify(res));
-            
-             window.location.href='profileModule';
+            console.log(res);
+            localStorage.setItem("playerInformation",JSON.stringify(res[0]));
+            window.location.href='profileModule';
         },
         (err) => {
           console.log(err.json()); 
         });
-*/
 }
 
 

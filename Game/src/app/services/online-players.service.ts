@@ -16,25 +16,25 @@ export class OnlinePlayersService {
 
   public getPlayers(playerId:Number){
 
-    return this.http.get(this.apiUrl +`onlinePlayers?playerId=${playerId}`)
+    return this.http.get(this.apiUrl +`getActivePlayers?idPlayer=${playerId}`)
     .map(res => 
       res.json()); 
   }
 
   public invitePlayer(hostPlayerId:Number,guestPlayerId:Number,boardSize:Number,amountGames:Number){
-    let headers = new Headers ({"Content-Type": "application/json"});
-    let options = new RequestOptions({headers: headers});
-    return this.http.post(this.apiUrl+`invitePlayer?`,JSON.stringify({'transmitterID':hostPlayerId,
-    'receiverID':guestPlayerId,'boardSize':boardSize,"amountGames":amountGames}),options)
+  
+    return this.http.get(this.apiUrl+`newInvitation?idPlayer=${hostPlayerId}+&idRival=${guestPlayerId}
+    +&boardSize=${boardSize}+&amountGames=${amountGames}`)
     .map(res => 
       res.json()); 
   }
 
+
+
   public inviteMachine(playerId:Number,boardSize:Number,amountGames:Number,machineLevel:Number){
-    let headers = new Headers ({"Content-Type": "application/json"});
-    let options = new RequestOptions({headers: headers});
-    return this.http.post(this.apiUrl+`inviteMachine?`,JSON.stringify({'playerId':playerId,
-    'boardSize':boardSize,'amountGames':amountGames,'machineLevel':machineLevel}),options)
+
+    return this.http.get(this.apiUrl+`inviteMachine?=idPlayer=${playerId}
+    +&boardSize=${boardSize}+&amountGames=${amountGames}+&machineLevel=${machineLevel}`)
     .map(res => 
       res.json()); 
   }

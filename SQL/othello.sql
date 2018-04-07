@@ -14,6 +14,7 @@ CREATE TABLE players
 
 );
 
+
 CREATE TABLE sessions
 (
 	sessionID        SERIAL      NOT NULL,
@@ -96,7 +97,7 @@ CREATE TABLE invitations
 CREATE OR REPLACE FUNCTION mg_get_player(
 IN i_mail t_mail,
 IN i_playerName VARCHAR(50),
-IN i_image VARCHAR(50),
+IN i_image TEXT,
 OUT o_playerId INT,
 OUT o_playerLevel INT)
 RETURNS
@@ -449,14 +450,15 @@ OUT o_sessionID INT,
 OUT o_boardSize INT,
 OUT o_amountGames INT,
 OUT o_numberActualGame INT,
-OUT o_enemyName VARCHAR(50))
+OUT o_enemyName VARCHAR(50),
+OUT o_board INTEGER[])
 RETURNS
 SETOF RECORD AS
 $body$
 BEGIN
 
 RETURN query
-SELECT sessionData.sessionID, sessionData.boardSize, sessionData.amountGames, sessionData.numberActualGame , p.playerName FROM
+SELECT sessionData.sessionID, sessionData.boardSize, sessionData.amountGames, sessionData.numberActualGame , p.playerName, sessionData.board FROM
 (SELECT s.*, t.amountGames,t.numberActualGame FROM sessions s, sessionStadistics t
 WHERE s.sessionID = t.sessionID AND playerOneID = i_playerID OR playerTwoID = i_playerID) AS sessionData
 INNER JOIN players AS p ON ((p.playerID = sessionData.playerOneId AND p.playerID != i_playerID) OR (p.playerID = sessionData.playerTwoId AND p.playerID != i_playerID));
@@ -464,6 +466,7 @@ INNER JOIN players AS p ON ((p.playerID = sessionData.playerOneId AND p.playerID
 END;
 $body$
 LANGUAGE plpgsql;
+select mg_get_activeSessions(1);
 
 /*
 * Allows get all the notifications of a player
@@ -509,7 +512,7 @@ SETOF RECORD AS
 $body$
 BEGIN
 RETURN query
-SELECT invitationID "ID", ((SELECT playerName FROM players WHERE playerID = transmitterID) || ' te ha invitado a jugar. Caracteristicas del juego: Tamaño del tablero: '|| boardSize || ' Cantidad partidas: ' || amountGames) "content"
+SELECT invitationID "ID", ((SELECT playerName FROM players WHERE playerID = transmitterID) || ' te ha invitado a jugar \n Caracteristicas del juego: \n Tamaño del tablero: '|| boardSize || ' \n Cantidad partidas: ' || amountGames) "content"
 FROM invitations WHERE receiverID = i_playerID ORDER BY creationDate DESC;
 
 END;

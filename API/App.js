@@ -35,9 +35,10 @@ app.use(function(req, res, next)
  * @returns JSON
  * Checked
  */
-app.post('/getPlayerId',function(req, res)
-{        
-    db.func('mg_get_player', [req.body.mail, req.body.name, req.body.imageURL])    
+app.get('/getPlayerId',function(req, res)
+{    
+    console.log(req.query);
+    db.func('mg_get_player', [req.query.mail, req.query.name, req.query.imageURL])    
     .then(data => 
     {        	              
         res.end(JSON.stringify(data));
@@ -56,12 +57,9 @@ app.post('/getPlayerId',function(req, res)
  */
 app.get('/getActivePlayers',function(req, res)
 {        
-<<<<<<< HEAD
-    db.func('mg_get_player', [req.body.mail, req.body.name, req.body.imageURL])    
-=======
-    console.log(req.query.idPlayer);
+
     db.func('mg_get_activePlayers', [req.query.idPlayer])    
->>>>>>> e2d0aa20b9083a80ddf6d48945bf3aa1c8ac9d9e
+
     .then(data => 
     {        	              
         console.log(data);

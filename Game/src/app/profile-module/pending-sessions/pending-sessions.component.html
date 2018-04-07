@@ -15,7 +15,7 @@
                 <h6>Tamaño del tablero: {{pendingSession.getBoardSize()}}</h6>
                 </td>
                 <td>
-                <button type="button" class="btn btn-secondary btn-lg" (click)="restartSession(pendingSession.getSessionId())">Reanudar</button>
+                <button type="button" class="btn btn-secondary btn-lg" (click)="restartSession(pendingSession.getSessionId(),pendingSession.getBoard())">Reanudar</button>
                 </td>
             </tr>
             <hr><hr>

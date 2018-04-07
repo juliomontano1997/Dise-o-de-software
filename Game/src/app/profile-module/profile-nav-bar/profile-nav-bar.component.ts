@@ -54,11 +54,14 @@ export class ProfileNavBarComponent implements OnInit {
   
 
   public invitationAnswer(invitationId:Number,decision:Boolean){
+    let that=this;
     this.navService.invitationAnswer(invitationId,decision).subscribe(
       (res) =>{
         //check this
+          this.getMyNotifications(this.playerId);
           console.log("res");
           console.log(res);
+          
       },
       (err) => {
         console.log(err.json()); 
@@ -71,6 +74,8 @@ export class ProfileNavBarComponent implements OnInit {
           //check this
             console.log("res");
             console.log(res);
+            this.getMyNotifications(this.playerId);
+            
         },
         (err) => {
           console.log(err.json()); 

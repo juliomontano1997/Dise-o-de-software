@@ -12,8 +12,15 @@ export class PendingSessionsService {
 
   constructor(private http:Http) { }
 
-  public getPendingSessions(playerId:Number){
-    return this.http.get(this.apiUrl +`getPendingSessions?playerId=${playerId}`)
+  public getPendingSessions(playerId:Number)
+  {
+    return this.http.get(this.apiUrl +`getPendingSessions?idPlayer=${playerId}`)
+    .map(res => 
+      res.json()); 
+  }
+
+  public startSession(sessionId:Number){
+    return this.http.get(this.apiUrl +`startSession?idSession=${sessionId}`)
     .map(res => 
       res.json()); 
   }

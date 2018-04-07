@@ -15,25 +15,22 @@ export class NavService {
   }
 
   public getNotifications (playerId:Number){
-    return this.http.get(this.apiUrl +`getNotifications?playerId=${playerId}`)
+    return this.http.get(this.apiUrl +`getNotifications?idPlayer=${playerId}`)
     .map(res => 
       res.json()); 
   }
 
   public deleteNotification(notificationId:Number){
-    let headers = new Headers ({"Content-Type": "application/json"});
-    let options = new RequestOptions({headers: headers});
-    return this.http.post(this.apiUrl+`deleteNotification?`,JSON.stringify(
-      {'notificationId':notificationId}),options)
+    
+    return this.http.get(this.apiUrl+`deleteNotifications?idNotification=${notificationId}`)
     .map(res => 
       res.json()); 
   }
 
   public invitationAnswer(invitationId:Number, decision:Boolean){
-    let headers = new Headers ({"Content-Type": "application/json"});
-    let options = new RequestOptions({headers: headers});
-    return this.http.post(this.apiUrl+`invitationAnswer?`,JSON.stringify(
-      {'invitationId':invitationId,'decision':decision}),options)
+ 
+    return this.http.get(this.apiUrl+`decideInvitation?idInvitation=${invitationId}
+    +&decision=${decision}`)
     .map(res => 
       res.json()); 
   }

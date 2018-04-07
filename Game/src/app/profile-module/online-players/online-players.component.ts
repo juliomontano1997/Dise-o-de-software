@@ -21,7 +21,6 @@ export class OnlinePlayersComponent implements OnInit {
   constructor( private onlinePlayersService: OnlinePlayersService) { 
 
     this.playersHandler=new onlinePlayersHandler();
-
     let playerIdLevel=JSON.parse(localStorage.getItem("playerInformation"));
     this.playerId=playerIdLevel.o_playerId;
     this.getPlayersOnline();
@@ -55,6 +54,7 @@ export class OnlinePlayersComponent implements OnInit {
       }
       //invite player
       else{
+        
         this.onlinePlayersService.invitePlayer(this.playerId,this.playersHandler.getGuestPlayerId(),
         this.boardSize,this.amountGames)
         .subscribe(

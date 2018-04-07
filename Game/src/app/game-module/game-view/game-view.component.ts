@@ -51,7 +51,7 @@ export class GameViewComponent implements OnInit {
   public getBoardChanges():void{
     let id = setInterval(() => {
       if (this.sessionHandler.itsMyTurn()===true &&
-        (JSON.parse(localStorage.getItem("notUpdate")).state===false){
+        (JSON.parse(localStorage.getItem("notUpdate")).state===false)){
         this.updateBoard(); 
       }
       

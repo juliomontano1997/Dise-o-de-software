@@ -22,8 +22,11 @@ export class UserInformationComponent implements OnInit {
 
     let playerData= JSON.parse(localStorage.getItem("user_data")); //parse string json to json object
     let playerIdLevel=JSON.parse(localStorage.getItem("playerInformation"));
-    this.playerHandler=new player(playerIdLevel.o_playerId,playerData.name,playerData.email,
-      playerIdLevel.o_playerLevel, "https://graph.facebook.com/"+playerData.id+"/picture?type=normal");
+    console.log("player id and level");
+    console.log(playerIdLevel);
+    alert("player level: "+ playerIdLevel.o_playerLevel);
+    this.playerHandler=new player(playerIdLevel.o_playerid,playerData.name,playerData.email,
+      playerIdLevel.o_playerlevel, "https://graph.facebook.com/"+playerData.id+"/picture?type=normal");
     console.log("player object");
     console.log(this.playerHandler);
   }

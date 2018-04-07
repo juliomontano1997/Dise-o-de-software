@@ -30,7 +30,7 @@ export class PendingSessionsComponent implements OnInit {
     for(i=0; i< size;i++){
       this.pendingSessions.push(new pendingSessions(dataArray[i].o_sessionID,
         dataArray[i].o_enemyName,dataArray[i].o_amountGames,dataArray[i].o_boardSize,
-        dataArray[i].o_numberActualGame));
+        dataArray[i].o_numberActualGame,dataArray[i].o_board));
 
     }
   }
@@ -46,6 +46,18 @@ export class PendingSessionsComponent implements OnInit {
         });
   }
 
+  public startSession(sessionId:Number){
+    this.pendingSessionService.startSession(sessionId)
+    .subscribe(
+      (res) =>{
+        localStorage.setItem("sessionData",JSON.stringify({"sessionId":sessionId,"playerId":this.playerId}));
+        window.location.href='gameModule';
+      },
+      (err) => {
+        console.log(err.json()); 
+      });
+  }
+
   public getSessions(){
     let id = setInterval(() => {
       this.getPendingSessions(this.playerId);
@@ -53,10 +65,17 @@ export class PendingSessionsComponent implements OnInit {
 
   }
 
-  public restartSession(sessionId:Number){
+  public restartSession(sessionId:Number,board:Array<any>){
     alert("Id de la sesión: "+ sessionId);
-    localStorage.setItem("sessionData",JSON.stringify({"sessionId":sessionId,"playerId":this.playerId}));
-    window.location.href='gameModule';
+    if (board.length>0 ){
+      localStorage.setItem("sessionData",JSON.stringify({"sessionId":sessionId,"playerId":this.playerId}));
+      window.location.href='gameModule';
+    }
+    else{
+      this.startSession(sessionId);
+    }
+    
+    
   }
 
   ngOnInit() {

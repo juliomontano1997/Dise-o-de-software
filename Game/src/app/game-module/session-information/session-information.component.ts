@@ -22,7 +22,7 @@ export class SessionInformationComponent implements OnInit {
     //this.sessionHandler= new boardSessionHandler(sessionInformation.sessionId,sessionInformation.playerId);
     this.sessionInformationHandler=new sessionInformationHandler(1);
     this.sessionInformationHandler.setSessionEnd(false);
-    let data= JSON.parse(localStorage.getItem("somethingChange"));
+   // let data= JSON.parse(localStorage.getItem("somethingChange"));
     this.sessionInformationHandler.setAllowUpdating(data.state);
     this.getPlayersName();
     this.updateSessionInformation();

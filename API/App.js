@@ -447,7 +447,7 @@ app.get('/deleteNotifications',function(req, res)
     db.func('mg_erase_notifications', [req.query.idNotification])    
     .then(data => 
     {        	              
-        res.end(JSON.stringify(data));
+        res.end(JSON.stringify({"data":data[0].mg_erase_notifications}));
     })
     .catch(error=> 
     {    	    	 
@@ -516,7 +516,7 @@ app.get('/decideInvitation',function(req, res)
     db.func('mg_handling_invitations',[req.query.idInvitation, req.query.decision])    
     .then(data => 
     {              	              
-        res.end(JSON.stringify(data));
+        res.end(JSON.stringify({"data":data[0].mg_handling_invitations}));
     })
     .catch(error=> 
     {    	    	 

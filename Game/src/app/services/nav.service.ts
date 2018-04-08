@@ -35,4 +35,10 @@ export class NavService {
       res.json()); 
   }
 
+  public getInvitations(playerId:Number){
+    return this.http.get(this.apiUrl +`getInvitations?idPlayer=${playerId}`)
+    .map(res => 
+      res.json()); 
+  }
+
 }

@@ -15,7 +15,7 @@ export class userNotificationsHandler {
      */
     public notify(notificationCode:Number,message:String,notificationTitle:String){
         //success
-        if (notificationCode==0){
+        if (notificationCode===0){
             swal({
                 type:'success',
                 title: notificationTitle,
@@ -26,13 +26,21 @@ export class userNotificationsHandler {
                 });
         }
         //danger
-        else if (notificationCode==1){
+        else if (notificationCode===1){
             swal({
                 type:'error',
                 title: notificationTitle,
                 text: message,
                 confirmButtonColor: '#049F0C',
                 confirmButtonText: 'Ok',
+                });
+        }
+        else if (notificationCode===2){
+            swal({
+                type:'success',
+                title: notificationTitle,
+                text: message,
+                confirmButton:false                
                 });
         }
 

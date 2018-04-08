@@ -459,15 +459,15 @@ $body$
 BEGIN
 
 RETURN query
-SELECT sessionData.sessionID, sessionData.boardSize, sessionData.amountGames, sessionData.numberActualGame , p.playerName, sessionData.board FROM
-(SELECT s.*, t.amountGames,t.numberActualGame FROM sessions s, sessionStadistics t
-WHERE s.sessionID = t.sessionID AND playerOneID = i_playerID OR playerTwoID = i_playerID) AS sessionData
+SELECT sessionData.sessionID, sessionData.boardSize, sessionData.amountGames, sessionData.numberActualGame , p.playerName, sessionData.board FROM (
+SELECT s.*,t.amountGames ,t.numberActualGame FROM (SELECT s.sessionID,s.boardSize,s.board,s.playerOneId,s.playerTwoId FROM sessions s
+WHERE playerOneID = i_playerID OR playerTwoID = i_playerID) AS s INNER JOIN sessionStadistics AS t
+ON s.sessionID= t.sessionID) AS sessionData
 INNER JOIN players AS p ON ((p.playerID = sessionData.playerOneId AND p.playerID != i_playerID) OR (p.playerID = sessionData.playerTwoId AND p.playerID != i_playerID));
 
 END;
 $body$
 LANGUAGE plpgsql;
-select mg_get_activeSessions(1);
 
 /*
 * Allows get all the notifications of a player
@@ -513,7 +513,8 @@ SETOF RECORD AS
 $body$
 BEGIN
 RETURN query
-SELECT invitationID "ID", ((SELECT playerName FROM players WHERE playerID = transmitterID) || ' te ha invitado a jugar \n Caracteristicas del juego: \n Tamaño del tablero: '|| boardSize || ' \n Cantidad partidas: ' || amountGames) "content"
+SELECT invitationID "ID", ((SELECT playerName FROM players WHERE playerID = transmitterID) || ' te ha invitado a jugar' || chr(10) ||' Caracteristicas del juego: '
+	|| chr(10) ||' Tamaño del tablero: '|| boardSize || chr(10) ||'Cantidad partidas: ' || amountGames) "content"
 FROM invitations WHERE receiverID = i_playerID ORDER BY creationDate DESC;
 
 END;

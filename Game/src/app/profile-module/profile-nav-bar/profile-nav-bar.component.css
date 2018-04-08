@@ -7,13 +7,17 @@
     cursor: pointer;
 }
 
+.notification{
+    background-color: gray;
+}
+
 .exit{
     color: white;
     margin-top: 8%;
 }
 
 .divBorder{
-    border: solid 10px gray;
+    border: solid 2px gray;
     
 }
 

@@ -24,7 +24,7 @@ export class LoginComponent implements OnInit,AfterViewInit
     
     constructor(private http:HttpClient,private loginService:LoginServiceService) 
     {
-       this.aplicationId='726004681121152';       
+       this.aplicationId='726004681121152';   
     }
   
    

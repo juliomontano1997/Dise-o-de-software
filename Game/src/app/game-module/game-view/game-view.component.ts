@@ -23,7 +23,7 @@ export class GameViewComponent implements OnInit {
     
     this.sessionHandler= new boardSessionHandler(sessionInformation.sessionId,sessionInformation.playerId);
     this.updateBoard();
-    this.getBoardChanges();
+    //this.getBoardChanges();
   }
     
   ngOnInit() {
@@ -40,9 +40,18 @@ export class GameViewComponent implements OnInit {
     this.gameService.getUpdatedBoard(this.sessionHandler.getSessionId())
     .subscribe(
       (res) =>{
-        console.log("respuesta actualización");
-        console.log(res);
-        this.sessionHandler.UpdateData(res);
+        if (res.data===1){
+          this.changeNotify();
+        }
+        else if (res.data===2){
+          this.changeNotify();
+        }
+        else{
+          console.log("respuesta actualización");
+          console.log(res);
+          this.sessionHandler.UpdateData(res);
+        }
+        
       },
       (err) => {
         console.log(err.json()); 
@@ -53,13 +62,7 @@ export class GameViewComponent implements OnInit {
   public getBoardChanges():void{
     let id = setInterval(() => {
       console.log("looking for answer");
-      /**
-       * if (this.sessionHandler.itsMyTurn()===false &&
-        (JSON.parse(localStorage.getItem("notUpdate")).state===false)){
-
-        this.updateBoard(); 
-        }
-       */
+      
       if (JSON.parse(localStorage.getItem("notUpdate")).state===false){
 
         this.updateBoard(); 

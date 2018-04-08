@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { facebookSessionHandler } from '../../models/facebookSessionHandler.model';
-
+import { NavService } from '../../services/nav.service';
 @Component({
   selector: 'app-message-nav-bar',
   templateUrl: './message-nav-bar.component.html',
@@ -15,7 +15,7 @@ export class MessageNavBarComponent implements OnInit {
   private sessionId:Number;
   private messagesNumber:Number=0;
 
-  constructor() { 
+  constructor(private navService: NavService) { 
     this.facebookManager=new facebookSessionHandler('726004681121152');
     this.messages= new Array<any>();
     //testing
@@ -43,10 +43,22 @@ export class MessageNavBarComponent implements OnInit {
   }
 
   public closeSession(){
+    this.navService.closeSession(this.playerId).subscribe(
+      (res) =>{
+        //check this
+        if (res.data===true){
+          this.facebookManager.logOut();
     
-    this.facebookManager.logOut();
+        }
+
+      },
+      (err) => {
+        console.log(err.json()); 
+      });
     
   }
+
+
 
   /**
   public getBoardChanges():void{

@@ -21,9 +21,7 @@ export class SessionInformationComponent implements OnInit {
     this.sessionInformationHandler.setSessionEnd(false);
 
     let data= JSON.parse(localStorage.getItem("somethingChange"));
-    console.log("data local");
-    alert("sessionInformation: "+ data.state);
-    console.log(data);
+
     this.sessionInformationHandler.setAllowUpdating(data.state);
     this.getPlayersName();
     this.getSessionInformation();
@@ -44,12 +42,19 @@ export class SessionInformationComponent implements OnInit {
   }
 
   public getSessionInformation():void{
-    alert("we go to session Id: "+ this.sessionInformationHandler.getSessionId());
     this.sessionService.getStadistics(this.sessionInformationHandler.getSessionId())
     .subscribe(
       (res) =>{
         console.log(res);
-        this.sessionInformationHandler.UpdateData(res);
+        if (res.length > 0) {
+          this.sessionInformationHandler.UpdateData(res);
+        }
+        else{
+          //this is the end because the session was deleted;
+          this.sessionEnd(true);
+          alert("fin de sesion");
+        }
+        
 
       },
       (err) => {
@@ -97,17 +102,20 @@ export class SessionInformationComponent implements OnInit {
           (res) =>{
     
             //if the session is not ended
-            if (res.mg_finishSession===true){
+            if (res.data===false){
               //stop updating
+              this.getSessionInformation();
               this.sessionEnd(false);
-              this.updateSessionInformation();
-              
+               
             }
+            
             else{
               this.sessionInformationHandler.setSessionEnd(true);
               this.sessionEnd(true);
+              alert("fin de juego");
               //determinar quien ganó el juego.
             }
+            
             
           },
           (err) => {

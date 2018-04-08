@@ -95,7 +95,7 @@ export class boardSessionHandler {
     }
 
     public getPlayerTwoColor(): String{
-        return this.playerTwoColor;
+       return this.playerTwoColor;
     }
 
     public getPlayerPlayingId(): number{

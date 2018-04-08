@@ -41,4 +41,10 @@ export class NavService {
       res.json()); 
   }
 
+  public closeSession(playerId:Number){
+    return this.http.get(this.apiUrl +`getCloseSession?idPlayer=${playerId}`)
+    .map(res => 
+      res.json()); 
+  }
+
 }

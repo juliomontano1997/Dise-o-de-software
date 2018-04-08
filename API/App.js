@@ -68,6 +68,27 @@ app.get('/getActivePlayers',function(req, res)
     })      
 });
 
+/**
+ * Allows to close the player session
+ * @param {number} idPlayer
+ * @returns Json
+ * Checked
+ */
+app.get('/getCloseSession',function(req, res)
+{        
+    db.func('mg_closeSession', [req.query.idPlayer])    
+
+    .then(data => 
+    {                         
+        console.log(data);
+        res.end(JSON.stringify({"data":data[0].mg_closesession}));
+    })
+    .catch(error=> 
+    {                
+        console.log(error);
+        res.end(JSON.stringify(false));                
+    })      
+});
 
 /**
  * Allows start a new session, the method initialice the board
@@ -78,7 +99,6 @@ app.get('/getActivePlayers',function(req, res)
 app.get('/startSession',function(req, res)
 {        
 
-    console.log("voy hacer el tablero");
     db.func ('mg_get_board', [req.query.idSession])
     .then(data =>
     {        
@@ -136,7 +156,8 @@ app.get('/getBoard',function(req, res)
 {            
     db.func('mg_get_board',[req.query.idSession])    
     .then(data => 
-    {                	                        
+    {             
+        console.log(data);   	                        
         var scores = verifyFullBoard(data[0].o_board, data[0].o_playeroneid);
         if(scores!=false) // Solo se activa cuando se llena el tablero.
         {
@@ -157,12 +178,14 @@ app.get('/getBoard',function(req, res)
                 db.func('mg_get_session_stadistic',[req.query.idSession])  
                 .then(data => 
                 {        	        
-                    if(data[0].o_amountgames ===data[0].o_numberactualgame)
+                    if(data[0].o_amountgames === data[0].o_numberactualgame)
                     {            
                         db.func('mg_finishSession',[req.query.idSession])    
                         .then(data => 
-                        {                        	                   
-                            res.end(JSON.stringify(1));
+                        {   console.log("*************************");
+                            console.log("sesion terminada");
+                            console.log("*************************");        	                   
+                            res.end(JSON.stringify({"data":1})); //finish session
                         })
                         .catch(error=> 
                         {    	    	                 
@@ -173,7 +196,10 @@ app.get('/getBoard',function(req, res)
                     {
                         var urlLink="http://localhost:8081/startSession?idSession="+req.query.idSession;              
                         autoRequest(urlLink);  
-                        res.end(JSON.stringify(true));
+                        console.log("*************************");
+                        console.log("juego terminado pero no la sesión");
+                        console.log("*************************");
+                        res.end(JSON.stringify({"data":2})); //the game finish but not the session
                     }
                     res.end(JSON.stringify());                  
                 })
@@ -313,24 +339,27 @@ app.get('/surrender',function(req, res)
     var newBoard;
     db.func('mg_give_up',[req.query.idPlayer,req.query.idSession])  
     .then(data => 
-    {        	        
-        if(req.query.currentGame === req.query.amountGames)
+    {   
+        console.log("current game number");
+        console.log(req.query.currentGame+1);
+        if(((req.query.currentGame*1)+1) > req.query.amountGames*1)
         {            
             db.func('mg_finishSession',[req.query.idSession])    
             .then(data => 
-            {                        	                   
-                res.end(JSON.stringify(1));
+            {              
+                console.log("sessionEnd");          	                   
+                res.end(JSON.stringify({"data":true}));
             })
             .catch(error=> 
             {    	    	                 
-                res.end(JSON.stringify(false));                
+                res.end(JSON.stringify({"data":false}));                
             })               
         }  
         else
         {
             var urlLink="http://localhost:8081/startSession?idSession="+req.query.idSession;              
             autoRequest(urlLink);  
-            res.end(JSON.stringify(true));
+            res.end(JSON.stringify({"data":false}));
         }
         res.end(JSON.stringify());                  
     })

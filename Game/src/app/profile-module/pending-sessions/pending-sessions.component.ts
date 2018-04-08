@@ -70,8 +70,6 @@ export class PendingSessionsComponent implements OnInit {
   }
 
   public restartSession(sessionId:Number,board:Array<any>){
-    alert("Id de la sesión: "+ sessionId);
-    console.log("board size: "+ board.length);
     localStorage.setItem("somethingChange",JSON.stringify({"state":false}));
     localStorage.setItem("notUpdate",JSON.stringify({"state":false}));
     localStorage.setItem("sessionData",JSON.stringify({"sessionId":sessionId,"playerId":this.playerId}));

@@ -12,6 +12,7 @@ import { SessionInformationComponent } from './session-information/session-infor
 import { SessionStadisticsService } from '../services/session-stadistics.service';
 import { Routes, RouterModule } from '@angular/router';
 import { MessageNavBarComponent } from './message-nav-bar/message-nav-bar.component';
+import { NavService } from '../services/nav.service';
 
 const routes: Routes = [
   { path: '', component: GameModuleComponent},
@@ -29,6 +30,6 @@ const routes: Routes = [
   SessionInformationComponent,
   MessageNavBarComponent
   ],
-  providers: [GameServicesService, SessionStadisticsService,]
+  providers: [GameServicesService, SessionStadisticsService,NavService]
 })
 export class GameModule { }

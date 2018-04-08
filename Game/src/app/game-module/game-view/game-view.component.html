@@ -12,7 +12,7 @@
         <ng-template #rival>
             <div class="divTd" *ngIf="checkEqualId(row,col,sessionHandler.getPlayerTwoId()); else whiteSpace">
                 <svg class="circle-piece" >
-                  <circle id="circle" cx="12" cy="7" r="7" fill="sessionHandler.getPlayerTwoColor()"/>
+                  <circle id="circle" cx="12" cy="7" r="7" [ngStyle]="{fill:sessionHandler.getPlayerTwoColor()}"/>
                   Lo sentimos, tu navegador no soporta SVG.  
                 </svg>
               </div>
@@ -36,6 +36,7 @@
           Tu rival está jugando 
         </h4>
         </ng-template>
+        <span style="background-color:blue" class="badge bg-gray badge-pill"> </span>
   </div>
   </div>
 

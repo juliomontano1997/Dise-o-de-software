@@ -149,9 +149,21 @@ export class ProfileNavBarComponent implements OnInit {
   }
 
   public closeSession(){
-    
-    this.facebookManager.logOut();
-    
+    this.navService.closeSession(this.playerId).subscribe(
+      (res) =>{
+        //check this
+        alert("respuesta: "+res);
+        console.log("respuesta cerrar sesión");
+        console.log(res);
+        if (res.data===true){
+          this.facebookManager.logOut();
+        }
+
+      },
+      (err) => {
+        console.log(err.json()); 
+      });
+
   }
 
 

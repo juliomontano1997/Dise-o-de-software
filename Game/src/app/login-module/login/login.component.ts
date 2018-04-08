@@ -111,6 +111,17 @@ public notifyUser(){
   //verify if the user exist.
 public userSignIn(response:any, imageDir:string)
 {
+    //if the email is not gotten
+    if (response.email=== undefined){
+        swal({
+            type:'error',
+            title: "Notificación del sistema",
+            text: "No puede iniciar sesión debido a que no fue posible obtener tu correo electrónico",
+            confirmButtonColor: '#049F0C',
+            confirmButtonText: 'Ok',
+            });
+        return;
+    }
     console.log(response);
     localStorage.setItem("user_data",JSON.stringify(response));
 

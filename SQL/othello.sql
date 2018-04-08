@@ -144,6 +144,29 @@ $body$
 LANGUAGE plpgsql;
 
 /*
+* Allows to close a session
+*
+* Receive:
+* i_playerID  int
+* 
+*
+* Return:
+* boolean
+*/
+CREATE OR REPLACE FUNCTION mg_closeSession(
+  IN i_playerID INT
+)
+RETURNS BOOLEAN AS
+$body$
+BEGIN	
+	UPDATE players SET state=FALSE WHERE playerID=i_playerID;
+	RETURN TRUE;
+	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
+END
+$body$
+LANGUAGE plpgsql;
+
+/*
 * Allows start the board of a session
 *
 * Receive:
@@ -239,7 +262,6 @@ SELECT playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1,
 END;
 $body$
 LANGUAGE plpgsql;
-
 /*
 * Allows update the board of a session
 *
@@ -563,7 +585,7 @@ DECLARE
 sessionExists INT;
 
 BEGIN
-SELECT count(*) INTO sessionExists FROM sessions WHERE playerOneID = i_transmitterID AND playerTwoID = i_receiverID;
+SELECT count(*) INTO sessionExists FROM sessions WHERE (playerOneID = i_transmitterID AND playerTwoID = i_receiverID) OR (playerOneID = i_receiverID AND playerTwoID = i_transmitterID);
 
 IF (sessionExists = 0) THEN
 	INSERT INTO invitations (transmitterID, receiverID, boardSize, amountGames) VALUES
@@ -608,7 +630,7 @@ sessionExists := (SELECT count(*) FROM sessions WHERE playerOneID = i_playerID A
 IF (sessionExists = 0) THEN
 
 INSERT INTO sessions (playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2, levelPlayerOne, levelPlayerTwo, amountPassTurn) VALUES
-(i_playerID, 0, i_playerID, i_boardSize,'{}','red','blue',(SELECT playerLevel FROM players WHERE playerID = i_playerID),0,0);
+(i_playerID, 0, i_playerID, i_boardSize,'{}','red','blue',(SELECT playerLevel FROM players WHERE playerID = i_playerID),machineLevel,0);
 
 newSessionID = (SELECT currval('sessions_sessionid_seq'));
 INSERT INTO sessionStadistics (sessionID, winsPlayer1, winsPlayer2, ties, amountGames, numberActualGame) VALUES (newSessionID, 0, 0, 0, i_amountGames, 1);
@@ -694,9 +716,8 @@ BEGIN
 	ELSE
 		UPDATE sessionStadistics SET winsPlayer1 = winsPlayer1 + 1 WHERE sessionID = i_sessionID;
 	END IF;
-	IF (SELECT amountGames > numberActualGame FROM sessionstadistics WHERE sessionID= i_sessionID) = TRUE THEN
-		UPDATE sessionStadistics SET numberActualGame = numberActualGame + 1 WHERE sessionID = i_sessionID;
-	END IF;
+
+	UPDATE sessionStadistics SET numberActualGame = numberActualGame + 1 WHERE sessionID = i_sessionID;
 	
 	UPDATE sessions SET amountPassTurn = 0 WHERE sessionID = i_sessionID;
 	UPDATE sessions SET board = '{}' WHERE sessionID = i_sessionID;

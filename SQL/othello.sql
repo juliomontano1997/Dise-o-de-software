@@ -536,7 +536,8 @@ $body$
 BEGIN
 RETURN query
 SELECT invitationID "ID", ((SELECT playerName FROM players WHERE playerID = transmitterID) || ' te ha invitado a jugar' || chr(10) ||' Caracteristicas del juego: '
-	|| chr(10) ||' Tamaño del tablero: '|| boardSize || chr(10) ||'Cantidad partidas: ' || amountGames) "content"
+	|| chr(10) ||' Tamaño del tablero: '|| boardSize || chr(10) ||'Cantidad partidas: ' || amountGames || chr(10) ||'Nivel de tu oponente: ' || 
+	(SELECT playerLevel FROM players WHERE playerID = transmitterID) ) "content"
 FROM invitations WHERE receiverID = i_playerID ORDER BY creationDate DESC;
 
 END;
@@ -590,13 +591,13 @@ SELECT count(*) INTO sessionExists FROM sessions WHERE (playerOneID = i_transmit
 IF (sessionExists = 0) THEN
 	INSERT INTO invitations (transmitterID, receiverID, boardSize, amountGames) VALUES
 	(i_transmitterID, i_receiverID, i_boardSize, i_amountGames);
+	INSERT INTO notifications(playerID,notificationContent,creationDate) VALUES(i_transmitterID,'Has invitado a ' || (SELECT playerName FROM players WHERE playerID=i_receiverID) || ' para que juegue contigo',current_timestamp);
 	RETURN TRUE;
 ELSE
 RETURN FALSE;
 END IF;
 
-EXCEPTION WHEN OTHERS THEN RETURN FALSE;
-
+--EXCEPTION WHEN OTHERS THEN RETURN FALSE;
 
 END;
 $body$
@@ -629,24 +630,26 @@ sessionExists := (SELECT count(*) FROM sessions WHERE playerOneID = i_playerID A
 
 IF (sessionExists = 0) THEN
 
-INSERT INTO sessions (playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2, levelPlayerOne, levelPlayerTwo, amountPassTurn) VALUES
-(i_playerID, 0, i_playerID, i_boardSize,'{}','red','blue',(SELECT playerLevel FROM players WHERE playerID = i_playerID),machineLevel,0);
+	INSERT INTO sessions (playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2, levelPlayerOne, levelPlayerTwo, amountPassTurn) VALUES
+	(i_playerID, 0, i_playerID, i_boardSize,'{}','red','blue',(SELECT playerLevel FROM players WHERE playerID = i_playerID),machineLevel,0);
 
-newSessionID = (SELECT currval('sessions_sessionid_seq'));
-INSERT INTO sessionStadistics (sessionID, winsPlayer1, winsPlayer2, ties, amountGames, numberActualGame) VALUES (newSessionID, 0, 0, 0, i_amountGames, 1);
-
-RETURN TRUE;
+	newSessionID = (SELECT currval('sessions_sessionid_seq'));
+	INSERT INTO sessionStadistics (sessionID, winsPlayer1, winsPlayer2, ties, amountGames, numberActualGame) VALUES (newSessionID, 0, 0, 0, i_amountGames, 1);
+	INSERT INTO notifications(playerID,notificationContent,creationDate) VALUES(i_playerID,'Ahora tienes una sesión de juego con la máquina',current_timestamp);
+	RETURN TRUE;
 ELSE
 RETURN FALSE;
 
 END IF;
 
-EXCEPTION WHEN OTHERS THEN RETURN FALSE;
+
+--EXCEPTION WHEN OTHERS THEN RETURN FALSE;
 
 END;
 $body$
 LANGUAGE plpgsql;
 
+select * from notifications
 /*
 * Allows the handling of a player's invitations
 *

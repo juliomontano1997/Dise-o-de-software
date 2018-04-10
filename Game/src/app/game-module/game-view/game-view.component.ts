@@ -3,7 +3,7 @@ import { Component, OnInit, EventEmitter, Input, Output } from '@angular/core';
 import { GameServicesService } from '../../services/game-services.service';
 import { HttpClient, HttpClientModule} from '@angular/common/http';
 import { boardSessionHandler } from '../../models/boardSessionHandler.model';
-
+import { userNotificationsHandler } from '../../models/userNotificationsHandler.model';
 
 @Component({
   selector: 'game-play-view',
@@ -13,23 +13,60 @@ import { boardSessionHandler } from '../../models/boardSessionHandler.model';
 export class GameViewComponent implements OnInit {
   
   private sessionHandler:boardSessionHandler;
-  private sessionId
+  private sessionId;
+  private colors:Array<any>;
+  private selectedColor;
+  private userNotify:userNotificationsHandler;
 
   constructor(private gameService: GameServicesService) { 
     let sessionInformation= JSON.parse(localStorage.getItem("sessionData"));
+    this.userNotify=new userNotificationsHandler();
+    this.initColors();
 
-    this.sessionHandler= new boardSessionHandler(sessionInformation.sessionId,
-      sessionInformation.playerId);
     
     this.sessionHandler= new boardSessionHandler(sessionInformation.sessionId,sessionInformation.playerId);
     this.updateBoard();
-    //this.getBoardChanges();
+    this.getBoardChanges();
   }
     
   ngOnInit() {
 
   }
 
+  public initColors(){
+    this.colors=[{"name":"Negro","colorName":"black"},
+           {"name":"Rojo","colorName":"red"},
+           {"name":"Azul","colorName":"blue"},
+           {"name":"Amarillo","colorName":"yellow"},
+           {"name":"Morado","colorName":"purple"},
+           {"name":"Naranja","colorName":"orange"},
+           {"name":"Rosado","colorName":"DeepPink"},
+           {"name":"Gris","colorName":"gray"},
+           {"name":"Dorado","colorName":"GoldenRod "},
+           {"name":"Café","colorName":"peru"},
+    ]
+    this.selectedColor=this.colors[0];
+  }
+  
+  public changePiecesColor(){
+      this.gameService.changePiecesColor(this.sessionHandler.getSessionId(),this.sessionHandler.getPlayerPlayingId(),
+      this.selectedColor.colorName)
+      .subscribe(
+        (res) =>{
+
+          //color is not available
+          if (res.data===false){
+          this.userNotify.notify(1,"No fue posible realizar el cambio de color verifique que el color seleccionado no esté siendo utilizado por su oponente",
+          "Notificación de sistema");
+          }
+          
+          
+        },
+        (err) => {
+          console.log(err.json()); 
+        });
+
+  }
 
   public changeNotify (){
       localStorage.setItem("somethingChange",JSON.stringify({"state":true}));

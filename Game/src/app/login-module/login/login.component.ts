@@ -120,8 +120,13 @@ public userSignIn(response:any, imageDir:string)
             confirmButtonColor: '#049F0C',
             confirmButtonText: 'Ok',
             });
-        return;
+
+        FB.logout(function(response) {
+            return;       
+        });
+ 
     }
+    else{
     console.log(response);
     localStorage.setItem("user_data",JSON.stringify(response));
 
@@ -137,6 +142,7 @@ public userSignIn(response:any, imageDir:string)
         (err) => {
           console.log(err.json()); 
         });
+    }
 }
 
 

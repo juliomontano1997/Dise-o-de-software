@@ -90,7 +90,7 @@ CREATE TABLE invitations
 * i_image  varchar
 *
 * Return:
-* playerID int
+* o_playerID int
 */
 CREATE OR REPLACE FUNCTION mg_get_player(
 IN i_mail t_mail,
@@ -121,11 +121,12 @@ LANGUAGE plpgsql;
 * Allows get all the active players
 *
 * Receive:
+* i_playerID int
 *
 * Return:
-* playerID int
-* playerName varchar
-* image varchar
+* o_playerID int
+* o_playerName varchar
+* o_image varchar
 */
 CREATE OR REPLACE FUNCTION mg_get_activePlayers(
 IN i_playerID INT,
@@ -194,8 +195,8 @@ LANGUAGE plpgsql;
 *
 * Receive:
 * i_sessionID  int
-* i_playerID
-* i_color
+* i_playerID  int
+* i_color varchar
 *
 * Return:
 * boolean
@@ -240,7 +241,7 @@ LANGUAGE plpgsql;
 * o_playerOneID int
 * o_playerTwoID int
 * o_boardSize int
-* o_board int[]
+* o_board []
 * o_colorPlayer1 varchar
 * o_colorPlayer2 varchar
 */
@@ -262,13 +263,14 @@ SELECT playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1,
 END;
 $body$
 LANGUAGE plpgsql;
+
 /*
 * Allows update the board of a session
 *
 * Receive:
 * i_sessionID  int
 * i_actualPlayerID
-* i_board
+* i_board []
 *
 * Return:
 * boolean
@@ -312,8 +314,8 @@ currentPlayer INT;
 playerTurn INT;
 playerOneId INT;
 playerTwoId INT;
-
 BEGIN
+
 UPDATE sessions SET amountPassTurn = amountPassTurn + 1 WHERE sessionID = i_sessionID;
 SELECT s.playerOneId,s.playerTwoId,s.actualPlayerId INTO playerOneId,playerTwoId,currentPlayer FROM sessions AS s WHERE sessionID=i_sessionID;
 
@@ -336,7 +338,7 @@ LANGUAGE plpgsql;
 * Receive:
 * i_sessionID  int
 * i_winers int
-* i_board int[]
+* i_board []
 *
 * Return:
 * boolean
@@ -406,9 +408,9 @@ LANGUAGE plpgsql;
 * Return:
 * o_winsPlayer1 int
 * o_winsPlayer2 int
-* o_ties
-* o_amountGames
-* o_numbersActualGame
+* o_ties int
+* o_amountGames int
+* o_numbersActualGame  int
 */
 CREATE OR REPLACE FUNCTION mg_get_session_stadistic (
 IN i_sessionID INT,
@@ -498,8 +500,8 @@ LANGUAGE plpgsql;
 * i_playerID  int
 *
 * Return:
-* ID int
-* content text
+* o_ID int
+* o_content text
 */
 CREATE OR REPLACE FUNCTION mg_get_notifications(
 IN i_playerID INT,
@@ -523,8 +525,8 @@ LANGUAGE plpgsql;
 * i_playerID  int
 *
 * Return:
-* ID int
-* content text
+* o_ID int
+* o_content text
 */
 CREATE OR REPLACE FUNCTION mg_get_invitations(
 IN i_playerID INT,
@@ -649,7 +651,6 @@ END;
 $body$
 LANGUAGE plpgsql;
 
-select * from notifications
 /*
 * Allows the handling of a player's invitations
 *

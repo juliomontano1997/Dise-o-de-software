@@ -731,6 +731,75 @@ END;
 $body$
 LANGUAGE plpgsql;
 
+/* 
+* Allows get all the messages of a session
+*
+* Receive: 
+* i_sessionID int
+*
+* Return:
+* o_transmitterID int
+* o_receiverID int
+* o_messageContent text
+*/
+CREATE OR REPLACE FUNCTION mg_get_Messages(
+IN i_sessionID INT,
+OUT o_transmitterID  INT,
+OUT o_receiverID     INT,
+OUT o_messageContent TEXT)
+RETURNS 
+SETOF RECORD AS
+$body$
+BEGIN 	
+	RETURN query
+	SELECT transmitterID, receiverID, messageContent FROM messages WHERE sessionID = i_sessionID ORDER BY shippingDate ASC;
+	
+	
+END;	
+$body$
+LANGUAGE plpgsql;
+
+/* 
+* Allows player to send a message to his opponent in the session
+*
+* Receive: 
+* i_sessionID int
+* i_transmitterID  int
+* i_messageContent text
+*
+* Return:
+* boolean
+*/
+CREATE OR REPLACE FUNCTION mg_send_Messages(
+IN i_sessionID INT,
+IN i_transmitterID  INT,
+IN i_messageContent TEXT)
+RETURNS BOOLEAN AS
+$body$
+DECLARE
+	ID1 INT;
+	ID2 INT;
+BEGIN 	
+
+	SELECT playerOneID, playerTwoID INTO ID1, ID2 FROM sessions WHERE sessionID = i_sessionID;
+	IF i_transmitterID = ID1 THEN
+		INSERT INTO messages (sessionID, transmitterID, receiverID, messageContent) VALUES (i_sessionID, ID1, ID2, i_messageContent);
+		RETURN TRUE;
+	ELSIF i_transmitterID = ID2 THEN
+		INSERT INTO messages (sessionID, transmitterID, receiverID, messageContent) VALUES (i_sessionID, ID2, ID1, i_messageContent);
+		RETURN TRUE;		
+	END IF;
+	RETURN FALSE;
+	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
+	
+END;	
+$body$
+LANGUAGE plpgsql;
+
+
+
+
+
 /**********************************
 Machine image
 **********************************/

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { player } from '../../models/player.model';
-import { UserService } from '../../services/user.service';
+
+import { LoginServiceService } from '../../services/login-service.service';
 
 @Component({
   selector: 'app-user-information',
@@ -11,7 +12,7 @@ export class UserInformationComponent implements OnInit {
 
   private playerHandler: player;
   
-  constructor(private userService: UserService) { 
+  constructor(private loginService:LoginServiceService) { 
     this.getPlayerInformation();
   }
 
@@ -22,10 +23,20 @@ export class UserInformationComponent implements OnInit {
 
     let playerData= JSON.parse(localStorage.getItem("user_data")); //parse string json to json object
     let playerIdLevel=JSON.parse(localStorage.getItem("playerInformation"));
-    this.playerHandler=new player(playerIdLevel.o_playerid,playerData.name,playerData.email,
-      playerIdLevel.o_playerlevel, "https://graph.facebook.com/"+playerData.id+"/picture?type=normal");
-    console.log("player object");
-    console.log(this.playerHandler);
+
+    this.loginService.userRegistration(playerData.email,playerData.name,
+      "https://graph.facebook.com/"+playerData.id+"/picture?type=normal")
+    .subscribe(
+        (res) =>{
+
+          this.playerHandler=new player(playerIdLevel.o_playerid,playerData.name,playerData.email,
+            res[0].o_playerlevel, "https://graph.facebook.com/"+playerData.id+"/picture?type=normal");
+
+        },
+        (err) => {
+          console.log(err.json()); 
+        });
+    
   }
 
 }

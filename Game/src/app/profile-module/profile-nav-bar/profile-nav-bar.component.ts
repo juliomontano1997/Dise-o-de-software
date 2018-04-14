@@ -67,7 +67,7 @@ export class ProfileNavBarComponent implements OnInit {
         
         //check if is there a new notification for the user
         if ((this.lastLength < this.notifications.length)  && (this.firstTime===false)){
-          this.notificationsNumber= (this.notifications.length - this.lastLength);    
+          this.notificationsNumber= (this.notifications.length - this.lastLength)+ this.notificationsNumber;    
           //play sound   
           let audio = new Audio();
           audio.src = "../../assets/sounds/notification.mp3";
@@ -152,7 +152,6 @@ export class ProfileNavBarComponent implements OnInit {
     this.navService.closeSession(this.playerId).subscribe(
       (res) =>{
         //check this
-        alert("respuesta: "+res);
         console.log("respuesta cerrar sesión");
         console.log(res);
         if (res.data===true){

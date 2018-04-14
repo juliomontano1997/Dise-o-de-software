@@ -31,7 +31,6 @@ export class OnlinePlayersComponent implements OnInit {
 
   public invitePlayer(playerId:Number){
     this.playersHandler.setGuestPlayerId(playerId);
-    alert("invitar jugador con Id: " + playerId);
   
   }
 
@@ -52,16 +51,14 @@ export class OnlinePlayersComponent implements OnInit {
           (res) =>{
               console.log("successful machine invitation");
               console.log(res);
-              if (res.data===true){
-                this.userNotices.notify(0,
-                "La invitación ha sido enviada con éxito, ahora tienes una sesión contra la máquina"
-                ,"Notificación del sistema");
+              if (res.data===false){
+                this.userNotices.notify(1,
+                  "La invitación no ha sido enviada, posiblemente usted ya este jugando una sesión con la máquina",
+                  "Notificación del sistema");
                 this.amountGames=0;
                 this.boardSize=0;
               }
-              else{
-                this.userNotices.notify(1,"La invitación no ha sido enviada, posiblemente usted ya este jugando una sesión con la máquina","Notificación del sistema");
-              }
+              
           },
           (err) => {
             console.log(err.json()); 
@@ -77,14 +74,12 @@ export class OnlinePlayersComponent implements OnInit {
             console.log("successful player invitation");
             console.log(res);
             //success player invitation
-            if (res.data===true){
-              this.userNotices.notify(0,"La invitación ha sido enviada","Notificación del sistema");
+            if (res.data===false){
+              this.userNotices.notify(1,"La invitación no ha sido enviada, posiblemente usted ya este jugando una sesión con esta persona","Notificación del sistema");
               this.amountGames=0;
               this.boardSize=0;
             }
-            else{
-              this.userNotices.notify(1,"La invitación no ha sido enviada, posiblemente usted ya este jugando una sesión con esta persona","Notificación del sistema");
-            }
+            
           },
           (err) => {
           console.log(err.json()); 
@@ -93,7 +88,7 @@ export class OnlinePlayersComponent implements OnInit {
     }
 
     else{
-      this.userNotices.notify(1,"Error, debe especificar el número de partidas y el tamaño de tablero"  
+      this.userNotices.notify(1,"Debe especificar el número de partidas y el tamaño de tablero"  
       +" tal que sean mayor a 0 ","Notificación del sistema");
       //show error in board size or amount games
     }

@@ -28,12 +28,13 @@
                     <h5>{{notification.getContent()[1]}}</h5>
                     <h5>{{notification.getContent()[2]}}</h5>
                     <h5>{{notification.getContent()[3]}}</h5> 
+                    <h5>{{notification.getContent()[4]}}</h5> 
                     <hr>
                     <div class="btn-group">
                         <button type="button" (click)="invitationAnswer(notification.getNotificationId(),true)" class="btn btn-primary" 
-                        data-dismiss="modal">Aceptar la solicitud</button>
+                        data-dismiss="modal">Aceptar</button>
                         <button type="button" (click)="invitationAnswer(notification.getNotificationId(),false)" class="btn btn-danger" 
-                        data-dismiss="modal" style="margin-left:2%;">Rechazar la solicitud</button>
+                        data-dismiss="modal" style="margin-left:2%;">Rechazar</button>
                     </div> 
                     <hr>             
             

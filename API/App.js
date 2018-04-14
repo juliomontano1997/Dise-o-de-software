@@ -135,8 +135,10 @@ app.get('/updateColor',function(req, res)
 {        
     db.func('mg_get_updateColor', [req.query.idSession, req.query.idPlayer,req.query.color])    
     .then(data => 
-    {        	              
-        res.end(JSON.stringify(data));
+    {        	
+       
+        res.end(JSON.stringify({"data":data[0].mg_get_updatecolor}));
+
     })
     .catch(error=> 
     {    	    	 

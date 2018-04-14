@@ -8,12 +8,6 @@ export class Notifications {
     constructor(notificationId:Number,content:String){
         this.notificationId=notificationId;
         this.content=content.split("\n");
-        console.log("****************************** Contenido ***************************");
-        
-        console.log(content);
-        console.log("****************************** Split ***************************");
-        console.log(this.content);
-
         
     }
 

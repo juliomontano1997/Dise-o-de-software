@@ -648,7 +648,7 @@ $body$
 LANGUAGE plpgsql;
 
 /*
-* Allows the handling of a player's invitations
+* Allows the handling of a players invitations
 *
 * Receive:
 * i_playerID  int

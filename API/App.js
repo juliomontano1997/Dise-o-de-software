@@ -9,7 +9,7 @@ var pg = require('pg');
 var express = require('express');
 var app = express();
 var pgp = require('pg-promise')();
-var cn = {host: 'localhost', port: 5432, database: 'othelloDB', user: 'postgres', password: 'p'};
+var cn = {host: 'localhost', port: 5432, database: 'othelloDB', user: 'postgres', password: 'postgresql2017'};
 var db = pgp(cn);
 var http =  require('http');
 
@@ -552,16 +552,18 @@ app.get('/decideInvitation',function(req, res)
 });
 
 
+
+
 /**
  * Allows get the loist og messajes of a session.
  * @param {number} idSession   
  * */
-app.get('/getMessage',function(req, res)
+app.get('/getMessages',function(req, res)
 {        
     db.func('mg_get_messages',[req.query.idSession])    
     .then(data => 
     {              	              
-        res.end(JSON.stringify());
+        res.end(JSON.stringify(data));
     })
     .catch(error=> 
     {    	    	 
@@ -573,43 +575,21 @@ app.get('/getMessage',function(req, res)
 /**
  * Allows set a messaje 
  * @param {number} idSession
- * @param {number} idTransmitter
+ * @param {number} idPlayer
  * @param {String}  content
  * */
 app.get('/sendMessage',function(req, res)
-{        
-    db.func('mg_get_board',[req.query.idSession])    
+{                            
+    db.func('mg_send_messages',[req.query.idSession,req.query.idPlayer,req.query.content])    
     .then(data => 
-    {   
-        if(data!= [] | data!= null)
-        {
-            var receiverId = data[0].o_levelplayertwo;
-            if(!req.query.idTransmitterID==data[0].o_playeroneid)
-            {   
-                receiverId = data[0].o_playeroneid;         
-            }            
-            console.log(">>>Emisor:"+idTransmitterID +"  Receptor:"+receiverId);
-            res.end(JSON.stringify(true));                
-
-            /*
-            db.func('mg_',[req.query.idSession])    
-            .then(data => 
-            {                                                              	              
-                res.end(JSON.stringify({"data":data[0].mg_handling_invitations}));
-            })
-            .catch(error=> 
-            {    	    	 
-                console.log(error);
-                res.end(JSON.stringify(false));                
-            })*/  
-        }           	              
-        res.end(JSON.stringify());
+    {                                                              	              
+        res.end(JSON.stringify({"data":data[0]}));
     })
     .catch(error=> 
     {    	    	 
         console.log(error);
         res.end(JSON.stringify(false));                
-    })      
+    })
 });
 
 

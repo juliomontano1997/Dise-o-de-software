@@ -755,7 +755,8 @@ function calculateAutomaticMove(idSession)
 
         console.log("Posibles puntos para jugar: "+posiblePlays);
         //3. Calculate the afected indices of each element in posiblePlay list  and save the afected indices in playsAfectedIndexes
-        
+
+
         if(posiblePlays.length == 0)
         {
             var urlLink="http://localhost:8081/mg_passTurn?idSession="+idSession;  

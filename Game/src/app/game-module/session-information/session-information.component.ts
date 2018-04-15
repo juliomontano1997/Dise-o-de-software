@@ -26,7 +26,6 @@ export class SessionInformationComponent implements OnInit {
     this.getPlayersName();
     this.getSessionInformation();
     this.updateSessionInformation();
-   
   }
 
   ngOnInit() {

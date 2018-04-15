@@ -11,16 +11,11 @@ export class boardSessionHandler {
     private boardSizeArray: number[];
 
     
+ 
     /**
      * 
-     * @param playerOneID 
-     * @param playerTwoID 
-     * @param actualPlayerId 
-     * @param boardSize 
-     * @param board 
-     * @param playerOneColor 
-     * @param playerTwoColor 
-     * @param playerPlayingId it's necessaru to know when disabled the board to the player 
+     * @param sessionId 
+     * @param playerPlayingId 
      */
     constructor(sessionId:number, playerPlayingId:number){
         this.sessionId=sessionId;

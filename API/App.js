@@ -134,7 +134,7 @@ app.get('/startSession',function(req, res)
  */
 app.get('/updateColor',function(req, res)
 {        
-    db.func('mg_get_updateColor', [req.query.idSession, req.query.idPlayer,req.query.color])    
+    db.func('mg_get_updateColor', [req.query.idSession, req.query.idPlayer,"#"+req.query.color])    
     .then(data => 
     {        	
        

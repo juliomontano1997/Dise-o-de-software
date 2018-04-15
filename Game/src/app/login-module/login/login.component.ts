@@ -134,7 +134,8 @@ public userSignIn(response:any, imageDir:string)
     .subscribe(
         (res) =>{
             console.log("login response");
-            console.log(res);
+            console.log(res[0]);
+        
             localStorage.setItem("playerInformation",JSON.stringify(res[0]));
             window.location.href='profileModule';
 

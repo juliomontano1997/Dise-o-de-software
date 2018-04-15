@@ -14,7 +14,7 @@ export class ProfileNavBarComponent implements OnInit {
   private userNotices:userNotificationsHandler;
   private facebookManager: facebookSessionHandler;
   private notificationsNumber;
-  private lastLength;
+  private lastLength:number;
 
   private notificationId:Number;
   private playerId:Number;

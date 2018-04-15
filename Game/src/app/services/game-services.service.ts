@@ -25,7 +25,9 @@ export class GameServicesService {
   }
 
   public changePiecesColor(sessionId:Number,playerId:Number,colorName:String){
-    return this.http.get(this.apiUrl +`updateColor?idSession=${sessionId}+&idPlayer=${playerId}+&color=${colorName}`)
+    
+    return this.http.get(this.apiUrl +`updateColor?idSession=${sessionId}
+    +&idPlayer=${playerId}+&color=${colorName}`)
     .map(res => 
       res.json()); 
   }

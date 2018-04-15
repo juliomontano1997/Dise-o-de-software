@@ -1,10 +1,10 @@
 
 <ul class="nav bg-dark justify-content-end">
   <li class="nav-item">
-        <a class="nav-link hand letter" data-toggle="modal" data-target="#messages">
-        <i class="material-icons bg-white">chat</i>
+        <button class="btn letter bg-dark" (click)="restartMessagesNumber()" data-toggle="modal" data-target="#messages">
+        <i class="material-icons">chat</i>
         <span class="label-count letter"> {{messagesNumber}}</span>
-        </a>
+        </button>
       </li>
   <li class="nav-item">
     <button class="btn btn-primary exit"  (click)="closeSession()">Salir</button>
@@ -22,7 +22,7 @@
         </div>
         <div class="modal-body">
           <div  class="container-fluid" *ngFor="let message of messages">
-              <h1>id:  {{message.transmitterId}}</h1>
+              <hr>
               <div class="row">
                   <div   [ngClass]="{'col-md-6': message.transmitterId===playerId,
                       'col-md-6 ml-auto' :message.transmitterId!=playerId}">
@@ -47,10 +47,12 @@
                 </div>
 
                 <div class="form-group">
-                        <button type="button" class="btn btn-primary" 
+                        <button type="button" class="btn btn-primary" (click)="sendMessage()"
                           data-dismiss="modal">Enviar mensaje</button>
                 </div>
             </div>
+
+            
           
         </div>
   </div>

@@ -55,9 +55,11 @@ export class OnlinePlayersComponent implements OnInit {
                 this.userNotices.notify(1,
                   "La invitación no ha sido enviada, posiblemente usted ya este jugando una sesión con la máquina",
                   "Notificación del sistema");
-                this.amountGames=0;
-                this.boardSize=0;
+                
               }
+              this.amountGames=undefined;
+              this.boardSize=undefined;
+              
               
           },
           (err) => {
@@ -76,9 +78,10 @@ export class OnlinePlayersComponent implements OnInit {
             //success player invitation
             if (res.data===false){
               this.userNotices.notify(1,"La invitación no ha sido enviada, posiblemente usted ya este jugando una sesión con esta persona","Notificación del sistema");
-              this.amountGames=0;
-              this.boardSize=0;
+              
             }
+            this.amountGames=undefined;
+            this.boardSize=undefined;
             
           },
           (err) => {

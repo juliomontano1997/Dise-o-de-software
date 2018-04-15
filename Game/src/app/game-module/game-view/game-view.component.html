@@ -36,18 +36,20 @@
           Tu rival está jugando 
         </h4>
         </ng-template>
-        <span style="background-color:blue" class="badge bg-gray badge-pill"> </span>
   </div>
   </div>
 
   <div class="container-fluid boardGame">
-      <h6 style="color:white;">Cambiar color de fichas </h6>
+      
       <div class="form-group">
+          <h6 style="color:white;">Cambiar color de fichas </h6>
+          <input type="color" [(ngModel)]="selectedColor" >
+          <!--
           <select class="form-control" [(ngModel)]="selectedColor">
               <option *ngFor="let color of colors" [ngValue]="color">
                   {{color.name}}
               </option> 
-          </select>
+          </select> -->
           <hr>
           <button class="btn btn-primary" (click)="changePiecesColor()"> Cambiar color de fichas</button>
 

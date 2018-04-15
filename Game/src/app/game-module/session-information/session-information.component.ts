@@ -64,19 +64,16 @@ export class SessionInformationComponent implements OnInit {
   public updateSessionInformation():void {
     let id = setInterval(() => {
 
-      this.sessionInformationHandler.setAllowUpdating(JSON.parse(localStorage.getItem("somethingChange")).state);
-      if (this.sessionInformationHandler.getAllowUpdating()===true){
-        this.getSessionInformation();
-        this.sessionEnd(false);
-      }
-
-      else{
         if (this.sessionInformationHandler.getSessionEnd()===true){
               clearInterval(id);
         }
+        else{
+          this.getSessionInformation();
+          this.sessionEnd(false);
+        }
        
-      }
-    }, 3000);
+      
+    }, 6000);
   }
 
   public getPlayersName(): void{

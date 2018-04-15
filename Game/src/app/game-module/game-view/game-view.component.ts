@@ -15,15 +15,13 @@ export class GameViewComponent implements OnInit {
   private sessionHandler:boardSessionHandler;
   private sessionId;
   private colors:Array<any>;
-  private selectedColor;
+  private selectedColor:String;
   private userNotify:userNotificationsHandler;
 
   constructor(private gameService: GameServicesService) { 
     let sessionInformation= JSON.parse(localStorage.getItem("sessionData"));
     this.userNotify=new userNotificationsHandler();
-    this.initColors();
-
-    
+    this.selectedColor="#000000";
     this.sessionHandler= new boardSessionHandler(sessionInformation.sessionId,sessionInformation.playerId);
     this.updateBoard();
     this.getBoardChanges();
@@ -33,24 +31,9 @@ export class GameViewComponent implements OnInit {
 
   }
 
-  public initColors(){
-    this.colors=[{"name":"Negro","colorName":"black"},
-           {"name":"Rojo","colorName":"red"},
-           {"name":"Azul","colorName":"blue"},
-           {"name":"Amarillo","colorName":"yellow"},
-           {"name":"Morado","colorName":"purple"},
-           {"name":"Naranja","colorName":"orange"},
-           {"name":"Rosado","colorName":"DeepPink"},
-           {"name":"Gris","colorName":"gray"},
-           {"name":"Dorado","colorName":"GoldenRod "},
-           {"name":"Café","colorName":"peru"},
-    ]
-    this.selectedColor=this.colors[0];
-  }
-  
   public changePiecesColor(){
       this.gameService.changePiecesColor(this.sessionHandler.getSessionId(),this.sessionHandler.getPlayerPlayingId(),
-      this.selectedColor.colorName)
+      this.selectedColor.slice(1,this.selectedColor.length))
       .subscribe(
         (res) =>{
 

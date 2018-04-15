@@ -41,10 +41,24 @@ export class NavService {
       res.json()); 
   }
 
+  public getMessages(sessionId: Number){
+    return this.http.get(this.apiUrl +`getMessages?idSession=${sessionId}`)
+    .map(res => 
+      res.json()); 
+  }
+
+  public sendMessage(sessionId:Number, playerId:Number,content:String){
+    return this.http.get(this.apiUrl +`sendMessage?idSession=${sessionId}+
+    &idPlayer=${playerId}+&content=${content}`)
+    .map(res => 
+      res.json()); 
+  }
+
   public closeSession(playerId:Number){
     return this.http.get(this.apiUrl +`getCloseSession?idPlayer=${playerId}`)
     .map(res => 
       res.json()); 
   }
+
 
 }

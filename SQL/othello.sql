@@ -791,15 +791,13 @@ BEGIN
 		RETURN TRUE;		
 	END IF;
 	RETURN FALSE;
-	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
+
 	
 END;	
 $body$
 LANGUAGE plpgsql;
 
-
-
-
+select * from messages
 
 /**********************************
 Machine image

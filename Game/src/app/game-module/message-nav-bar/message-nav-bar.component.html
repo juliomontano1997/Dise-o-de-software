@@ -12,8 +12,8 @@
 </ul>  
 
 
-<div class="modal fade bd-example-modal-lg" id="messages" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-<div class="modal-dialog modal-lg">
+<div class="modal fade" id="messages" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<div class="modal-dialog">
   <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">Bandeja de entrada</h4>  
@@ -22,7 +22,7 @@
         </div>
         <div class="modal-body">
           <div  class="container-fluid" *ngFor="let message of messages">
-              <hr>
+              <br>
               <div class="row">
                   <div   [ngClass]="{'col-md-6': message.transmitterId===playerId,
                       'col-md-6 ml-auto' :message.transmitterId!=playerId}">

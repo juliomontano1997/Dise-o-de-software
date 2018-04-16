@@ -1,13 +1,13 @@
 .cellBackground{
 	background-color: lightgreen;
-	border: solid;
-	width: 20px;
-	height: 10px;
+	border: 10px gray ridge;
+	width: 30px;
+	height: 20px;
 }
 
 .divTd{
-	width: 20px;
-	height: 10px;
+	width: 30px;
+	height: 20px;
 }
 
 .circle-piece{
@@ -21,8 +21,8 @@
 }
 
 .boardGame{
-	padding-top: 6%;
-	padding-left: 6%;
+	padding-top: 2%;
+	padding-left: 1%;
 	border: 3px black;
 	width: 100%;
 	height: 100%;
@@ -35,6 +35,9 @@
 
 .tableGame{
 	align-self: center;
+	border: 10px gray groove; 
+	border-spacing: 0px;
+	overflow: auto;
 }
 
 .yourTurn {
@@ -52,7 +55,7 @@
 @media only screen and (max-width: 600px) {
 	.cellBackground{
 		background-color:lightgreen;
-		border: solid;
+		border: 10px gray ridge;
 		width: 30px;
 		height: 10px;
 	}

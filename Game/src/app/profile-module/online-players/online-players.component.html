@@ -8,15 +8,16 @@
         
         <tbody>
             <tr class="tableOnline"  *ngFor="let player of playersHandler.getPlayers()|paginate: { itemsPerPage: amountItems, currentPage: pageNumber,id:'first'};">
-                
+
                 <img class="imageSize" align="left" [src]="player.getPlayerImage()">
                 <h6 class="letter name">Nombre:  {{player.getPlayerName()}}</h6>
-                <hr>
                 <h6 class="letter alignData">Nivel: {{player.getPlayerLevel()}}</h6>
-                <hr>
-                <button class="btn btn-primary alignButton" data-toggle="modal" data-target="#sessionInvitation" 
+                
+                <button class="btn btn-primary inviteButton"  data-toggle="modal" data-target="#sessionInvitation" 
                 (click)="invitePlayer(player.getPlayerId())">Invitar a juego</button>
-                <hr>
+                <br>
+                <br>
+                <br>
             </tr>
         </tbody>
         <pagination-controls (pageChange)="pageNumber=$event" id="first"></pagination-controls>

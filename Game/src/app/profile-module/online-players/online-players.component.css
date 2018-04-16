@@ -6,9 +6,15 @@
     padding-left:120px;
 }
 
+.inviteButton{
+    float:right;
+    margin-right:42%;
+}
+
 .tableOnline{
     border: none;
 }
+
 
 .name{
     padding-left: 120px;

@@ -55,7 +55,6 @@ app.get('/getPlayerId',function(req, res)
 app.get('/getActivePlayers',function(req, res)
 {        
     db.func('mg_get_activePlayers', [req.query.idPlayer])    
-
     .then(data => 
     {        	              
         console.log(data);
@@ -173,10 +172,10 @@ app.get('/getBoard',function(req, res)
             {
                 winner = data[0].o_playertwoid;
             }
+
             db.func('mg_finishgame', [req.query.idSession, winner, newBoard])
             .then(data=>
             {                                
-
                 db.func('mg_get_session_stadistic',[req.query.idSession])  
                 .then(data => 
                 {        	        
@@ -210,7 +209,7 @@ app.get('/getBoard',function(req, res)
                     console.log(error);
                     res.end(JSON.stringify(false));                
                 });                            
-                res.end(JSON.stringify(data[0].mg_finishgame));                                                                                                
+                res.end(JSON.stringify({"data":data[0].mg_finishgame}));                                                                                                
             })
             .catch(error => {
                 res.end(JSON.stringify(false));
@@ -722,9 +721,7 @@ function calculateAutomaticMove(idSession)
         var originalBoard = data[0].o_board;        
         var matrixSize = Math.sqrt(originalBoard.length);
         var machineLevel = data[0].o_levelplayertwo;
-        printMatrix(originalBoard, matrixSize);        
-        
-        //1.Search the positions and validate if this position .....                 
+        printMatrix(originalBoard, matrixSize);                             
         var posiblePlays =[];
 
         // Search all marks and evaluate if this marks are valid for a new play.
@@ -758,6 +755,18 @@ function calculateAutomaticMove(idSession)
 
         console.log("Posibles puntos para jugar: "+posiblePlays);
         //3. Calculate the afected indices of each element in posiblePlay list  and save the afected indices in playsAfectedIndexes
+
+
+        if(posiblePlays.length == 0)
+        {
+            var urlLink="http://localhost:8081/mg_passTurn?idSession="+idSession;  
+        
+            console.log(urlLink);
+            setTimeout(function () {
+                            console.log("La maquina no tiene movimientos");
+                            autoRequest(urlLink);  
+                          }, 2000);
+        }
         var playsAfectedIndexes = []; 
         for(i=0; i<posiblePlays.length;i++)
         {
@@ -777,7 +786,7 @@ function calculateAutomaticMove(idSession)
             var rigthDown = check(row*1+1, column*1+1, matrixSize,originalBoard,0*1, 1*1,1*1); 
             afectedIndices = afectedIndices.concat(up).concat(down).concat(left).concat(rigth).concat(leftUp).concat(rightUP).concat(leftDown).concat(rigthDown);
             playsAfectedIndexes.push(afectedIndices);
-        }
+        }        
         var response = machineSelection(machineLevel, playsAfectedIndexes, posiblePlays);
         var coordinates = getCoordinates(response, matrixSize);     
         var urlLink="http://localhost:8081/checkMovement?row="+coordinates[0]+"&column="+coordinates[1]+"&idPlayer="+0+"&idSession="+idSession;  
@@ -969,7 +978,7 @@ function verifyFullBoard(board, player1)
 var server = app.listen(8081, function ()
 {                        
 	var host = server.address().address;
-	var port = server.address().port;
+    var port = server.address().port;
     console.log("Esta corriendo en %s:%s", host, port);   
 });
 

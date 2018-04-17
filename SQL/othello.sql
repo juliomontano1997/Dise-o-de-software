@@ -92,6 +92,7 @@ CREATE TABLE invitations
 * Return:
 * o_playerID int
 */
+
 CREATE OR REPLACE FUNCTION mg_get_player(
 IN i_mail t_mail,
 IN i_playerName VARCHAR(50),
@@ -473,13 +474,14 @@ SETOF RECORD AS
 $body$
 BEGIN
 RETURN query
-SELECT p.playerID, p.playerName, gameSession.playerOneID FROM (SELECT playerOneID, playerTwoID FROM sessions WHERE sessionID =1) AS gameSession
+SELECT p.playerID, p.playerName, gameSession.playerOneID FROM (SELECT playerOneID, playerTwoID FROM sessions WHERE sessionID =i_sessionID) AS gameSession
 INNER JOIN Players AS p
   ON playerID = gameSession.playerOneID OR playerID = gameSession.playerTwoID;
 END;
 $body$
 LANGUAGE plpgsql;
 
+  
 /*
 * Allows get all active sessions of a player
 *

@@ -253,13 +253,14 @@ OUT o_actualPlayerID INT,
 OUT o_boardSize INT,
 OUT o_board INTEGER[],
 OUT o_colorPlayer1 VARCHAR(30),
-OUT o_colorPlayer2 VARCHAR(30))
+OUT o_colorPlayer2 VARCHAR(30),
+OUT o_amountPassTurn INT)
 RETURNS
 SETOF RECORD AS
 $body$
 BEGIN
 RETURN query
-SELECT playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2 FROM sessions where sessionID = i_sessionID;
+SELECT playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2, amountPassTurn FROM sessions where sessionID = i_sessionID;
 END;
 $body$
 LANGUAGE plpgsql;
@@ -305,29 +306,43 @@ LANGUAGE plpgsql;
 * Return:
 * boolean
 */
-CREATE OR REPLACE FUNCTION mg_passTurn(
-IN i_sessionID INT)
+CREATE OR REPLACE FUNCTION mg_passTurn
+(
+	IN i_sessionID INT, 
+	IN i_playerID INT
+)
 RETURNS BOOLEAN AS
 $body$
 DECLARE
-currentPlayer INT;
-playerTurn INT;
-playerOneId INT;
-playerTwoId INT;
+	currentPlayer INT;
+	playerTurn INT;
+	playerOneId INT;
+	playerTwoId INT;
 BEGIN
+	SELECT s.playerOneId,s.playerTwoId,s.actualPlayerId 
+	INTO playerOneId,playerTwoId,currentPlayer 
+	FROM sessions AS s 
+	WHERE sessionID=i_sessionID;
 
-UPDATE sessions SET amountPassTurn = amountPassTurn + 1 WHERE sessionID = i_sessionID;
-SELECT s.playerOneId,s.playerTwoId,s.actualPlayerId INTO playerOneId,playerTwoId,currentPlayer FROM sessions AS s WHERE sessionID=i_sessionID;
+	IF currentPlayer = i_playerID 
+	THEN 
+		UPDATE sessions SET amountPassTurn = amountPassTurn + 1 
+		WHERE sessionID = i_sessionID;
 
-IF currentPlayer = playerOneId THEN
-playerTurn = playerTwoId;
-ELSE
-playerTurn = playerOneId;
-END IF;
-
-UPDATE sessions SET actualPlayerId = playerTurn WHERE sessionID = i_sessionID;
-RETURN TRUE;
-EXCEPTION WHEN OTHERS THEN RETURN FALSE;
+		IF currentPlayer = playerOneId 
+		THEN
+			playerTurn = playerTwoId;
+		ELSE
+			playerTurn = playerOneId;
+		END IF;
+		UPDATE sessions SET actualPlayerId = playerTurn WHERE sessionID = i_sessionID;
+		RETURN TRUE;
+	ELSE 
+		RETURN FALSE;
+	END IF;	
+	
+	RETURN FALSE;					
+	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
 END;
 $body$
 LANGUAGE plpgsql;
@@ -343,26 +358,33 @@ LANGUAGE plpgsql;
 * Return:
 * boolean
 */
-CREATE OR REPLACE FUNCTION mg_finishGame(
-IN i_sessionID INT,
-IN i_winers INT,
-IN i_board INT[])
+CREATE OR REPLACE FUNCTION mg_finishGame
+(
+	IN i_sessionID INT,
+	IN i_winers INT,
+	IN i_board INT[]
+)
 RETURNS BOOLEAN AS
 $body$
 BEGIN
-IF i_winers = 2 THEN
-UPDATE sessionStadistics SET ties = ties + 1 WHERE sessionID = i_sessionID;
-ELSIF i_winers = (SELECT playerOneID FROM sessions WHERE sessionID = i_sessionID) THEN
-UPDATE sessionStadistics SET winsPlayer1 = winsPlayer1 + 1 WHERE sessionID = i_sessionID;
-ELSE
-UPDATE sessionStadistics SET winsPlayer2 = winsPlayer2 + 1 WHERE sessionID = i_sessionID;
-END IF;
+	IF i_winers = 2 
+		THEN
+			UPDATE sessionStadistics SET ties = ties + 1 
+				WHERE sessionID = i_sessionID;
+	ELSIF i_winers = (SELECT playerOneID FROM sessions WHERE sessionID = i_sessionID) 
+		THEN
+			UPDATE sessionStadistics SET winsPlayer1 = winsPlayer1 + 1 
+				WHERE sessionID = i_sessionID;
+	ELSE
+		UPDATE sessionStadistics SET winsPlayer2 = winsPlayer2 + 1 
+			WHERE sessionID = i_sessionID;
+	END IF;
 
-UPDATE sessionStadistics SET numberActualGame = numberActualGame + 1 WHERE sessionID = i_sessionID;
-UPDATE sessions SET amountPassTurn = 0 WHERE sessionID = i_sessionID;
-UPDATE sessions SET board = i_board WHERE sessionID = i_sessionID;
-RETURN TRUE;
-EXCEPTION WHEN OTHERS THEN RETURN FALSE;
+	UPDATE sessionStadistics SET numberActualGame = numberActualGame + 1 WHERE sessionID = i_sessionID;
+	UPDATE sessions SET amountPassTurn = 0 WHERE sessionID = i_sessionID;
+	UPDATE sessions SET board = i_board WHERE sessionID = i_sessionID;
+	RETURN TRUE;
+	EXCEPTION WHEN OTHERS THEN RETURN FALSE;
 END;
 $body$
 LANGUAGE plpgsql;

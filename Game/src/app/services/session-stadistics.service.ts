@@ -17,8 +17,8 @@ export class SessionStadisticsService {
       res.json()); 
   }
 
-  public passTurn (sessionId:Number){
-    return this.http.get(this.apiUrl +`passTurn?idSession=${sessionId}`)
+  public passTurn (sessionId:Number,playerId:Number){
+    return this.http.get(this.apiUrl +`passTurn?idSession=${sessionId}&idPlayer=${playerId}`)
     .map(res => 
       res.json()); 
   }

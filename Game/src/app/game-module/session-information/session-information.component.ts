@@ -121,7 +121,7 @@ export class SessionInformationComponent implements OnInit {
     }
 
     public passTurn(){
-      this.sessionService.passTurn(this.sessionInformationHandler.getSessionId())
+      this.sessionService.passTurn(this.sessionInformationHandler.getSessionId(), this.sessionInformationHandler.getPlayerPlayingId())
         .subscribe(
           (res) =>{
             console.log(res);

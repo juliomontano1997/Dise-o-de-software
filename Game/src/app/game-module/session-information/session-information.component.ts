@@ -103,10 +103,7 @@ export class SessionInformationComponent implements OnInit {
     this.sessionService.getSessionNames(this.sessionInformationHandler.getSessionId())
     .subscribe(
       (res) =>{
-        console.log("*****************************");
-        console.log("respuesta de nombre de jugadores");
-        console.log(res);
-        console.log("*****************************");
+        
         this.sessionInformationHandler.setPlayersNameData(res);
       },
       (err) => {

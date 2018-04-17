@@ -741,13 +741,14 @@ function calculateAutomaticMove(idSession)
 
         if(posiblePlays.length == 0 || posiblePlays==undefined )
         {
-            var urlLink="http://localhost:8081/passTurn?idSession="+idSession;  
+            var urlLink="http://localhost:8081/passTurn?idSession="+idSession+"&idPlayer=0";  
         
             console.log(urlLink);
             setTimeout(function () {
                             console.log("La maquina no tiene movimientos");
                             autoRequest(urlLink);  
                           }, 2000);
+
             return;
         }
 

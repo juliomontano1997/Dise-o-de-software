@@ -17,8 +17,8 @@ export class SessionStadisticsService {
       res.json()); 
   }
 
-  public passTurn (sessionId:Number){
-    return this.http.get(this.apiUrl +`passTurn?idSession=${sessionId}`)
+  public passTurn (sessionId:Number, playerId:Number){
+    return this.http.get(this.apiUrl +`passTurn?idSession=${sessionId}&idPlayer=${playerId}`)
     .map(res => 
       res.json()); 
   }
@@ -32,6 +32,12 @@ export class SessionStadisticsService {
 
   public getStadistics(sessionId:Number){
     return this.http.get(this.apiUrl +`getSessionStadistics?idSession=${sessionId}`)
+    .map(res => 
+      res.json()); 
+  }
+
+  public getFinishSession(sessionId:Number){
+    return this.http.get(this.apiUrl +`finishSession?idSession=${sessionId}`)
     .map(res => 
       res.json()); 
   }

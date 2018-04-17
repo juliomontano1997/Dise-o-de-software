@@ -767,6 +767,7 @@ function calculateAutomaticMove(idSession)
                             autoRequest(urlLink);  
                           }, 2000);
         }
+        
         var playsAfectedIndexes = []; 
         for(i=0; i<posiblePlays.length;i++)
         {

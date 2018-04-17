@@ -46,7 +46,12 @@ export class userNotificationsHandler {
 
         else{
             swal({
-                message
+                type:'success',
+                title: notificationTitle,
+                text: message,
+                timer: 3000,
+                showConfirmButton: false
+                
                 });
         }
     }

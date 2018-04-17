@@ -316,6 +316,7 @@ playerOneId INT;
 playerTwoId INT;
 BEGIN
 
+
 UPDATE sessions SET amountPassTurn = amountPassTurn + 1 WHERE sessionID = i_sessionID;
 SELECT s.playerOneId,s.playerTwoId,s.actualPlayerId INTO playerOneId,playerTwoId,currentPlayer FROM sessions AS s WHERE sessionID=i_sessionID;
 

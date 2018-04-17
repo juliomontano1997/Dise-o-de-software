@@ -25,6 +25,7 @@ export class OnlinePlayersComponent implements OnInit {
     this.playersHandler=new onlinePlayersHandler();
     let playerIdLevel=JSON.parse(localStorage.getItem("playerInformation"));
     this.playerId=playerIdLevel.o_playerid;
+    this.getPlayers();
     this.getPlayersOnline();
 
   }

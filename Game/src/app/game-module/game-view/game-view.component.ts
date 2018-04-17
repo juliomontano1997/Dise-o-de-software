@@ -69,7 +69,10 @@ export class GameViewComponent implements OnInit {
         else{
           console.log("respuesta actualización");
           console.log(res);
-          this.sessionHandler.UpdateData(res);
+          if (res.data){
+            this.sessionHandler.UpdateData(res);
+          }
+
         }
         
       },

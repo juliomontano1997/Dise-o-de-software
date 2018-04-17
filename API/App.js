@@ -45,6 +45,24 @@ app.get('/getPlayerId',function(req, res)
 });
 
 
+/**
+ * Allows finishes a session
+ * @param {number} idSession
+ * @return {boolean}
+ */
+app.get('/finishSession',function(req, res)
+{    
+    db.func('mg_finishSession', [req.query.idSession])    
+    .then(data => 
+    {        	  
+        res.end(JSON.stringify(data));
+    })
+    .catch(error=> 
+    {    	    	  
+        res.end(JSON.stringify(false));                
+    })      
+});
+
 
 /**
  * Allows obtains the list of the active players 
@@ -157,11 +175,32 @@ app.get('/getBoard',function(req, res)
 {            
     db.func('mg_get_board',[req.query.idSession])    
     .then(data => 
-    {             
-        console.log(data);   	                        
-        var scores = verifyFullBoard(data[0].o_board, data[0].o_playeroneid);
-        if(scores!=false) // Solo se activa cuando se llena el tablero.
+    {                                             
+        var scores = verifyFullBoard(data[0].o_board, data[0].o_playeroneid);                
+        if(scores!=false) // Ends the game if the board is full 
+        {            
+            var winner = -2;
+            var newBoard = makeBoard(data[0].o_boardsize,data[0].o_playeroneid,data[0].o_playertwoid);
+            if(scores[0]> scores[1])            
+            {                   
+                winner = data[0].o_playeroneid;
+            }
+            else if (scores[0]<scores[1])
+            {
+                winner = data[0].o_playertwoid;
+            }
+            db.func('mg_finishgame', [req.query.idSession, winner, newBoard])
+            .then(data=>
+            {                                             
+                var urlLink="http://localhost:8081/startSession?idSession="+req.query.idSession;              
+                autoRequest(urlLink);                                                                                           
+                res.end(JSON.stringify({"data":data[0].mg_finishgame}));                                                                                                
+            })
+            .catch(error => {res.end(JSON.stringify(false));});                              
+        }        
+        else if (data[0].o_amountpassturn >= 2) // Ends the game if the pass turn amount is higher than 2
         {
+            scores = countPieces(data[0].o_board, data.o_playeroneid);
             var winner = -2;
             var newBoard = makeBoard(data[0].o_boardsize,data[0].o_playeroneid,data[0].o_playertwoid);
             if(scores[0]> scores[1])            
@@ -175,40 +214,9 @@ app.get('/getBoard',function(req, res)
 
             db.func('mg_finishgame', [req.query.idSession, winner, newBoard])
             .then(data=>
-            {                                
-                db.func('mg_get_session_stadistic',[req.query.idSession])  
-                .then(data => 
-                {        	        
-                    if(data[0].o_amountgames === data[0].o_numberactualgame)
-                    {            
-                        db.func('mg_finishSession',[req.query.idSession])    
-                        .then(data => 
-                        {   console.log("*************************");
-                            console.log("sesion terminada");
-                            console.log("*************************");        	                   
-                            res.end(JSON.stringify({"data":1})); //finish session
-                        })
-                        .catch(error=> 
-                        {    	    	                 
-                            res.end(JSON.stringify(false));                
-                        })               
-                    }  
-                    else
-                    {
-                        var urlLink="http://localhost:8081/startSession?idSession="+req.query.idSession;              
-                        autoRequest(urlLink);  
-                        console.log("*************************");
-                        console.log("juego terminado pero no la sesión");
-                        console.log("*************************");
-                        res.end(JSON.stringify({"data":2})); //the game finish but not the session
-                    }
-                    res.end(JSON.stringify());                  
-                })
-                .catch(error=> 
-                {    	    	 
-                    console.log(error);
-                    res.end(JSON.stringify(false));                
-                });                            
+            {                                              
+                var urlLink="http://localhost:8081/startSession?idSession="+req.query.idSession;              
+                autoRequest(urlLink);                                      
                 res.end(JSON.stringify({"data":data[0].mg_finishgame}));                                                                                                
             })
             .catch(error => {
@@ -224,10 +232,7 @@ app.get('/getBoard',function(req, res)
             } 
         }        
     })
-    .catch(error=> 
-    {    	    	         
-        res.end(JSON.stringify(false));                
-    })      
+    .catch(error=> {res.end(JSON.stringify(false));})      
 });
 
 /**
@@ -311,7 +316,7 @@ app.get('/checkMovement', function(req, res)
  */
 app.get('/passTurn',function(req, res)
 {            
-    db.func('mg_passTurn',[req.query.idSession])    
+    db.func('mg_passTurn',[req.query.idSession, req.query.idPlayer])    
     .then(data => 
     {        	                
         res.end(JSON.stringify(data));
@@ -340,29 +345,10 @@ app.get('/surrender',function(req, res)
     var newBoard;
     db.func('mg_give_up',[req.query.idPlayer,req.query.idSession])  
     .then(data => 
-    {   
-        console.log("current game number");
-        console.log(req.query.currentGame+1);
-        if(((req.query.currentGame*1)+1) > req.query.amountGames*1)
-        {            
-            db.func('mg_finishSession',[req.query.idSession])    
-            .then(data => 
-            {              
-                console.log("sessionEnd");          	                   
-                res.end(JSON.stringify({"data":true}));
-            })
-            .catch(error=> 
-            {    	    	                 
-                res.end(JSON.stringify({"data":false}));                
-            })               
-        }  
-        else
-        {
-            var urlLink="http://localhost:8081/startSession?idSession="+req.query.idSession;              
-            autoRequest(urlLink);  
-            res.end(JSON.stringify({"data":false}));
-        }
-        res.end(JSON.stringify());                  
+    {             
+        var urlLink="http://localhost:8081/startSession?idSession="+req.query.idSession;              
+        autoRequest(urlLink);  
+        res.end(JSON.stringify({"data":data[0].mg_give_up}));                             
     })
     .catch(error=> 
     {    	    	 
@@ -377,13 +363,10 @@ app.get('/surrender',function(req, res)
  *@returns Json
  */
 app.get('/getSessionStadistics',function(req, res)
-{        
-    console.log("session stadistics");
-    console.log(req.query.idSession);
+{         
     db.func('mg_get_session_stadistic',[req.query.idSession])    
     .then(data => 
-    {        	   
-        console.log(data);
+    {        	           
         res.end(JSON.stringify(data));
     })
     .catch(error=> 
@@ -656,8 +639,7 @@ function check(row,column, matrixSize, board, player, verticalMov, horisontalMov
  * 
  * @param {number} row 
  * @param {number} column 
- * @param {number} lengt 
- * 
+ * @param {number} lengt  
  * @returns {number} 
  */
 function getIndex(row, column,lengt)
@@ -714,7 +696,7 @@ function calculateAutomaticMove(idSession)
     db.func('mg_get_board',[idSession])    
     .then(data => 
     {        	       
-        if(data===null)
+        if(data===null || data==[])
         {
             return;
         }         
@@ -722,7 +704,7 @@ function calculateAutomaticMove(idSession)
         var matrixSize = Math.sqrt(originalBoard.length);
         var machineLevel = data[0].o_levelplayertwo;
         printMatrix(originalBoard, matrixSize);                             
-        var posiblePlays =[];
+        var posiblePlays = [];
 
         // Search all marks and evaluate if this marks are valid for a new play.
         for(i=0;i<originalBoard.length; i++)
@@ -757,17 +739,18 @@ function calculateAutomaticMove(idSession)
         //3. Calculate the afected indices of each element in posiblePlay list  and save the afected indices in playsAfectedIndexes
 
 
-        if(posiblePlays.length == 0)
+        if(posiblePlays.length == 0 || posiblePlays==undefined )
         {
-            var urlLink="http://localhost:8081/mg_passTurn?idSession="+idSession;  
+            var urlLink="http://localhost:8081/passTurn?idSession="+idSession;  
         
             console.log(urlLink);
             setTimeout(function () {
                             console.log("La maquina no tiene movimientos");
                             autoRequest(urlLink);  
                           }, 2000);
+            return;
         }
-        
+
         var playsAfectedIndexes = []; 
         for(i=0; i<posiblePlays.length;i++)
         {
@@ -793,10 +776,7 @@ function calculateAutomaticMove(idSession)
         var urlLink="http://localhost:8081/checkMovement?row="+coordinates[0]+"&column="+coordinates[1]+"&idPlayer="+0+"&idSession="+idSession;  
         
         console.log(urlLink);
-        setTimeout(function () {
-    					console.log("Haciendo jugada automatica");
-                    	autoRequest(urlLink);  
-  					}, 2000);
+        setTimeout(function () {console.log("Haciendo jugada automatica");autoRequest(urlLink);  }, 2000);
   
     })
     .catch(error=> 
@@ -883,8 +863,8 @@ function machineSelection(machineLevel, playsAfectedIndexes, playIndices)
     // Select a ramdom option
     else if(machineLevel===2)
     {
-        var length = playsAfectedIndexes.length;
-        return playIndices[Math.floor((Math.random() * length) + 0)];
+        var len = playsAfectedIndexes.length;
+        return playIndices[Math.floor((Math.random() * len) + 0)];
     }
     // Select the best option 
     else
@@ -961,6 +941,29 @@ function verifyFullBoard(board, player1)
         if(board[i]==-1)
         {
             return false;
+        }
+        else if(board[i]==player1)
+        {
+            marksPlayer1++;
+        }        
+        else
+        {
+            marksPlayer2++;
+        }
+    }  
+    return [marksPlayer1, marksPlayer2];
+}
+
+function countPieces(board, player1)
+{
+    var marksPlayer1 =0;
+    var marksPlayer2 =0;
+    var length = board.length;
+    for(i=0; i<length; i++)
+    {
+        if(board[i]==-1)
+        {
+
         }
         else if(board[i]==player1)
         {

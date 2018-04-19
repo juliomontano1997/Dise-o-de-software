@@ -16,6 +16,7 @@ const routes: Routes = [
   { path: '',loadChildren: './login-module/login-module.module#LoginModule'},
   { path: 'gameModule', loadChildren: './game-module/game-module.module#GameModule'},
   { path: 'profileModule',loadChildren:'./profile-module/profile.module#ProfileModule' },
+  { path: 'DemoModule',loadChildren:'./demo-module/demo-module.module#DemoModuleModule' },
 ];
 const routerModule = RouterModule.forRoot(routes);
 

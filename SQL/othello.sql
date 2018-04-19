@@ -44,7 +44,7 @@ CREATE TABLE sessionStadistics
 );
 
 CREATE TABLE messages
-(
+( 
 	messageID      SERIAL    NOT NULL,
 	sessionID      INT       NOT NULL,
 	transmitterID  INT       NOT NULL,
@@ -859,3 +859,9 @@ LANGUAGE plpgsql;
 Machine image
 **********************************/
 --../../assets/images/machine.jpg
+
+
+/*********************************
+DEMO player
+*********************************/
+INSERT INTO players VALUES(1,'PlayerDemo@gmail.com','PlayerDemo',0,'mi image',FALSE)

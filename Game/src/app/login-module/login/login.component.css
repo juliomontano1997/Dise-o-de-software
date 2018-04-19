@@ -13,6 +13,9 @@
     width: 100%;  
 }
 
+.white{
+    color: white;
+}
 .position{
     padding-right: 30%;
     margin: 2px;

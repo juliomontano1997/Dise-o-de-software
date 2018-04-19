@@ -20,5 +20,14 @@ export class LoginServiceService {
   
 }
 
+public startDemo(playerId:Number,boardSize:Number,amountGames:Number,machineLevel:Number){
+
+  return this.http.get(this.apiUrl+`createDemoSession?idPlayer=${playerId}
+    +&boardSize=${boardSize}+&amountGames=${amountGames}+&machineLevel=${machineLevel}`)
+    .map(res => 
+      res.json()); 
+
+}
+
 
 }

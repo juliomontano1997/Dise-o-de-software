@@ -146,6 +146,20 @@ public userSignIn(response:any, imageDir:string)
     }
 }
 
+public toDemo(){
+ 
+    this.loginService.startDemo(1,6,1,1).subscribe(
+        (res) =>{
+               // set local data; -1 player 
+            localStorage.setItem("sessionData",JSON.stringify({"sessionId":res.data,"playerId":1}));
+            window.location.href='DemoModule';
+
+        },
+        (err) => {
+          console.log(err.json()); 
+        });
+}
+
 
 ngOnInit(){
   if (window.FB) {

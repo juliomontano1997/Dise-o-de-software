@@ -61,6 +61,8 @@ export class SessionInformationComponent implements OnInit {
       (res) =>{
         console.log(res);
         if (res.length > 0) {
+
+          //fin del juego
           if (res[0].o_amountgames < res[0].o_numberactualgame){
             this.sessionInformationHandler.setWinsPlayerOne(res[0].o_winsplayer1);
             this.sessionInformationHandler.setWinsPlayerTwo(res[0].o_winsplayer2);

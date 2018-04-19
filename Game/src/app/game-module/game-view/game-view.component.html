@@ -38,18 +38,13 @@
         </ng-template>
   </div>
   </div>
-
-  <div class="container-fluid boardGame">
+ <!-- show it if is demo game-->
+  <div *ngIf="isDemo===true" class="container-fluid boardGame">
       
       <div class="form-group">
           <h6 style="color:white;">Cambiar color de fichas </h6>
           <input type="color" [(ngModel)]="selectedColor" >
-          <!--
-          <select class="form-control" [(ngModel)]="selectedColor">
-              <option *ngFor="let color of colors" [ngValue]="color">
-                  {{color.name}}
-              </option> 
-          </select> -->
+        
           <hr>
           <button class="btn btn-primary" (click)="changePiecesColor()"> Cambiar color de fichas</button>
 

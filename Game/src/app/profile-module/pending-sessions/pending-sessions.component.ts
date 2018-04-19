@@ -74,7 +74,7 @@ export class PendingSessionsComponent implements OnInit {
     localStorage.setItem("somethingChange",JSON.stringify({"state":false}));
     localStorage.setItem("notUpdate",JSON.stringify({"state":false}));
     localStorage.setItem("sessionData",JSON.stringify({"sessionId":sessionId,"playerId":this.playerId}));
-    if (board.length> 0 ){
+    if (board.length > 0 ){
       
       window.location.href='gameModule';
     }

@@ -69,7 +69,7 @@ export class SessionInformationComponent implements OnInit {
             this.sessionInformationHandler.setTiesNumber(res[0].o_ties);
             setTimeout(() => {
               this.finishGame();
-            }, 500);
+            }, 1500);
             
           }
           else{

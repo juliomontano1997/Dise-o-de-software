@@ -1,0 +1,20 @@
+.background{
+    background-color: black;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.gameTitle{
+
+    padding-left: 70px;
+}
+
+
+.navPosition{
+    width:100%;
+    
+}
+
+

@@ -17,9 +17,21 @@ export class GameViewComponent implements OnInit {
   private colors:Array<any>;
   private selectedColor:String;
   private userNotify:userNotificationsHandler;
+  private movesList:Array<any>;
+  private isDemo:Boolean; //to control demo actions
+  private demoIndex:number;
+
 
   constructor(private gameService: GameServicesService) { 
+    this.isDemo=false;
     let sessionInformation= JSON.parse(localStorage.getItem("sessionData"));
+    if (sessionInformation.playerId===1){
+      this.isDemo=true;
+      this.demoIndex=0;
+      this.movesList=new Array();
+      this.movesList=[[2,4],[3,1],[5,1],[4,2],[0,4],[1,5],[5,3],[4,0],[3,0],[5,5],[4,5],[3,4],[2,5]
+      ,[2,1],[0,0],[1,1,]];
+    }
     this.userNotify=new userNotificationsHandler();
     this.selectedColor="#000000";
     this.sessionHandler= new boardSessionHandler(sessionInformation.sessionId,sessionInformation.playerId);
@@ -30,6 +42,8 @@ export class GameViewComponent implements OnInit {
   ngOnInit() {
 
   }
+
+  
 
   public changePiecesColor(){
       this.gameService.changePiecesColor(this.sessionHandler.getSessionId(),this.sessionHandler.getPlayerPlayingId(),
@@ -61,7 +75,25 @@ export class GameViewComponent implements OnInit {
     .subscribe(
       (res) =>{
 
-          if (res.length >0){
+          
+          if (this.isDemo===true) {
+
+              if (this.demoIndex > (this.movesList.length+2)){
+                 this.userNotify.notify(0,"El demo ha finalizado","Notificación del sistema");
+                 setTimeout(() => {
+                  window.location.href='/'; //go to login page
+                }, 1000);
+                 
+              }
+
+              if (this.sessionHandler.itsMyTurn()===true){
+                this.movePiece(this.movesList[this.demoIndex][0],this.movesList[this.demoIndex][1]);
+              }
+              this.demoIndex++
+              
+          }
+
+          if (res.length > 0){
             this.sessionHandler.UpdateData(res);
           }
         
@@ -85,7 +117,7 @@ export class GameViewComponent implements OnInit {
         clearInterval(id);
       }
       
-    }, 500);
+    }, 1000);
   }
     
   public checkEqualId(row:number, column:number, Id:number,){
@@ -94,7 +126,7 @@ export class GameViewComponent implements OnInit {
 
   public movePiece(row:number,column:number){
   
-    if (this.sessionHandler.itsMyTurn()==true){
+    if (this.sessionHandler.itsMyTurn()==true && this.isDemo==false){
       this.gameService.makeMove(row,column,this.sessionHandler.getSessionId(),this.sessionHandler.getPlayerPlayingId())
     .subscribe(
       (res) =>{

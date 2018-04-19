@@ -750,7 +750,7 @@ function calculateAutomaticMove(idSession)
         }
         else {
 
-        }
+        
         var playsAfectedIndexes = []; 
         for(i=0; i<posiblePlays.length;i++)
         {
@@ -777,6 +777,7 @@ function calculateAutomaticMove(idSession)
         
         console.log(urlLink);
         setTimeout(function () {console.log("Haciendo jugada automatica");autoRequest(urlLink);  }, 2000);
+    }
   
     })
     .catch(error=> 

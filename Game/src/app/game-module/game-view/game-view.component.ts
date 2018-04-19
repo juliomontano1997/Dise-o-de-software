@@ -78,18 +78,21 @@ export class GameViewComponent implements OnInit {
           
           if (this.isDemo===true) {
 
-              if (this.demoIndex > (this.movesList.length+2)){
+              if (this.demoIndex === (this.movesList.length-1)){
                  this.userNotify.notify(0,"El demo ha finalizado","Notificación del sistema");
                  setTimeout(() => {
                   window.location.href='/'; //go to login page
-                }, 1000);
+                }, 2000);
                  
               }
 
               if (this.sessionHandler.itsMyTurn()===true){
-                this.movePiece(this.movesList[this.demoIndex][0],this.movesList[this.demoIndex][1]);
+                setTimeout(() => {
+                  this.movePiece(this.movesList[this.demoIndex][0],this.movesList[this.demoIndex][1]);
+                }, 2000);
+                
               }
-              this.demoIndex++
+             
               
           }
 
@@ -131,6 +134,9 @@ export class GameViewComponent implements OnInit {
     .subscribe(
       (res) =>{
         if (res!=false){
+        if (this.isDemo==true){
+          this.demoIndex++;
+        }  
         this.sessionHandler.getBoard()[(row*this.sessionHandler.getBoardSize())+column]=this.sessionHandler.getPlayerPlayingId();
         this.sessionHandler.setActualPlayerId();
         this.getBoardChanges();

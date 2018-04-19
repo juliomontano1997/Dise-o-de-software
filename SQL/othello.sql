@@ -656,13 +656,12 @@ BEGIN
 sessionExists := (SELECT count(*) FROM sessions WHERE playerOneID = i_playerID AND playerTwoID = 0);
 
 IF (sessionExists = 0) THEN
-
 	INSERT INTO sessions (playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2, levelPlayerOne, levelPlayerTwo, amountPassTurn) VALUES
 	(i_playerID, 0, i_playerID, i_boardSize,'{}','red','blue',(SELECT playerLevel FROM players WHERE playerID = i_playerID),machineLevel,0);
 
 	newSessionID = (SELECT currval('sessions_sessionid_seq'));
 	INSERT INTO sessionStadistics (sessionID, winsPlayer1, winsPlayer2, ties, amountGames, numberActualGame) VALUES (newSessionID, 0, 0, 0, i_amountGames, 1);
-	INSERT INTO notifications(playerID,notificationContent,creationDate) VALUES(i_playerID,'Ahora tienes una sesión de juego con la máquina',current_timestamp);
+	INSERT INTO notifications(playerID,notificationContent,creationDate) VALUES(i_playerID,'Ahora tienes una sesión de juego con la máquina',current_timestamp);	
 	RETURN TRUE;
 ELSE
 RETURN FALSE;
@@ -822,7 +821,38 @@ END;
 $body$
 LANGUAGE plpgsql;
 
-select * from messages
+
+
+
+
+
+
+
+
+
+
+CREATE OR REPLACE FUNCTION mg_create_demo_session
+(
+	IN i_playerID INT,
+	IN i_boardSize INT,
+	IN i_amountGames INT,
+	IN machineLevel INT
+)
+RETURNS INT AS
+$body$
+DECLARE
+sessionExists INT;
+newSessionID INT;
+BEGIN	
+	INSERT INTO sessions (playerOneID, playerTwoID, actualPlayerID, boardSize, board, colorPlayer1, colorPlayer2, levelPlayerOne, levelPlayerTwo, amountPassTurn) 
+	VALUES  (i_playerID, 0, i_playerID, i_boardSize,'{}','red','blue',1,machineLevel,0);
+
+	newSessionID = (SELECT currval('sessions_sessionid_seq'));	
+	DELETE from sessions WHERE  (SELECT EXTRACT(DAY FROM (now()-'2018-04-1 21:10:37.507476-06')))>2 and playeroneid=1; 
+	return newSessionID; 		
+END;	
+$body$
+LANGUAGE plpgsql;
 
 /**********************************
 Machine image

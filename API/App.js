@@ -9,7 +9,7 @@ var pg = require('pg');
 var express = require('express');
 var app = express();
 var pgp = require('pg-promise')();
-var cn = {host: 'localhost', port: 5432, database: 'otelloDB', user: 'postgres', password: '12345'};
+var cn = {host: 'localhost', port: 5432, database: 'othelloDB', user: 'postgres', password: 'postgresql2017'};
 var db = pgp(cn);
 var http =  require('http');
 
@@ -573,6 +573,34 @@ app.get('/sendMessage',function(req, res)
 });
 
 
+/**
+ * Allows set a messaje 
+ * @param {number} idSession
+ * @param {number} idPlayer
+ * @param {String}  content
+ * */
+app.get('/createDemoSession',function(req, res)
+{                            
+    db.func('mg_create_demo_session',[
+        req.query.idPlayer,
+        req.query.boardSize,
+        req.query.amountGames, 
+        req.query.machineLevel ])            
+    .then(data => 
+    {                         
+        var urlLink="http://localhost:8081/startSession?idSession="+data[0].mg_create_demo_session;              
+        autoRequest(urlLink);                                       	           
+        console.log(data[0].mg_create_demo_session);   
+        res.end(JSON.stringify({"data":data[0].mg_create_demo_session}));
+    })
+
+    .catch(error=> 
+    {    	    	 
+        console.log(error);
+        res.end(JSON.stringify(false));                
+    })
+});
+
 
 
 
@@ -738,14 +766,13 @@ function calculateAutomaticMove(idSession)
 
         if(posiblePlays.length == 0 || posiblePlays==undefined )
         {
-            var urlLink="http://localhost:8081/passTurn?idSession="+idSession+"&idPlayer=0";  
+            var urlLink="http://localhost:8081/passTurn?idSession="+idSession;  
         
             console.log(urlLink);
             setTimeout(function () {
                             console.log("La maquina no tiene movimientos");
                             autoRequest(urlLink);  
                           }, 2000);
-
             return;
         }
         else {

@@ -13,6 +13,7 @@ export class UserInformationComponent implements OnInit {
   private playerHandler: player;
   
   constructor(private loginService:LoginServiceService) { 
+    
     this.getPlayerInformation();
   }
 

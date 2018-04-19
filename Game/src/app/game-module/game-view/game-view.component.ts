@@ -81,17 +81,13 @@ export class GameViewComponent implements OnInit {
             this.sessionHandler.UpdateData(res);
           }
 
-          console.log(res);
-          console.log("*****Index value******");
-          console.log("index: "+ this.demoIndex);
-          console.log("**************************");
           if (this.isDemo===true) {
  
               if (this.demoIndex === this.movesList.length){
                  this.userNotify.notify(0,"El demo ha finalizado","Notificación del sistema");
                  setTimeout(() => {
                   window.location.href='/'; //go to login page
-                }, 500);
+                }, 300);
                  
               }
 

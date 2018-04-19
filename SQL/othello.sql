@@ -848,11 +848,12 @@ BEGIN
 	VALUES  (i_playerID, 0, i_playerID, i_boardSize,'{}','red','blue',1,machineLevel,0);
 
 	newSessionID = (SELECT currval('sessions_sessionid_seq'));	
-	DELETE from sessions WHERE  (SELECT EXTRACT(DAY FROM (now()-'2018-04-1 21:10:37.507476-06')))>2 and playeroneid=1; 
+	DELETE from sessions WHERE  (SELECT EXTRACT(DAY FROM (now()- creationdate)))> 2 and playeroneid=1; 
 	return newSessionID; 		
 END;	
 $body$
 LANGUAGE plpgsql;
+
 
 /**********************************
 Machine image

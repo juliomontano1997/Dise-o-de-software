@@ -593,6 +593,7 @@ app.get('/createDemoSession',function(req, res)
         console.log(data[0].mg_create_demo_session);   
         res.end(JSON.stringify({"data":data[0].mg_create_demo_session}));
     })
+
     .catch(error=> 
     {    	    	 
         console.log(error);

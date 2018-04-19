@@ -297,10 +297,7 @@ app.get('/checkMovement', function(req, res)
             {                                                                               
                 res.end(JSON.stringify(data2[0].mg_update_board));                                                        
             })
-            .catch(error=> 
-            {    	    	                         
-                res.end(JSON.stringify(false));                 
-            });                      
+            .catch(error=> {res.end(JSON.stringify(false));});                      
         }                              
     })
     .catch(error=> 
@@ -751,7 +748,9 @@ function calculateAutomaticMove(idSession)
 
             return;
         }
+        else {
 
+        }
         var playsAfectedIndexes = []; 
         for(i=0; i<posiblePlays.length;i++)
         {

@@ -18,7 +18,7 @@ export class GameViewComponent implements OnInit {
   private selectedColor:String;
   private userNotify:userNotificationsHandler;
   private movesList:Array<any>;
-  private isDemo:Boolean; //to control demo actions
+  private isDemo:boolean; //to control demo actions
   private demoIndex:number;
 
 
@@ -29,7 +29,7 @@ export class GameViewComponent implements OnInit {
       this.isDemo=true;
       this.demoIndex=0;
       this.movesList=new Array();
-      this.movesList=[[2,4],[3,1],[5,1],[4,2],[0,4],[1,5],[5,3],[4,0],[3,0],[5,5],[4,5],[3,4],[2,5]
+      this.movesList=[[2,4],[3,1],[5,1],[4,2],[0,4],[1,3],[5,3],[4,0],[3,0],[5,5],[4,5],[3,4],[2,5]
       ,[2,1],[0,0],[1,1,]];
     }
     this.userNotify=new userNotificationsHandler();
@@ -43,7 +43,9 @@ export class GameViewComponent implements OnInit {
 
   }
 
-  
+  public demo(){
+    return this.isDemo;
+  }
 
   public changePiecesColor(){
       this.gameService.changePiecesColor(this.sessionHandler.getSessionId(),this.sessionHandler.getPlayerPlayingId(),
@@ -70,35 +72,41 @@ export class GameViewComponent implements OnInit {
   }
 
   public updateBoard(): void{
-
+ 
     this.gameService.getUpdatedBoard(this.sessionHandler.getSessionId())
     .subscribe(
       (res) =>{
 
-          
-          if (this.isDemo===true) {
+           if (res.length > 0){
+            this.sessionHandler.UpdateData(res);
+          }
 
-              if (this.demoIndex === (this.movesList.length-1)){
+          console.log(res);
+          console.log("*****Index value******");
+          console.log("index: "+ this.demoIndex);
+          console.log("**************************");
+          if (this.isDemo===true) {
+ 
+              if (this.demoIndex === this.movesList.length){
                  this.userNotify.notify(0,"El demo ha finalizado","Notificación del sistema");
                  setTimeout(() => {
                   window.location.href='/'; //go to login page
-                }, 2000);
+                }, 500);
                  
               }
 
-              if (this.sessionHandler.itsMyTurn()===true){
+              if (this.sessionHandler.itsMyTurn()===true && this.demoIndex < this.movesList.length){
                 setTimeout(() => {
-                  this.movePiece(this.movesList[this.demoIndex][0],this.movesList[this.demoIndex][1]);
-                }, 2000);
+
+                  this.demoMove(this.movesList[this.demoIndex][0],this.movesList[this.demoIndex][1]);
+                }, 3000);
                 
               }
              
               
           }
 
-          if (res.length > 0){
-            this.sessionHandler.UpdateData(res);
-          }
+          
         
       },
       (err) => {
@@ -127,19 +135,34 @@ export class GameViewComponent implements OnInit {
       return this.sessionHandler.getBoard()[(row*this.sessionHandler.getBoardSize())+column] === Id ? true : false; 
   } 
 
+  public demoMove(row:number,column:number){
+    this.gameService.makeMove(row,column,this.sessionHandler.getSessionId(),this.sessionHandler.getPlayerPlayingId())
+    .subscribe(
+      (res) =>{
+        if (res!=false){  
+        this.sessionHandler.getBoard()[(row*this.sessionHandler.getBoardSize())+column]=this.sessionHandler.getPlayerPlayingId();
+        this.sessionHandler.setActualPlayerId();
+        this.demoIndex++;
+        }
+
+
+
+
+      },
+      (err) => {
+        console.log(err.json());   
+      });
+  }
+
   public movePiece(row:number,column:number){
   
-    if (this.sessionHandler.itsMyTurn()==true && this.isDemo==false){
+    if (this.sessionHandler.itsMyTurn()==true && this.isDemo===false){
       this.gameService.makeMove(row,column,this.sessionHandler.getSessionId(),this.sessionHandler.getPlayerPlayingId())
     .subscribe(
       (res) =>{
-        if (res!=false){
-        if (this.isDemo==true){
-          this.demoIndex++;
-        }  
+        if (res!=false){  
         this.sessionHandler.getBoard()[(row*this.sessionHandler.getBoardSize())+column]=this.sessionHandler.getPlayerPlayingId();
         this.sessionHandler.setActualPlayerId();
-        this.getBoardChanges();
         
         }
 

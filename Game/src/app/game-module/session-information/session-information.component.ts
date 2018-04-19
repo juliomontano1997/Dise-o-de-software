@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { GameViewComponent } from '../game-view/game-view.component';
 
 import { Subscription } from 'rxjs';
+import { userNotificationsHandler } from '../../models/userNotificationsHandler.model';
 import { SessionStadisticsService } from '../../services/session-stadistics.service';
 import { sessionInformationHandler } from '../../models/sessionInformationHandler.model';
 
@@ -13,13 +14,14 @@ import { sessionInformationHandler } from '../../models/sessionInformationHandle
 export class SessionInformationComponent implements OnInit {
 
   private sessionInformationHandler:sessionInformationHandler;
+  private userNotices:userNotificationsHandler;
 
   constructor(private sessionService:SessionStadisticsService,) {
     let sessionInformation= JSON.parse(localStorage.getItem("sessionData"));
     this.sessionInformationHandler=new sessionInformationHandler(sessionInformation.sessionId);
     this.sessionInformationHandler.setPlayerPlayingId(sessionInformation.playerId);
     this.sessionInformationHandler.setSessionEnd(false);
-
+    this.userNotices= new userNotificationsHandler();
     let data= JSON.parse(localStorage.getItem("somethingChange"));
 
     this.sessionInformationHandler.setAllowUpdating(data.state);
@@ -40,20 +42,40 @@ export class SessionInformationComponent implements OnInit {
       localStorage.setItem("somethingChange",JSON.stringify({"state":false}));
   }
 
+  public finishGame(){
+    let message:String= this.sessionInformationHandler.getWinner();
+    this.userNotices.notify(3,message,"Fin de sesión");
+    this.sessionService.getFinishSession(this.sessionInformationHandler.getSessionId()).subscribe(
+      (res) =>{
+        window.location.href='profileModule';
+      },
+      (err) => {
+        console.log(err.json()); 
+      });
+
+  }
+
   public getSessionInformation():void{
     this.sessionService.getStadistics(this.sessionInformationHandler.getSessionId())
     .subscribe(
       (res) =>{
         console.log(res);
         if (res.length > 0) {
-          this.sessionInformationHandler.UpdateData(res);
+          if (res[0].o_amountgames < res[0].o_numberactualgame){
+            this.sessionInformationHandler.setWinsPlayerOne(res[0].o_winsplayer1);
+            this.sessionInformationHandler.setWinsPlayerTwo(res[0].o_winsplayer2);
+            this.sessionInformationHandler.setTiesNumber(res[0].o_ties);
+            setTimeout(() => {
+              this.finishGame();
+            }, 500);
+            
+          }
+          else{
+            
+            this.sessionInformationHandler.UpdateData(res);
+          }
+ 
         }
-        else{
-          //this is the end because the session was deleted;
-          this.sessionEnd(true);
-          alert("fin de sesion");
-        }
-        
 
       },
       (err) => {
@@ -81,7 +103,7 @@ export class SessionInformationComponent implements OnInit {
     this.sessionService.getSessionNames(this.sessionInformationHandler.getSessionId())
     .subscribe(
       (res) =>{
-
+        
         this.sessionInformationHandler.setPlayersNameData(res);
       },
       (err) => {
@@ -98,18 +120,10 @@ export class SessionInformationComponent implements OnInit {
           (res) =>{
     
             //if the session is not ended
-            if (res.data===false){
+            if (res.data===true){
               //stop updating
               this.getSessionInformation();
               this.sessionEnd(false);
-               
-            }
-            
-            else{
-              this.sessionInformationHandler.setSessionEnd(true);
-              this.sessionEnd(true);
-              alert("fin de juego");
-              //determinar quien ganó el juego.
             }
             
             
@@ -121,10 +135,11 @@ export class SessionInformationComponent implements OnInit {
     }
 
     public passTurn(){
-      this.sessionService.passTurn(this.sessionInformationHandler.getSessionId(), this.sessionInformationHandler.getPlayerPlayingId())
+      this.sessionService.passTurn(this.sessionInformationHandler.getSessionId(),
+      this.sessionInformationHandler.getPlayerPlayingId())
         .subscribe(
           (res) =>{
-            console.log(res);
+
           },
           (err) => {
             console.log(err.json()); 

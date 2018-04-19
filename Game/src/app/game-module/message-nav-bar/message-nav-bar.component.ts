@@ -19,11 +19,13 @@ export class MessageNavBarComponent implements OnInit {
   private lastLength: number;
   private firstTime:Boolean;
   private messagesNumber:number=0;
+  private characterPerLine;
 
   constructor(private navService: NavService) { 
     this.userNotify=new userNotificationsHandler();
     this.facebookManager=new facebookSessionHandler('726004681121152');
 
+    this.characterPerLine=20;
     let playerIdLevel=JSON.parse(localStorage.getItem("playerInformation"));
     this.playerId=playerIdLevel.o_playerid;
 
@@ -31,7 +33,12 @@ export class MessageNavBarComponent implements OnInit {
     this.lastLength=-1;
     let sessionInformation= JSON.parse(localStorage.getItem("sessionData"));
     this.sessionId= sessionInformation.sessionId;
+    this.getMyMessages(this.sessionId);
     this.getMessages();
+  }
+
+  public setSize(message: String){
+      return (message.length / this.characterPerLine)+1; 
   }
 
   public addDataToArray(dataArray:Array<any>){

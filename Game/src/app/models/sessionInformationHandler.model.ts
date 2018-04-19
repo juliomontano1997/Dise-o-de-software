@@ -42,6 +42,28 @@ export class sessionInformationHandler {
         this.setTiesNumber(dataArray[0].o_ties);
     }
     
+    public customMessage(playerId:Number,code:Number) :String{
+        if (this.playerPlayingId===playerId && code===0){
+            return "Has ganado la sesión";
+        }
+        else{
+            return "Has perdido la sesión";
+        }
+    }
+
+    public getWinner(): String {
+        if (this.winsPlayerOne>this.winsPlayerTwo){
+            return this.customMessage(this.playerOneID,0);
+        }
+        else if (this.winsPlayerOne< this.winsPlayerTwo){
+            return this.customMessage(this.playerOneID,1);
+        }
+        //tie
+        else{
+            "La sesión finalizó en un empate";
+        }
+    }
+
     public setAllowUpdating(allow:boolean){
         this.allowUpdating=allow;
     }

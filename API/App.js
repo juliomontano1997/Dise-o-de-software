@@ -9,7 +9,7 @@ var pg = require('pg');
 var express = require('express');
 var app = express();
 var pgp = require('pg-promise')();
-var cn = {host: 'localhost', port: 5432, database: 'othelloDB', user: 'postgres', password: 'postgresql2017'};
+var cn = {host: 'localhost', port: 5432, database: 'otelloDB', user: 'postgres', password: '12345'};
 var db = pgp(cn);
 var http =  require('http');
 
@@ -738,13 +738,14 @@ function calculateAutomaticMove(idSession)
 
         if(posiblePlays.length == 0 || posiblePlays==undefined )
         {
-            var urlLink="http://localhost:8081/passTurn?idSession="+idSession;  
+            var urlLink="http://localhost:8081/passTurn?idSession="+idSession+"&idPlayer=0";  
         
             console.log(urlLink);
             setTimeout(function () {
                             console.log("La maquina no tiene movimientos");
                             autoRequest(urlLink);  
                           }, 2000);
+
             return;
         }
         else {

@@ -17,6 +17,7 @@ export class PendingSessionsComponent implements OnInit {
   constructor(private pendingSessionService:PendingSessionsService) { 
     let playerIdLevel=JSON.parse(localStorage.getItem("playerInformation"));
     this.playerId=playerIdLevel.o_playerid;
+    this.getPendingSessions(this.playerId);
     this.getSessions();
 
   }

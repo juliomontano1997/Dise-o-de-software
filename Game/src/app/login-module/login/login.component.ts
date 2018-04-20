@@ -133,12 +133,13 @@ public userSignIn(response:any, imageDir:string)
     this.loginService.userRegistration(response.email,response.name,imageDir)
     .subscribe(
         (res) =>{
+            
             console.log("login response");
-            console.log(res[0]);
-        
-            localStorage.setItem("playerInformation",JSON.stringify(res[0]));
-            window.location.href='profileModule';
-
+            console.log(res);
+            if (res!=false){
+                localStorage.setItem("playerInformation",JSON.stringify(res[0]));
+                window.location.href='profileModule';
+            }
         },
         (err) => {
           console.log(err.json()); 

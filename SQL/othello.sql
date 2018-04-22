@@ -563,7 +563,7 @@ $body$
 BEGIN
 RETURN query
 SELECT invitationID "ID", ((SELECT playerName FROM players WHERE playerID = transmitterID) || ' te ha invitado a jugar' || chr(10) ||' Caracteristicas del juego: '
-	|| chr(10) ||' Tamaño del tablero: '|| boardSize || chr(10) ||'Cantidad partidas: ' || amountGames || chr(10) ||'Nivel de tu oponente: ' || 
+	|| chr(10) ||' Tamaño del tablero: '|| boardSize ||' x ' || boardSize || chr(10) ||'Cantidad partidas: ' || amountGames || chr(10) ||'Nivel de tu oponente: ' || 
 	(SELECT playerLevel FROM players WHERE playerID = transmitterID) ) "content"
 FROM invitations WHERE receiverID = i_playerID ORDER BY creationDate DESC;
 

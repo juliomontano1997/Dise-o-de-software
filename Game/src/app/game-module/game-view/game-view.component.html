@@ -41,10 +41,7 @@
     </div>
   </div>
 
-
- <!-- show it if is demo game-->
-  <div *ngIf="demo()===true" class="container-fluid boardGame">
-
+  <div *ngIf="demo()===false" class="container-fluid boardGame">
       <div class="form-group">
           <h6 style="color:white;">Cambiar color de fichas </h6>
           <input type="color" [(ngModel)]="selectedColor" >

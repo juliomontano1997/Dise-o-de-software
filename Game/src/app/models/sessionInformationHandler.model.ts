@@ -52,10 +52,10 @@ export class sessionInformationHandler {
     }
 
     public getWinner(): String {
-        if (this.winsPlayerOne>this.winsPlayerTwo){
+        if (this.winsPlayerOne >this.winsPlayerTwo){
             return this.customMessage(this.playerOneID,0);
         }
-        else if (this.winsPlayerOne< this.winsPlayerTwo){
+        else if (this.winsPlayerOne < this.winsPlayerTwo){
             return this.customMessage(this.playerOneID,1);
         }
         //tie

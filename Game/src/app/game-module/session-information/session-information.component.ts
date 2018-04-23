@@ -78,6 +78,11 @@ export class SessionInformationComponent implements OnInit {
           }
  
         }
+        else{
+          setTimeout(() => {
+            this.finishGame();
+          }, 1100);
+        }
 
       },
       (err) => {

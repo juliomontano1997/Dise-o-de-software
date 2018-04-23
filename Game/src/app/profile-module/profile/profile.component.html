@@ -1,21 +1,19 @@
+<app-profile-nav-bar> <!-- the nav bar is here--></app-profile-nav-bar>
 
-<app-profile-nav-bar></app-profile-nav-bar>
-
-<div class="row">
-
-    <div class="col-xs-6 profileInformation">
-        <div class="container-fluid">
-            <app-user-information></app-user-information>
-            </div>
-            <hr><hr>
-            <div class="container-fluid sessionPadding">
-            <app-pending-sessions></app-pending-sessions>
-          </div>
+<div class="profileBody">
+  <!--The body application is here-->
+  <div class="bodyLeft">
+    <div class="container-fluid">
+      <app-user-information></app-user-information>
     </div>
-    <div class="col-xs-6">
-        <div class="container-fluid online">
-            <app-online-players></app-online-players>
-        </div>
+    <hr>
+    <div class="container-fluid">
+      <app-pending-sessions></app-pending-sessions>
     </div>
-
+  </div>
+  <div class="sidebar">
+    <div class="container-fluid">
+    <app-online-players></app-online-players>
+  </div>
+  </div>
 </div>

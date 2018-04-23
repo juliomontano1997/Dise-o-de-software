@@ -1,63 +1,62 @@
-
-<hr>
-<h2 class="letter title"> Jugadores en línea</h2>
-<hr>
-
-<div class="table-responsive" >
-    <table class="table tableOnline">
-        
-        <tbody>
-            <tr class="tableOnline"  *ngFor="let player of playersHandler.getPlayers()|paginate: { itemsPerPage: amountItems, currentPage: pageNumber,id:'first'};">
-
-                <img class="imageSize" align="left" [src]="player.getPlayerImage()">
-                <h6 class="letter name">Nombre:  {{player.getPlayerName()}}</h6>
-                <h6 class="letter alignData">Nivel: {{player.getPlayerLevel()}}</h6>
-                
-                <button class="btn btn-primary inviteButton"  data-toggle="modal" data-target="#sessionInvitation" 
-                (click)="invitePlayer(player.getPlayerId())">Invitar a juego</button>
-                <br>
-                <br>
-                <br>
-            </tr>
-        </tbody>
-        <pagination-controls (pageChange)="pageNumber=$event" id="first"></pagination-controls>
-    </table>
-</div>
-
-<div class="modal fade" id="sessionInvitation" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title">Invitar a sesión de juego</h4>  
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-              
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="boardSize">Tamaño del tablero</label>
-                    <input type="number" class="form-control" id="boardSize" [(ngModel)]="boardSize"
-                    placeholder="Ingrese el tamaño del tablero">
+<div  class="sidebar">
+  <hr>
+  <span class="title">Jugadores en línea</span>
+  <hr>
+  <div style="width: 100%" >
+      <table class="table table-responsive ">
+          <tbody class="tableOnline">
+              <tr class="tableItem"  *ngFor="let player of playersHandler.getPlayers()|paginate: { itemsPerPage: amountItems, currentPage: pageNumber,id:'first'};">
+                <td >
+                  <img class="imageSize" align="left" [src]="player.getPlayerImage()">
+                  <div class="content" data-toggle="modal" data-target="#sessionInvitation" (click)="invitePlayer(player.getPlayerId())">
+                    <span>Usuario: {{player.getPlayerName()}}</span>
+                    <span >Nivel:{{player.getPlayerLevel()}}</span>
                   </div>
+                </td>
+              </tr>
+          </tbody>
+          <pagination-controls (pageChange)="pageNumber=$event" id="first"></pagination-controls>
+      </table>
+  </div>
 
-                <div class="form-group">
-                      <label for="amountGames">Cantidad de partidas a jugar</label>
-                      <input type="number" class="form-control" id="amountGames" [(ngModel)]="amountGames" placeholder="Ingrese el número de partidas">
-                    </div>
 
-                <div  *ngIf="playersHandler.getGuestPlayerId()===machineId" class="form-group">
-                        <label for="amountGames">Elige el nivel de dificultad para la sesión</label>
-                        <select class="form-control" id="machineLevel" [(ngModel)]="selectedLevel">
-                            <option selected>Fácil</option>
-                            <option>Intermedio</option>
-                            <option>Díficil</option>
-                        </select>
-                      </div>
-            </div>
-            <div class="modal-footer">
-              <button class="btn btn-primary" (click)="finishInvitation()" data-dismiss="modal">Realizar la invitación </button>
-              <button type="button" class="btn btn-danger"  data-dismiss="modal">Cerrar</button>
-            </div>
+  <div class="modal fade" id="sessionInvitation" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Invitar a sesión de juego</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="boardSize">Tamaño del tablero</label>
+            <input type="number" class="form-control" id="boardSize" [(ngModel)]="boardSize"
+                   placeholder="Ingrese el tamaño del tablero">
+          </div>
+
+          <div class="form-group">
+            <label for="amountGames">Cantidad de partidas a jugar</label>
+            <input type="number" class="form-control" id="amountGames" [(ngModel)]="amountGames" placeholder="Ingrese el número de partidas">
+          </div>
+
+          <div  *ngIf="playersHandler.getGuestPlayerId()===machineId" class="form-group">
+            <label for="amountGames">Elige el nivel de dificultad para la sesión</label>
+            <select class="form-control" id="machineLevel" [(ngModel)]="selectedLevel">
+              <option selected>Fácil</option>
+              <option>Intermedio</option>
+              <option>Díficil</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" (click)="finishInvitation()" data-dismiss="modal">Realizar la invitación </button>
+          <button type="button" class="btn btn-danger"  data-dismiss="modal">Cerrar</button>
+        </div>
       </div>
     </div>
   </div>
+</div>
+
+
+
 

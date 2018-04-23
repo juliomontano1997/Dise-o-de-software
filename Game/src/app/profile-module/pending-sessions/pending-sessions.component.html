@@ -1,29 +1,20 @@
-<div class="container-fluid">
-  <h2 class="letter title">Sesiones en curso</h2>
-  <hr>
-</div>
-
-<div class="table-responsive" >
+<div class="container-fluid sidebar">
+  <span class="title">Sesiones en curso</span>
+  <div class="table-responsive" >
     <table class="table tableOnline">
-        
-        <tbody>
-            
-            <tr class="tableOnline"  *ngFor="let pendingSession of pendingSessions | paginate: { itemsPerPage: amountItems, currentPage: pageNumberTwo, id:'second'};">
-                <td>
-                <h6>{{pendingSession.getEnemyName()}}</h6>
-                <h6>Número de partidas: {{pendingSession.getAmountGames()}}</h6>
-                <h6>Partida actual: {{pendingSession.getCurrentGameNumber()}}</h6>
-                <h6>Tamaño del tablero: {{pendingSession.getBoardSize()}}</h6>
-                </td>
-                <td>
-                <button type="button" class="btn btn-secondary btn-lg" (click)="restartSession(pendingSession.getSessionId(),pendingSession.getBoard())">Reanudar</button>
-                </td>
-            </tr>
-            <br>
-        </tbody>
-        <div class="container-fluid">
-        <pagination-controls (pageChange)="pageNumberTwo = $event" id="second"></pagination-controls>
-      </div>
-
+      <tbody>
+        <tr class="tableOnline"  *ngFor="let pendingSession of pendingSessions | paginate: { itemsPerPage: amountItems, currentPage: pageNumberTwo, id:'second'};">
+          <td class="content" (click)="restartSession(pendingSession.getSessionId(),pendingSession.getBoard())">
+            <span>{{pendingSession.getEnemyName()}}</span>
+            <span>Número de partidas: {{pendingSession.getAmountGames()}}</span>
+            <span>Partida actual: {{pendingSession.getCurrentGameNumber()}}</span>
+            <span>Tamaño del tablero: {{pendingSession.getBoardSize()}}</span>
+          </td>
+        </tr>
+      </tbody>
     </table>
+    <div class="container-fluid">
+      <pagination-controls (pageChange)="pageNumberTwo = $event" id="second"></pagination-controls>
+    </div>
+  </div>
 </div>

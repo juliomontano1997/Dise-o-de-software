@@ -9,7 +9,7 @@ var pg = require('pg');
 var express = require('express');
 var app = express();
 var pgp = require('pg-promise')();
-var cn = {host: 'localhost', port: 5432, database: 'otelloDB', user: 'postgres', password: '12345'};
+var cn = {host: 'localhost', port: 5432, database: 'othelloDB', user: 'postgres', password: 'postgresql2017'};
 var db = pgp(cn);
 var http =  require('http');
 
@@ -178,16 +178,19 @@ app.get('/getBoard',function(req, res)
     {                                             
         var scores = verifyFullBoard(data[0].o_board, data[0].o_playeroneid);                
         if(scores!=false) // Ends the game if the board is full 
-        {            
+        {
+            scores.log("scores ddddddddddddddddddddddddddddddddd");
             var winner = -2;
             var newBoard = makeBoard(data[0].o_boardsize,data[0].o_playeroneid,data[0].o_playertwoid);
+            console.log(scores);
             if(scores[0]> scores[1])            
             {                   
                 winner = data[0].o_playeroneid;
             }
             else if (scores[0]<scores[1])
-            {
+            {                
                 winner = data[0].o_playertwoid;
+                console.log("El ganador es:"+winner);
             }
             db.func('mg_finishgame', [req.query.idSession, winner, newBoard])
             .then(data=>
@@ -593,7 +596,6 @@ app.get('/createDemoSession',function(req, res)
         console.log(data[0].mg_create_demo_session);   
         res.end(JSON.stringify({"data":data[0].mg_create_demo_session}));
     })
-
     .catch(error=> 
     {    	    	 
         console.log(error);
@@ -766,8 +768,7 @@ function calculateAutomaticMove(idSession)
 
         if(posiblePlays.length == 0 || posiblePlays==undefined )
         {
-            var urlLink="http://localhost:8081/passTurn?idSession="+idSession+"&idPlayer=0";  
-        
+            var urlLink="http://localhost:8081/passTurn?idSession="+idSession+"&idPlayer=0";          
             console.log(urlLink);
             setTimeout(function () {
                             console.log("La maquina no tiene movimientos");
@@ -775,7 +776,8 @@ function calculateAutomaticMove(idSession)
                           }, 2000);
             return;
         }
-        else {
+        else 
+        {
 
         
         var playsAfectedIndexes = []; 

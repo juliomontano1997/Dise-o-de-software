@@ -2,6 +2,12 @@
     color: white;
 }
 
+.myNav
+{
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
 
 .hand{
     cursor: pointer;
@@ -18,15 +24,18 @@
 
 .divBorder{
     border: solid 4px gray;
-    
+
 }
 
-@media only screen and (max-width: 600px) {
-    
-    
-    .exit{
+@media only screen and (max-width: 600px)
+{
+    .exit
+    {
         margin-top: 8%;
     }
-
-
+  .myNav
+  {
+    width: 100%;
+    position: fixed;
+  }
 }

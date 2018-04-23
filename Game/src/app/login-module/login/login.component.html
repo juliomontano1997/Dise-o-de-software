@@ -1,21 +1,18 @@
 
 <nav class="navbar navbar-dark bg-dark navPosition">
   <span class="navbar-brand mb-0 h1 gameTitle">Othello Game</span>
-  <!--
-  <a routerLink="/DemoModule"> Ver demo </a> -->
-  <button class="btn bg-dark white" (click)="toDemo()">
-    Ver Demo
-  </button>
-  
 </nav>
 
-<div class="container-fluid loginImage">
 
-  <div class="position">
-      <div class="fb-login-button position" data-max-rows="1"  scope="public_profile,email"
-      data-size="large" data-button-type="continue_with" 
-      data-show-faces="false" data-auto-logout-link="false" 
+
+<div class="container-fluid login">
+  <div class="loginView loginImage">
+    <div class="fb-login-button" data-max-rows="1"  scope="public_profile,email"
+      data-size="large" data-button-type="continue_with"
+      data-show-faces="false" data-auto-logout-link="false"
       data-use-continue-as="false"> </div>
+    <br>
+    <br>
+    <button class="btn demoButton" (click)="toDemo()">Ver Demo</button>
   </div>
-
 </div>

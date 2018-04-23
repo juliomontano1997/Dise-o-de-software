@@ -1,54 +1,57 @@
 
   <div class="container-fluid boardGame">
     <table class="table table-responsive tableGame">
-      <tr *ngFor="let row of sessionHandler.getBoardSizeArray()"> 
+      <tr *ngFor="let row of sessionHandler.getBoardSizeArray()">
         <td class="cellBackground" *ngFor="let col of sessionHandler.getBoardSizeArray()" (click)="movePiece(row,col)">
         <div class="divTd" *ngIf="checkEqualId(row,col,sessionHandler.getPlayerOneId()); else rival">
           <svg class="circle-piece" >
             <circle cx="15" cy="10" r="10" [ngStyle]="{fill:sessionHandler.getPlayerOneColor()}"/>
-            Lo sentimos, tu navegador no soporta SVG.  
+            Lo sentimos, tu navegador no soporta SVG.
           </svg>
         </div>
         <ng-template #rival>
             <div class="divTd" *ngIf="checkEqualId(row,col,sessionHandler.getPlayerTwoId()); else whiteSpace">
                 <svg class="circle-piece" >
                   <circle id="circle" cx="15" cy="10" r="10" [ngStyle]="{fill:sessionHandler.getPlayerTwoColor()}"/>
-                  Lo sentimos, tu navegador no soporta SVG.  
+                  Lo sentimos, tu navegador no soporta SVG.
                 </svg>
-              </div>
+            </div>
         </ng-template>
+
         <ng-template #whiteSpace>
             <div class="divTd">
               <svg class="circle-piece" >
-                <circle cx="15" cy="10" r="10" fill="lightgreen"/>
-                Lo sentimos, tu navegador no soporta SVG.  
+                <circle cx="15" cy="10" r="10" fill="#3a3b38"/>
+                Lo sentimos, tu navegador no soporta SVG.
               </svg>
             </div>
         </ng-template>
-        </td> 
+
+        </td>
       </tr>
     </table>
-    <div  class="container-fluid text-center"> 
+    <div  class="container-fluid text-center">
         <h4  class="yourTurn" *ngIf="sessionHandler.itsMyTurn()==true; else aviso" >
          Es tu turno de jugar</h4>
-        <ng-template  #aviso> 
-        <h4  class="turnAdvice" > 
-          Tu rival está jugando 
+        <ng-template  #aviso>
+        <h4  class="turnAdvice" >
+          Tu rival está jugando
         </h4>
         </ng-template>
+    </div>
   </div>
-  </div>
+
+
  <!-- show it if is demo game-->
   <div *ngIf="demo()===true" class="container-fluid boardGame">
-      
+
       <div class="form-group">
           <h6 style="color:white;">Cambiar color de fichas </h6>
           <input type="color" [(ngModel)]="selectedColor" >
-        
+
           <hr>
           <button class="btn btn-primary" (click)="changePiecesColor()"> Cambiar color de fichas</button>
 
       </div>
   </div>
 
-  

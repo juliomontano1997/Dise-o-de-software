@@ -1,10 +1,14 @@
-<div class="container-fluid">
-  <h2 class="letter title"> Información Personal</h2>
-  <img class="imageSize" align="left" [src]="playerHandler.getPlayerImage()">
-  <h6 class="letter name">Nombre:  {{playerHandler.getPlayerName()}}</h6>
-  <hr>
-  <h6 class="letter alignData">Correo: {{playerHandler.getPlayerEmail()}}  </h6>
-  <hr>
-  <h6 class="letter alignData">Nivel: {{playerHandler.getPlayerLevel()}}  </h6>
-
+<div class="container-fluid profile">
+  <span class="title"> Mi perfil</span>
+  <div class="allContent">
+    <div>
+      <img class="profileImage" align="left" [src]="playerHandler.getPlayerImage()">
+    </div>
+    <div class="content">
+      <span>Nombre:  {{playerHandler.getPlayerName()}}</span>
+      <span>Correo: {{playerHandler.getPlayerEmail()}}</span>
+      <span>Nivel: {{playerHandler.getPlayerLevel()}}</span>
+    </div>
+  </div>
+  <br>
 </div>

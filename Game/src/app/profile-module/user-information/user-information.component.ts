@@ -11,9 +11,9 @@ import { LoginServiceService } from '../../services/login-service.service';
 export class UserInformationComponent implements OnInit {
 
   private playerHandler: player;
-  
-  constructor(private loginService:LoginServiceService) { 
-    
+
+  constructor(private loginService:LoginServiceService) {
+
     this.getPlayerInformation();
   }
 
@@ -35,9 +35,9 @@ export class UserInformationComponent implements OnInit {
 
         },
         (err) => {
-          console.log(err.json()); 
+          console.log(err.json());
         });
-    
+
   }
 
 }

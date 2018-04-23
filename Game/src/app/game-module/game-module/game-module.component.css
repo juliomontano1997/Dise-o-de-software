@@ -1,19 +1,23 @@
-.information{
-    margin-left:5%;
+*
+{
+  padding: 0;
+  margin: 0;
+}
+.row
+{
+  display: flex;
+  justify-content: space-evenly;
 }
 
-.game{
-    margin-left: 2%;
-    margin-right:50%;
+.sidebar
+{
+  float: right;
 }
 
 @media only screen and (max-width: 600px) {
-    
-    .information{
-        margin-left: 5%;
+    .row
+    {
+      display: flex;
+      flex-direction: column-reverse;
     }
-    .game{
-        margin-left: 2%;
-    }
-
 }

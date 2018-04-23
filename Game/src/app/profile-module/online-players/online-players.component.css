@@ -1,53 +1,68 @@
-.letter{
+
+.sidebar
+{
+  margin-top: 10px;
+  float:right;
+  background: rgba(0, 0, 0, 0.92);
+  height: 100%;
+  width: 100%;
+}
+
+tbody
+{
+  width: 100%;
+}
+
+.letter, span
+{
     color: white;
 }
-
-.alignData{
-    padding-left:120px;
+.title
+{
+  display: flex;
+  justify-content: center;
+  font-size: 28px;
+  width: 100%;
 }
 
-.inviteButton{
-    float:right;
-    margin-right:42%;
+.content
+{
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
 }
-
-.tableOnline{
-    border: none;
+.content :hover
+{
+  cursor: pointer;
 }
-
-
-.name{
-    padding-left: 120px;
-}
-
 
 .imageSize{
-    width: 24%;
-    height:24%;
+  width: 60px;
+  height: 60px;
+  margin-right: 30px;
+  background-repeat: no-repeat;
+  border-radius: 50%;
 }
 
-@media only screen and (max-width: 600px) {
-    
-    
-    .name{
-        font-size: 12px;
-        margin-top: 70%;
-        padding-left: 0px;
-    }
-    .alignData{
-        padding-left:0px;
-        font-size: 12px;
-    }
 
-    
-    .imageSize{
-        width: 50%;
-        height:50%;
-    }
+.tableOnline{
+  background-color: #616161;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
-    .title{
-        font-size: 14px;
-    }
+.tableItem
+{
+  width: 100%;
+  background-color: #077491;
+  height: 80px;
+}
 
+
+@media only screen and (max-width: 600px)
+{
 
 }

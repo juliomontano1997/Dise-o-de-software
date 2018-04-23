@@ -1,5 +1,5 @@
 .cellBackground{
-	background-color: lightgreen;
+	background-color: #3a3b38;
 	border: 10px gray ridge;
 	width: 30px;
 	height: 20px;
@@ -33,18 +33,21 @@
 	padding-left: 6%;
 }
 
-.tableGame{
-	align-self: center;
-	border: 10px gray groove; 
-	border-spacing: 0px;
-	overflow: auto;
+.tableGame
+{
+  align-self: center;
+  border: 10px gray groove;
+  border-spacing: 0px;
+  overflow: auto;
+  width: 100%;
 }
 
-.yourTurn {
-    color: white;
-    background-color: green;
-    padding: 10px;
-    }
+.yourTurn
+{
+  color: white;
+  background-color: green;
+  padding: 10px;
+}
 
 .turnAdvice {
     color: white;
@@ -53,8 +56,12 @@
     }
 
 @media only screen and (max-width: 600px) {
+  .title
+  {
+    font-size: 16px;
+  }
 	.cellBackground{
-		background-color:lightgreen;
+		background-color: #3a3b38;
 		border: 10px gray ridge;
 		width: 30px;
 		height: 10px;

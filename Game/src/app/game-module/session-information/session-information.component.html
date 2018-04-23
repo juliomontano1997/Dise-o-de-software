@@ -1,25 +1,14 @@
 <div class="container-fluid informationContainer">
-    <div class="text-center">
-     <h2 class="align-center sessionInformation">Informacion de la sesión</h2>
-    </div>
-<form> 
-    <div class="form-group row">
-        <label for="gamesNumbers" class="col-sm-6 col-form-label sessionInformation">
-          Número de partidas: {{sessionInformationHandler.getAmountGamesNumber()}}</label>
-        <div class="col-sm-14">
-          <input type="text" readonly class="form-control-plaintext sessionInformation" id="gamesNumbers" >
-        </div>
-      </div>
-      <div class="form-group row">
-          <label for="currentGame" class="col-sm-6 col-form-label sessionInformation">
-            Partida actual: {{sessionInformationHandler.getCurrentGameNumber()}} </label>
-          <div class="col-sm-14">
-            <input type="text" readonly class="form-control-plaintext sessionInformation" id="currentGame">
-          </div>
-        </div>
-</form>
+  <span class="title">Informacion de la sesión</span>
+  <br>
+  <div class="content">
+    <span>Número de partidas: {{sessionInformationHandler.getAmountGamesNumber()}}</span>
+    <span>Partida actual: {{sessionInformationHandler.getCurrentGameNumber()}}</span>
+  </div>
+  <br>
 
-<table class="table table-responsive table-dark">
+
+  <table class="table table-responsive table-dark">
     <thead>
       <tr>
         <th>Partidas</th>
@@ -34,37 +23,25 @@
         <td>{{sessionInformationHandler.getWinsPlayerTwo()}}</td> <!-- second player victories -->
       </tr>
       <tr>
-          <td>Perdidas</td>
-          <td>{{sessionInformationHandler.getWinsPlayerTwo()}}</td> <!-- first player defeats -->
-          <td>{{sessionInformationHandler.getWinsPlayerOne()}} </td> <!-- second player defeats -->
-        </tr>
-        <tr>
-            <td>Empatadas</td>
-            <td>{{sessionInformationHandler.getTiesNumber()}}</td> <!-- first player tied -->
-            <td>{{sessionInformationHandler.getTiesNumber()}}</td> <!-- second player tied -->
-          </tr>
+        <td>Perdidas</td>
+        <td>{{sessionInformationHandler.getWinsPlayerTwo()}}</td> <!-- first player defeats -->
+        <td>{{sessionInformationHandler.getWinsPlayerOne()}} </td> <!-- second player defeats -->
+      </tr>
+      <tr>
+        <td>Empatadas</td>
+        <td>{{sessionInformationHandler.getTiesNumber()}}</td> <!-- first player tied -->
+        <td>{{sessionInformationHandler.getTiesNumber()}}</td> <!-- second player tied -->
+      </tr>
     </tbody>
   </table>
 
-  <div class="form-group row">
-        
-      <div class="col-sm-14">
-          <button type="button" class="btn btn-secondary btn-lg" (click)="giveUp()">Rendirse</button>
-      </div>
-    </div>
+  <div class="form-group buttonGroup">
+    <button type="button" class="btn btn-secondary btn-lg" (click)="giveUp()">  Rendirse  </button>
+    <button type="button" class="btn btn-secondary btn-lg" (click)="passTurn()">  Pasar de turno  </button>
+    <a  class="" routerLink="/profileModule">
+      <button type="button" class="btn btn-secondary btn-lg">Mi perfil</button>
+    </a>
+  </div>
 
-    <div class="form-group row">
-       
-        <div class="col-sm-14">
-            <button type="button" class="btn btn-secondary btn-lg" (click)="passTurn()">Pasar de turno</button>
-        </div>
-      </div>
-
-      <div class="form-group row">
-
-          <div class="col-sm-14">
-              <a routerLink="/profileModule"> <button type="button" class="btn btn-secondary btn-lg">Salir de partida</button> </a>
-          </div>
-        </div>
 
 </div>

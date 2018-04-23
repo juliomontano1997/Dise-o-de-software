@@ -864,4 +864,5 @@ Machine image
 /*********************************
 DEMO player
 *********************************/
-INSERT INTO players VALUES(1,'PlayerDemo@gmail.com','PlayerDemo',0,'mi image',FALSE)
+INSERT INTO players VALUES(0, 'PlayerDemo@gmail.com','PlayerDemo',0,'../../assets/images/machine.jpg',FALSE);
+INSERT INTO players VALUES(1,'PlayerDemo@gmail.com','PlayerDemo',0,'../../assets/images/machine.jpg',FALSE);

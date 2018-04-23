@@ -1,61 +1,30 @@
-.split {
-    height: 100%;
-    width: 65%;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    overflow-y: scroll;
-    overflow-x: scroll;
-    padding-top: 10px;
-    margin-top: 3%;
-    padding-left: 0px;
+.sidebar
+{
+  display: flex;
+  float: right;
+  width: 30%;
 }
 
-.splitRight {
-    height: 100%;
-    width: 35%;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    overflow-y: hidden;
-    overflow-x: scroll;
-    padding-top: 10px;
-    margin-top: 3%;
-    padding-left: 0px;
+.profileBody
+{
+  display: flex;
+  justify-content: center;
+}
+.bodyLeft
+{
+  width: 50%;
 }
 
-.profileInformation{
-    margin-left: 5%;
-}
-
-.online{
-    background: gray;
-    margin-left: 30%;
-}
-
-.sessionPadding{
-    opacity: 10%;
-    background-color: #FFFFFF;
-    padding-top: 2%;
-    margin-left: 5%;
-    
-}
-
-.left {
-    left: 0;
-    background-color: black;
-}
-
-.right {
-    right: 0;
-    background-color:black;
-}
-
-
-@media only screen and (max-width: 600px) {
-    
-    .online{
-        margin-left: 15%;
-    }
-
+@media only screen and (max-width: 600px)
+{
+  .profileBody
+  {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  .bodyLeft, .sidebar
+  {
+    width: 100%;
+  }
 }

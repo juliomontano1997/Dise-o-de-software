@@ -1,15 +1,54 @@
-.letter{
-    color: black;
-    margin-top: 5%;
+*
+{
+  margin: 0;
+  padding: 0;
+}
+.tableOnline{
+  background: #000000;
+  color: #FFFFFF;
 }
 
-.tableOnline{
-    color: black;
+.title
+{
+  color: #FFFFFF;
+  display: flex;
+  justify-content: center;
+  font-size: 28px;
+  width: 100%;
 }
+
+.content
+{
+  background-color: #077491;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.sidebar
+{
+  background-color: #000000;
+  margin-top: 10px;
+  float:right;
+  height: 100%;
+  width: 100%;
+}
+
 
 @media only screen and (max-width: 600px) {
-	
-    .title{
-        font-size: 14px;
+
+  .title{
+        font-size: 28px;
     }
+  .content
+  {
+    width: 100%;
+  }
+  .sidebar
+  {
+    width: 100%;
+  }
+
 }

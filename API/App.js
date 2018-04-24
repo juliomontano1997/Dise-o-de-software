@@ -178,11 +178,9 @@ app.get('/getBoard',function(req, res)
     {                                             
         var scores = verifyFullBoard(data[0].o_board, data[0].o_playeroneid);                
         if(scores!=false) // Ends the game if the board is full 
-        {
-            scores.log("scores ddddddddddddddddddddddddddddddddd");
+        {            
             var winner = -2;
-            var newBoard = makeBoard(data[0].o_boardsize,data[0].o_playeroneid,data[0].o_playertwoid);
-            console.log(scores);
+            var newBoard = makeBoard(data[0].o_boardsize,data[0].o_playeroneid,data[0].o_playertwoid);            
             if(scores[0]> scores[1])            
             {                   
                 winner = data[0].o_playeroneid;

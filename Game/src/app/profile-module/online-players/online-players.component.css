@@ -32,6 +32,7 @@ tbody
   justify-content: center;
   flex-direction: column;
 }
+
 .content :hover
 {
   cursor: pointer;
@@ -43,6 +44,7 @@ tbody
   margin-right: 30px;
   background-repeat: no-repeat;
   border-radius: 50%;
+  
 }
 
 
@@ -52,6 +54,7 @@ tbody
   display: flex;
   flex-direction: column;
   justify-content: center;
+  
 }
 
 .tableItem
@@ -59,6 +62,7 @@ tbody
   width: 100%;
   background-color: #077491;
   height: 80px;
+  border: 2px white;
 }
 
 

@@ -9,7 +9,7 @@ var pg = require('pg');
 var express = require('express');
 var app = express();
 var pgp = require('pg-promise')();
-var cn = {host: 'localhost', port: 5432, database: 'othelloDB', user: 'postgres', password: 'postgresql2017'};
+var cn = {host: 'localhost', port: 5432, database: 'otelloDB', user: 'postgres', password: '12345'};
 var db = pgp(cn);
 var http =  require('http');
 
@@ -179,7 +179,7 @@ app.get('/getBoard',function(req, res)
         var scores = verifyFullBoard(data[0].o_board, data[0].o_playeroneid);                
         if(scores!=false) // Ends the game if the board is full 
         {
-            scores.log("scores ddddddddddddddddddddddddddddddddd");
+
             var winner = -2;
             var newBoard = makeBoard(data[0].o_boardsize,data[0].o_playeroneid,data[0].o_playertwoid);
             console.log(scores);
@@ -194,12 +194,13 @@ app.get('/getBoard',function(req, res)
             }
             db.func('mg_finishgame', [req.query.idSession, winner, newBoard])
             .then(data=>
-            {                                             
+            {                                            
                 var urlLink="http://localhost:8081/startSession?idSession="+req.query.idSession;              
                 autoRequest(urlLink);                                                                                           
                 res.end(JSON.stringify({"data":data[0].mg_finishgame}));                                                                                                
             })
-            .catch(error => {res.end(JSON.stringify(false));});                              
+            .catch(error => {
+                res.end(JSON.stringify(false));});                              
         }        
         else if (data[0].o_amountpassturn >= 2) // Ends the game if the pass turn amount is higher than 2
         {
@@ -235,7 +236,9 @@ app.get('/getBoard',function(req, res)
             } 
         }        
     })
-    .catch(error=> {res.end(JSON.stringify(false));})      
+    .catch(error=> {
+        
+        res.end(JSON.stringify(false));})      
 });
 
 /**
@@ -253,6 +256,7 @@ app.get('/checkMovement', function(req, res)
     {        	                     
         if(data=== null | data[0].o_actualplayerid !== req.query.idPlayer*1)
         {                                    
+            console.log("porque no es tu turno");
             res.end(JSON.stringify(false));
             return;
         }             
@@ -260,7 +264,8 @@ app.get('/checkMovement', function(req, res)
         var matrixSize = Math.sqrt(originalBoard.length);        
         //2. Verify if the actual position is empty 
         if(originalBoard[getIndex(req.query.row, req.query.column, matrixSize)] !== -1)
-        {                        
+        {                 
+            console.log("porque la posicion especificada no esta vacía");      
             res.end(JSON.stringify(false));  
             return;        
         }                  
@@ -285,6 +290,7 @@ app.get('/checkMovement', function(req, res)
         printMatrix(originalBoard, matrixSize);        
         if(afectedIndices.length===1)
         {                            
+            console.log("por afected index length igual 1");
             res.end(JSON.stringify(false));  
             return;    
         }          
@@ -300,7 +306,10 @@ app.get('/checkMovement', function(req, res)
             {                                                                               
                 res.end(JSON.stringify(data2[0].mg_update_board));                                                        
             })
-            .catch(error=> {res.end(JSON.stringify(false));});                      
+            .catch(error=> {
+                console.log("error en check movement");
+                console.log(error);
+                res.end(JSON.stringify(false));});                      
         }                              
     })
     .catch(error=> 

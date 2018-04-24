@@ -6,13 +6,14 @@
       <table class="table table-responsive ">
           <tbody class="tableOnline">
               <tr class="tableItem"  *ngFor="let player of playersHandler.getPlayers()|paginate: { itemsPerPage: amountItems, currentPage: pageNumber,id:'first'};">
-                <td >
+                <td>
                   <img class="imageSize" align="left" [src]="player.getPlayerImage()">
                   <div class="content" data-toggle="modal" data-target="#sessionInvitation" (click)="invitePlayer(player.getPlayerId())">
                     <span>Usuario: {{player.getPlayerName()}}</span>
                     <span >Nivel:{{player.getPlayerLevel()}}</span>
                   </div>
                 </td>
+                
               </tr>
           </tbody>
           <pagination-controls (pageChange)="pageNumber=$event" id="first"></pagination-controls>

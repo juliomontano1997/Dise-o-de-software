@@ -76,7 +76,7 @@ export class GameViewComponent implements OnInit {
     this.gameService.getUpdatedBoard(this.sessionHandler.getSessionId())
     .subscribe(
       (res) =>{
-
+           
            if (res.length > 0){
             this.sessionHandler.UpdateData(res);
           }

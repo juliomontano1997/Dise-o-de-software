@@ -487,9 +487,9 @@ app.get('/deleteNotifications',function(req, res)
  */
 app.get('/newInvitation',function(req, res)
 {        
-    if (req.query.boardSize%2 == 0 )
+    if ((req.query.boardSize*1) %2 !== 0 || (req.query.boardSize*1) === 2 )
     {
-        res.end(JSON.stringify({"data":data[0].mg_create_invitation}));               
+        res.end(JSON.stringify({"data":false}));               
     }    
     else
     {
@@ -515,6 +515,13 @@ app.get('/newInvitation',function(req, res)
  */
 app.get('/inviteMachine',function(req, res)
 {        
+    if ((req.query.boardSize*1) %2 !== 0 || (req.query.boardSize*1) === 2 )
+    {
+        res.end(JSON.stringify({"data":false}));               
+    }  
+
+    else 
+    {
     db.func('mg_invite_machine', [req.query.idPlayer, req.query.boardSize,req.query.amountGames, req.query.machineLevel])    
     .then(data => 
     {        	              
@@ -524,7 +531,8 @@ app.get('/inviteMachine',function(req, res)
     {    	    	 
         console.log(error);
         res.end(JSON.stringify(false));                
-    })      
+    })
+    }      
 });
 
 

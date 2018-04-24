@@ -49,7 +49,7 @@ export class userNotificationsHandler {
                 type:'success',
                 title: notificationTitle,
                 text: message,
-                timer: 3000,
+                timer: 5000,
                 showConfirmButton: false
                 
                 });

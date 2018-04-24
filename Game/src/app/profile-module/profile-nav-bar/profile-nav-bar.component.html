@@ -15,7 +15,7 @@
 
 
 <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title">Tus notificaciones</h4>
@@ -48,6 +48,7 @@
 
                 <div *ngIf="notification.getContentSize()===1" class="container-fluid  divBorder">
                   <div class="container-fluid">
+                    <br>
                     <label style="padding: 0">{{notification.getContent()[0]}}</label>
                     <button style="float:right;" (click)="deleteNotification(notification.getNotificationId())" class="btn">
                         <i class="material-icons">delete</i>

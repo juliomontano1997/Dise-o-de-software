@@ -8,22 +8,15 @@ export class sessionInformationHandler {
     private winsPlayerTwo: number;
     private currentGameNumber: number;
     private amountGamesNumber: number;
-    private allowUpdating:boolean;
-    private playerPlayingId: Number;
-    private sessionEnd: Boolean;
 
+    private playerPlayingId: Number;
+  
     constructor(sessionId:number){
         this.sessionId=sessionId;
-        this.allowUpdating=true;
     }
 
-    public setSessionEnd(sessionEnd:Boolean){
-        this.sessionEnd=sessionEnd;
-    }
 
-    public getSessionEnd():Boolean{
-        return this.sessionEnd;
-    }   
+ 
 
     public setPlayerPlayingId(playerId:Number){
         this.playerPlayingId=playerId;
@@ -42,35 +35,32 @@ export class sessionInformationHandler {
         this.setTiesNumber(dataArray[0].o_ties);
     }
     
-    public customMessage(playerId:Number,code:Number) :String{
-        if (this.playerPlayingId===playerId && code===0){
-            return "Has ganado la sesión";
+    public compareIds(playerId:Number,idToCompare:Number) :Boolean{
+        if (playerId===idToCompare){
+            return true;
         }
-        else{
-            return "Has perdido la sesión";
-        }
+        return false;
     }
 
     public getWinner(): String {
-        if (this.winsPlayerOne >this.winsPlayerTwo){
-            return this.customMessage(this.playerOneID,0);
+        if (this.winsPlayerOne > this.winsPlayerTwo){
+            alert("Ganó "+ this.playerOneName + " jugador 1 _ playerOne= ");
+
+            return "Ganó "+ this.playerOneName;
+            
         }
         else if (this.winsPlayerOne < this.winsPlayerTwo){
-            return this.customMessage(this.playerOneID,1);
+            alert("Ganó "+ this.playerTwoName + " jugador 2 _ playertwo= ");
+
+            return "Ganó "+ this.playerTwoName;
         }
         //tie
         else{
+            alert("empate");
             "La sesión finalizó en un empate";
         }
     }
 
-    public setAllowUpdating(allow:boolean){
-        this.allowUpdating=allow;
-    }
-
-    public getAllowUpdating():boolean{
-        return this.allowUpdating;
-    }
 
     public setPlayerOneId(playerOneID:number):void{
         this.playerOneID=playerOneID;

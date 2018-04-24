@@ -20,11 +20,7 @@ export class SessionInformationComponent implements OnInit {
     let sessionInformation= JSON.parse(localStorage.getItem("sessionData"));
     this.sessionInformationHandler=new sessionInformationHandler(sessionInformation.sessionId);
     this.sessionInformationHandler.setPlayerPlayingId(sessionInformation.playerId);
-    this.sessionInformationHandler.setSessionEnd(false);
     this.userNotices= new userNotificationsHandler();
-    let data= JSON.parse(localStorage.getItem("somethingChange"));
-
-    this.sessionInformationHandler.setAllowUpdating(data.state);
     this.getPlayersName();
     this.getSessionInformation();
     this.updateSessionInformation();
@@ -33,25 +29,21 @@ export class SessionInformationComponent implements OnInit {
   ngOnInit() {
   }
 
-  
-  public sessionEnd(state:Boolean){
-    //session end
-      if (state===true){
-        localStorage.setItem("notUpdate",JSON.stringify({"state":true}));      
-      }
-      localStorage.setItem("somethingChange",JSON.stringify({"state":false}));
-  }
 
   public finishGame(){
     let message:String= this.sessionInformationHandler.getWinner();
     this.userNotices.notify(3,message,"Fin de sesión");
-    this.sessionService.getFinishSession(this.sessionInformationHandler.getSessionId()).subscribe(
-      (res) =>{
-        window.location.href='profileModule';
-      },
-      (err) => {
-        console.log(err.json()); 
-      });
+
+    setTimeout(() => {
+      this.sessionService.getFinishSession(this.sessionInformationHandler.getSessionId()).subscribe(
+        (res) =>{
+          window.location.href='profileModule';
+        },
+        (err) => {
+          console.log(err.json()); 
+        });
+    }, 4000);
+    
 
   }
 
@@ -93,13 +85,9 @@ export class SessionInformationComponent implements OnInit {
   public updateSessionInformation():void {
     let id = setInterval(() => {
 
-        if (this.sessionInformationHandler.getSessionEnd()===true){
-              clearInterval(id);
-        }
-        else{
           this.getSessionInformation();
-          this.sessionEnd(false);
-        }
+
+        
        
       
     }, 6000);
@@ -126,13 +114,7 @@ export class SessionInformationComponent implements OnInit {
         .subscribe(
           (res) =>{
     
-            //if the session is not ended
-            if (res.data===true){
-              //stop updating
-              this.getSessionInformation();
-              this.sessionEnd(false);
-            }
-            
+              this.getSessionInformation();       
             
           },
           (err) => {
@@ -146,7 +128,7 @@ export class SessionInformationComponent implements OnInit {
       this.sessionInformationHandler.getPlayerPlayingId())
         .subscribe(
           (res) =>{
-
+              //it's not necessary to do nothing
           },
           (err) => {
             console.log(err.json()); 

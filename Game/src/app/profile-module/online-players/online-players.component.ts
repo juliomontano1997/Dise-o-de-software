@@ -54,7 +54,7 @@ export class OnlinePlayersComponent implements OnInit {
               console.log(res);
               if (res.data===false){
                 this.userNotices.notify(1,
-                  "La invitación no ha sido enviada, posiblemente usted ya este jugando una sesión con la máquina",
+                  "La invitación no ha sido enviada, posiblemente usted ya este jugando una sesión con la máquina o el tamaño del tablero debe ser par y mayor que 2",
                   "Notificación del sistema");
                 
               }

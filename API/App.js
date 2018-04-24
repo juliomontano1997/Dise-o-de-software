@@ -178,11 +178,11 @@ app.get('/getBoard',function(req, res)
     {                                             
         var scores = verifyFullBoard(data[0].o_board, data[0].o_playeroneid);                
         if(scores!=false) // Ends the game if the board is full 
+
         {
 
             var winner = -2;
-            var newBoard = makeBoard(data[0].o_boardsize,data[0].o_playeroneid,data[0].o_playertwoid);
-            console.log(scores);
+            var newBoard = makeBoard(data[0].o_boardsize,data[0].o_playeroneid,data[0].o_playertwoid);            
             if(scores[0]> scores[1])            
             {                   
                 winner = data[0].o_playeroneid;
@@ -487,18 +487,23 @@ app.get('/deleteNotifications',function(req, res)
  */
 app.get('/newInvitation',function(req, res)
 {        
-    console.log("new invitation");
-    console.log("by someone");
-    db.func('mg_create_invitation', [req.query.idPlayer, req.query.idRival,req.query.boardSize, req.query.amountGames])    
-    .then(data => 
-    {        	              
-        res.end(JSON.stringify({"data":data[0].mg_create_invitation}));
-    })
-    .catch(error=> 
-    {    	    	 
-        console.log(error);
-        res.end(JSON.stringify(false));                
-    })      
+    if (req.query.boardSize%2 == 0 )
+    {
+        res.end(JSON.stringify({"data":data[0].mg_create_invitation}));               
+    }    
+    else
+    {
+        db.func('mg_create_invitation', [req.query.idPlayer, req.query.idRival,req.query.boardSize, req.query.amountGames])    
+        .then(data => 
+        {        	              
+            res.end(JSON.stringify({"data":data[0].mg_create_invitation}));
+        })
+        .catch(error=> 
+        {    	    	 
+            console.log(error);
+            res.end(JSON.stringify(false));                
+        })  
+    }      
 });
 
 /**

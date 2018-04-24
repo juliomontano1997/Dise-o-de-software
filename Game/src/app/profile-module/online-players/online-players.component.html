@@ -31,10 +31,9 @@
         <div class="modal-body">
           <div class="form-group">
             <label for="boardSize">Tamaño del tablero</label>
-            <input type="number" class="form-control" id="boardSize" [(ngModel)]="boardSize"
+            <input type="number" placeholder="El tamaño debe ser par y mayor que 2" class="form-control" id="boardSize" [(ngModel)]="boardSize"
                    placeholder="Ingrese el tamaño del tablero">
           </div>
-
           <div class="form-group">
             <label for="amountGames">Cantidad de partidas a jugar</label>
             <input type="number" class="form-control" id="amountGames" [(ngModel)]="amountGames" placeholder="Ingrese el número de partidas">

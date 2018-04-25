@@ -487,7 +487,9 @@ app.get('/deleteNotifications',function(req, res)
  */
 app.get('/newInvitation',function(req, res)
 {        
-    if ((req.query.boardSize*1) %2 !== 0 || (req.query.boardSize*1) === 2 )
+    console.log("Este es el tamaño:");
+
+    if ((req.query.boardSize*1)%2 !== 0 || req.query.boardSize*1<4)
     {
         res.end(JSON.stringify({"data":false}));               
     }    
@@ -514,25 +516,24 @@ app.get('/newInvitation',function(req, res)
  * @param {number} machineLevel
  */
 app.get('/inviteMachine',function(req, res)
-{        
-    if ((req.query.boardSize*1) %2 !== 0 || (req.query.boardSize*1) === 2 )
+{    
+    if ((req.query.boardSize*1)%2 !== 0 || req.query.boardSize*1<4)
     {
         res.end(JSON.stringify({"data":false}));               
-    }  
-
-    else 
-    {
-    db.func('mg_invite_machine', [req.query.idPlayer, req.query.boardSize,req.query.amountGames, req.query.machineLevel])    
-    .then(data => 
-    {        	              
-        res.end(JSON.stringify({"data":data[0].mg_invite_machine}));
-    })
-    .catch(error=> 
-    {    	    	 
-        console.log(error);
-        res.end(JSON.stringify(false));                
-    })
-    }      
+    }    
+    else
+    {    
+        db.func('mg_invite_machine', [req.query.idPlayer, req.query.boardSize,req.query.amountGames, req.query.machineLevel])    
+        .then(data => 
+        {        	              
+            res.end(JSON.stringify({"data":data[0].mg_invite_machine}));
+        })
+        .catch(error=> 
+        {    	    	 
+            console.log(error);
+            res.end(JSON.stringify(false));                
+        })      
+    }
 });
 
 

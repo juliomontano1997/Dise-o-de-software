@@ -676,7 +676,7 @@ DECLARE
 sessionExists INT;
 
 BEGIN
-SELECT count(*) INTO sessionExists FROM sessions WHERE active=TRUE AND ((playerOneID = i_transmitterID AND playerTwoID = i_receiverID) OR (playerOneID = i_receiverID AND playerTwoID = i_transmitterID));
+SELECT count(*) INTO sessionExists FROM sessions WHERE active=TRUE AND (playerOneID = i_transmitterID AND playerTwoID = i_receiverID) OR (playerOneID = i_receiverID AND playerTwoID = i_transmitterID);
 
 IF (sessionExists = 0) THEN
 	INSERT INTO invitations (transmitterID, receiverID, boardSize, amountGames) VALUES
